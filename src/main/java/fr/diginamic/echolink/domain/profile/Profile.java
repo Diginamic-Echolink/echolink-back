@@ -1,10 +1,19 @@
-package fr.diginamic.echolink.domain;
+package fr.diginamic.echolink.domain.profile;
 
+import fr.diginamic.echolink.domain.location.Location;
+import fr.diginamic.echolink.domain.message.Message;
+import fr.diginamic.echolink.domain.thread.Thread;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.jspecify.annotations.NullMarked;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -14,7 +23,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
-public class Profile {
+public class Profile implements UserDetails {
 
     /**
      * Unique identifier of the profile.
@@ -23,9 +32,7 @@ public class Profile {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    /**
-     * User's first name.
-     */
+    /** User's first name */
     private String firstName;
 
     /**
@@ -42,18 +49,25 @@ public class Profile {
      * User's email address.
      * Must be unique within the application.
      */
-    @Column(nullable = false, unique = true)
+    @Column(unique = true, nullable = false)
     private String email;
 
     /**
      * User's city of residence.
      */
-    private String city;
+    @Column(nullable = false)
+    private String passwordHash;
 
     /**
      * User's postal code.
      */
-    private String postalCode;
+    private String city;
+
+
+    /**
+     * User's postal code.
+     */
+    private int postalCode;
 
     /**
      * User's postal address.
@@ -71,21 +85,21 @@ public class Profile {
     private String linkImgProfile;
 
     /**
-     * Indicates whether the user has administrator privileges.
+     * Role of the user.
      */
-    private boolean admin;
+    private ProfileRole role;
 
     /**
      * Threads created by this user.
      */
     @OneToMany(mappedBy = "profile")
-    private Set<Thread> threads;
+    private final List<Thread> threads = new ArrayList<>();
 
     /**
      * Messages posted by this user.
      */
     @OneToMany(mappedBy = "profile")
-    private Set<Message> messages;
+    private final List<Message> messages = new ArrayList<>();
 
     /**
      * Geographic location associated with the user profile.
@@ -94,49 +108,35 @@ public class Profile {
     @JoinColumn(name = "location_id")
     private Location location;
 
-    /**
-     * Default constructor required by JPA.
-     */
     public Profile() {}
 
-    /**
-     * Creates a user profile.
-     *
-     * @param id unique identifier of the profile
-     * @param firstName user's first name
-     * @param lastName user's last name
-     * @param pseudonym user's display name
-     * @param email user's email address
-     * @param city user's city
-     * @param postalCode user's postal code
-     * @param address user's address
-     * @param phoneNumber user's phone number
-     * @param linkImgProfile URL of the profile picture
-     * @param admin indicates whether the user has administrator privileges
-     */
-    public Profile(
-            UUID id,
-            String firstName,
-            String lastName,
-            String pseudonym,
-            String email,
-            String city,
-            String postalCode,
-            String address,
-            String phoneNumber,
-            String linkImgProfile,
-            boolean admin) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.pseudonym = pseudonym;
+    public Profile(String email, String password) {
         this.email = email;
-        this.city = city;
-        this.postalCode = postalCode;
-        this.address = address;
-        this.phoneNumber = phoneNumber;
-        this.linkImgProfile = linkImgProfile;
-        this.admin = admin;
+        this.passwordHash = password;
+        this.role = ProfileRole.USER;
+    }
+
+    public boolean isAdmin() {
+        return role == ProfileRole.ADMIN;
+    }
+
+    @NullMarked
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public String getPassword() {
+        return passwordHash;
+    }
+
+    @NullMarked
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return isAdmin()
+                ? List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"))
+                : List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     /**
@@ -157,7 +157,7 @@ public class Profile {
                 ", address='" + address + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", linkImgProfile='" + linkImgProfile + '\'' +
-                ", admin=" + admin +
+                ", role=" + role +
                 '}';
     }
 }

@@ -1,3 +1,19 @@
 spring:
   application:
     name: echolink
+    jwt:
+      secret: ${JWT_SECRET:5mKbY6qNfK7dYjz9WvTn3GpLr4XsQe8BcDfGhJkLmNpQrStUvWxYz123456789AB}
+      expiration: 3600000
+
+  datasource:
+    url: ${DB_JDBC_URL:jdbc:mariadb://localhost:13306/echolink}
+    username: ${DB_USERNAME:echolink}
+    password: ${DB_PASSWORD:echolink}
+
+  flyway:
+    enabled: true
+
+
+
+
+
