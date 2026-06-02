@@ -27,17 +27,23 @@ import java.util.UUID;
 public class Location {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+
+    @Column(name = "name", nullable = false)
+    private String name;
 
     @Column(name = "postal_code", nullable = false)
     private String postalCode;
 
-    @Column(name = "longitude", nullable = false)
+    @Column(name = "longitude")
     private float longitude;
 
-    @Column(name = "latitude", nullable = false)
+    @Column(name = "latitude")
     private float latitude;
+
+    @Column(name = "altitude")
+    private float altitude;
 
     @OneToMany(mappedBy="location")
     private final Set<Profile> profiles = new HashSet<>();

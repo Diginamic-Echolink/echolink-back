@@ -10,7 +10,7 @@ public interface ProfileRepository {
 
     Optional<Profile> getById(UUID id);
 
-    Optional<Profile> getByEmail(String name);
+    Optional<Profile> getByEmail(String email);
 
     List<Profile> getAll();
 
