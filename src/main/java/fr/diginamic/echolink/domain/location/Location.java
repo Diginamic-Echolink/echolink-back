@@ -26,45 +26,64 @@ import java.util.UUID;
 @Table(name = "location")
 public class Location {
 
+    /** Unique identifier of the Location. */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    /** Location's name */
     @Column(name = "name", nullable = false)
     private String name;
 
+    /** Location's postal code */
     @Column(name = "postal_code", nullable = false)
     private String postalCode;
 
+    /** Location's longitude */
     @Column(name = "longitude")
     private float longitude;
 
+    /** Location's latitude */
     @Column(name = "latitude")
     private float latitude;
 
+    /** Location's altitude */
     @Column(name = "altitude")
     private float altitude;
 
+    /** Profile lived within this location. */
     @OneToMany(mappedBy="location")
     private final Set<Profile> profiles = new HashSet<>();
 
+    /** AirQuality link within this location. */
     @OneToMany(mappedBy="location")
     private final List<AirQuality> airQualities = new ArrayList<>();
 
+    /** Demography link within this location. */
     @OneToMany(mappedBy="location")
     private final List<Demography> demographies = new ArrayList<>();
 
+    /** Meteo link within this location. */
     @OneToMany(mappedBy="location")
     private final List<Meteo> meteos = new ArrayList<>();
 
+    /** Constructor for: Location */
     public Location() {}
 
+    /**
+     * Constructor for: Location
+     *
+     * @param postalCode
+     * @param longitude
+     * @param latitude
+     */
     public Location(String postalCode, float longitude, float latitude) {
         this.postalCode = postalCode;
         this.longitude = longitude;
         this.latitude = latitude;
     }
 
+    /** @return toString */
     @Override
     public String toString() {
         return "Location{" +
