@@ -20,9 +20,10 @@ import java.util.UUID;
  * Represents a user profile within the EchoLink application.
  * Contains personal information, contact details and user privileges.
  */
-@Entity
 @Getter
 @Setter
+@Entity
+@Table(name = "profile")
 public class Profile implements UserDetails {
 
     /**
@@ -32,61 +33,72 @@ public class Profile implements UserDetails {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    /** User's first name */
+    /**
+     * User's first name
+     */
+    @Column(name = "first_name")
     private String firstName;
 
     /**
      * User's last name.
      */
+    @Column(name = "last_name")
     private String lastName;
 
     /**
      * User's public display name.
      */
-    private String pseudonym;
+    @Column(name = "pseudo")
+    private String pseudo;
 
     /**
      * User's email address.
      * Must be unique within the application.
      */
-    @Column(unique = true, nullable = false)
+    @Column(name = "email", unique = true, nullable = false)
     private String email;
 
     /**
      * User's city of residence.
      */
-    @Column(nullable = false)
-    private String passwordHash;
+    @Column(name = "password", nullable = false)
+    private String password;
 
     /**
      * User's postal code.
      */
+    @Column(name = "city")
     private String city;
 
 
     /**
      * User's postal code.
      */
-    private int postalCode;
+    @Column(name = "postal_code")
+    private String postalCode;
 
     /**
      * User's postal address.
      */
+    @Column(name = "address")
     private String address;
 
     /**
      * User's phone number.
      */
+    @Column(name = "phone_number")
     private String phoneNumber;
 
     /**
      * URL of the user's profile picture.
      */
+    @Column(name = "link_img_profile")
     private String linkImgProfile;
 
     /**
      * Role of the user.
      */
+    @Column(name = "role")
     private ProfileRole role;
 
     /**
@@ -112,7 +124,7 @@ public class Profile implements UserDetails {
 
     public Profile(String email, String password) {
         this.email = email;
-        this.passwordHash = password;
+        this.password = password;
         this.role = ProfileRole.USER;
     }
 
@@ -124,11 +136,6 @@ public class Profile implements UserDetails {
     @Override
     public String getUsername() {
         return email;
-    }
-
-    @Override
-    public String getPassword() {
-        return passwordHash;
     }
 
     @NullMarked
@@ -150,7 +157,7 @@ public class Profile implements UserDetails {
                 "id=" + id +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
-                ", pseudonym='" + pseudonym + '\'' +
+                ", pseudonym='" + pseudo + '\'' +
                 ", email='" + email + '\'' +
                 ", city='" + city + '\'' +
                 ", postalCode='" + postalCode + '\'' +
