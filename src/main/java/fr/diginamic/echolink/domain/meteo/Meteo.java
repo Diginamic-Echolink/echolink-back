@@ -3,6 +3,8 @@ package fr.diginamic.echolink.domain.meteo;
 import fr.diginamic.echolink.domain.location.Location;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,14 +32,14 @@ public class Meteo {
      * Unique identifier of the weather record.
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     /**
      * Date and time when the weather data was recorded.
      */
-    @Column(name = "timestamp")
-    private LocalDateTime timestamp;
+    @Column(name = "recorded_at")
+    private LocalDateTime recordedAt;
 
     /**
      * Measured temperature in °C.
@@ -66,6 +68,7 @@ public class Meteo {
     /**
      * Measured wind direction.
      */
+    @Enumerated(EnumType.STRING)
     @Column(name = "wind_direction")
     private WindDirection windDirection;
 
@@ -91,7 +94,7 @@ public class Meteo {
     /**
      * Creates a weather record.
      *
-     * @param timestamp date and time when the weather data was recorded
+     * @param recordedAt date and time when the weather data was recorded
      * @param temperature measured temperature
      * @param atmPressure measured atmospheric pressure
      * @param humidity measured humidity level
@@ -100,14 +103,14 @@ public class Meteo {
      * @param rainFall measured rainfall amount
      */
     public Meteo(
-            LocalDateTime timestamp,
+            LocalDateTime recordedAt,
             byte temperature,
             int atmPressure,
             byte humidity,
             byte windSpeed,
             WindDirection windDirection,
             int rainFall) {
-        this.timestamp = timestamp;
+        this.recordedAt = recordedAt;
         this.temperature = temperature;
         this.atmPressure = atmPressure;
         this.humidity = humidity;
@@ -123,7 +126,7 @@ public class Meteo {
                 ", windSpeed=" + windSpeed +
                 ", humidity=" + humidity +
                 ", temperature=" + temperature +
-                ", timestamp=" + timestamp +
+                ", recorded_at=" + recordedAt +
                 ", atmPressure=" + atmPressure +
                 ", id=" + id +
                 ", location=" + location +

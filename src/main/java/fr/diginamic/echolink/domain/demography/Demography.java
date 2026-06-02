@@ -22,11 +22,11 @@ import java.util.UUID;
 public class Demography {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "timestamp")
-    private LocalDate timestamp;
+    @Column(name = "recorded_at")
+    private LocalDate recordedAt;
 
     @Column(name = "total_pop")
     private Long totalPop;
@@ -37,16 +37,16 @@ public class Demography {
 
     public Demography() {}
 
-    public Demography(Long totalPop, LocalDate timestamp) {
+    public Demography(Long totalPop, LocalDate recordedAt) {
         this.totalPop = totalPop;
-        this.timestamp = timestamp;
+        this.recordedAt = recordedAt;
     }
 
     @Override
     public String toString() {
         return "Demography{" +
                 "id=" + id +
-                ", timestamp=" + timestamp +
+                ", recorded_at=" + recordedAt +
                 ", totalPop=" + totalPop +
                 ", location=" + location +
                 '}';

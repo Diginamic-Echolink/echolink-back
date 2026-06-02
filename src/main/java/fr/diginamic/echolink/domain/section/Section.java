@@ -29,7 +29,7 @@ public class Section {
      * Unique identifier of the section.
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     /**
