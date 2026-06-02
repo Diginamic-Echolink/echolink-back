@@ -48,7 +48,7 @@ public class Section {
      * Threads belonging to this section.
      */
     @OneToMany(mappedBy = "section")
-    private final List<Thread> threads = new ArrayList<>();
+    private List<Thread> threads = new ArrayList<>();
 
     /**
      * Default constructor required by JPA.
