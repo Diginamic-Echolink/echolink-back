@@ -2,10 +2,10 @@ package fr.diginamic.echolink.application.profile.service;
 
 import fr.diginamic.echolink.application.profile.port.in.ProfileAuthUseCase;
 import fr.diginamic.echolink.application.profile.port.out.ProfileRepository;
+import fr.diginamic.echolink.application.profile.port.out.TokenService;
 import fr.diginamic.echolink.domain.profile.AuthRequest;
 import fr.diginamic.echolink.domain.profile.Profile;
 import fr.diginamic.echolink.domain.profile.exception.InvalidCredentialsException;
-import fr.diginamic.echolink.infrastructure.common.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,8 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProfileAuthService implements ProfileAuthUseCase {
 
     private final ProfileRepository repository;
-
-    private final JwtService jwtService;
+    private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
@@ -29,7 +28,7 @@ public class ProfileAuthService implements ProfileAuthUseCase {
         }
 
         Profile profile = new Profile(request.email(), passwordEncoder.encode(request.password()));
-        return jwtService.generateToken(repository.create(profile));
+        return tokenService.generateToken(repository.create(profile));
     }
 
     @Override
@@ -40,7 +39,7 @@ public class ProfileAuthService implements ProfileAuthUseCase {
                 .orElseThrow(() -> new InvalidCredentialsException("User not found : " + request.email()));
 
         if (passwordEncoder.matches(request.password(), profile.getPassword())) {
-            return jwtService.generateToken(profile);
+            return tokenService.generateToken(profile);
         }
 
         throw new InvalidCredentialsException("Password incorrect for user : " + request.email());
