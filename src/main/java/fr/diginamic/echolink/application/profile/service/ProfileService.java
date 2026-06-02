@@ -1,0 +1,56 @@
+package fr.diginamic.echolink.application.profile.service;
+
+import fr.diginamic.echolink.application.profile.port.in.ProfileDeleteUseCase;
+import fr.diginamic.echolink.application.profile.port.in.ProfileGetUseCase;
+import fr.diginamic.echolink.application.profile.port.in.ProfileUpdateUseCase;
+import fr.diginamic.echolink.application.profile.port.out.ProfileRepository;
+import fr.diginamic.echolink.domain.profile.Profile;
+import fr.diginamic.echolink.domain.profile.ProfileUpdateRequest;
+import fr.diginamic.echolink.domain.profile.exception.ProfileNotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+public class ProfileService implements ProfileGetUseCase, ProfileUpdateUseCase, ProfileDeleteUseCase {
+
+    private final ProfileRepository repository;
+    private final PasswordEncoder passwordEncoder;
+
+    @Override
+    public Profile getById(UUID id) throws ProfileNotFoundException {
+        return repository.getById(id)
+                .orElseThrow(() -> new ProfileNotFoundException("Profile with id " + id + " not found"));
+    }
+
+    @Override
+    public List<Profile> getAllProfiles() {
+        return repository.getAll();
+    }
+
+    @Override
+    public Profile update(UUID id, ProfileUpdateRequest request) throws ProfileNotFoundException {
+        Profile profile = getById(id);
+        profile.setFirstName(request.firstName());
+        profile.setLastName(request.lastName());
+        profile.setPseudo(request.pseudo());
+        profile.setEmail(request.email());
+        profile.setPassword(passwordEncoder.encode(request.password()));
+        profile.setCity(request.city());
+        profile.setPostalCode(request.postalCode());
+        profile.setAddress(request.address());
+        profile.setPhoneNumber(request.phoneNumber());
+        profile.setLinkImgProfile(request.linkImgProfile());
+        return repository.save(profile);
+    }
+
+    @Override
+    public void delete(UUID id) throws ProfileNotFoundException {
+        getById(id);
+        repository.delete(id);
+    }
+}

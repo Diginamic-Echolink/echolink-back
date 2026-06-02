@@ -1,21 +1,29 @@
 package fr.diginamic.echolink.infrastructure.common.in;
 
-import fr.diginamic.echolink.domain.profile.exception.InvalidCredentialsException;
+import fr.diginamic.echolink.domain.shared.exception.AbstractBadRequestException;
+import fr.diginamic.echolink.domain.shared.exception.AbstractNonFoundException;
 import fr.diginamic.echolink.infrastructure.common.in.dto.ErrorMessageQuery;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @ControllerAdvice
 public class RestResponseExceptionHandler {
 
-    @ExceptionHandler(InvalidCredentialsException.class)
-    public ResponseEntity<ErrorMessageQuery> handleNotFoundException(InvalidCredentialsException exception) {
+    @ExceptionHandler(AbstractBadRequestException.class)
+    public ResponseEntity<ErrorMessageQuery> handleBadRequestException(AbstractBadRequestException exception) {
         return ResponseEntity
                 .status(BAD_REQUEST)
-                .body(new ErrorMessageQuery(exception.getMessage(), null));
+                .body(new ErrorMessageQuery(exception.getMessage()));
     }
 
+    @ExceptionHandler(AbstractNonFoundException.class)
+    public ResponseEntity<ErrorMessageQuery> handleNotFoundException(AbstractNonFoundException exception) {
+        return ResponseEntity
+                .status(NOT_FOUND)
+                .body(new ErrorMessageQuery(exception.getMessage()));
+    }
 }
