@@ -1,4 +1,4 @@
-package fr.diginamic.echolink.infrastructure.security;
+package fr.diginamic.echolink.infrastructure.common.out;
 
 import fr.diginamic.echolink.application.profile.port.out.TokenService;
 import fr.diginamic.echolink.domain.profile.Profile;

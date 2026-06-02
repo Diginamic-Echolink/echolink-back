@@ -105,13 +105,13 @@ public class Profile implements UserDetails {
      * Threads created by this user.
      */
     @OneToMany(mappedBy = "profile")
-    private final List<Thread> threads = new ArrayList<>();
+    private List<Thread> threads = new ArrayList<>();
 
     /**
      * Messages posted by this user.
      */
     @OneToMany(mappedBy = "profile")
-    private final List<Message> messages = new ArrayList<>();
+    private List<Message> messages = new ArrayList<>();
 
     /**
      * Geographic location associated with the user profile.
@@ -142,8 +142,8 @@ public class Profile implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return isAdmin()
-                ? List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"))
-                : List.of(new SimpleGrantedAuthority("ROLE_USER"));
+                ? List.of(new SimpleGrantedAuthority("ADMIN"), new SimpleGrantedAuthority("USER"))
+                : List.of(new SimpleGrantedAuthority("USER"));
     }
 
     /**

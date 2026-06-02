@@ -87,7 +87,7 @@ public class Thread {
      * Messages posted within this thread.
      */
     @OneToMany(mappedBy = "thread")
-    private final List<Message> messages = new ArrayList<>();
+    private List<Message> messages = new ArrayList<>();
 
     /**
      * Default constructor required by JPA.
