@@ -21,27 +21,43 @@ import java.util.UUID;
 @Table(name = "demography")
 public class Demography {
 
+    /** Unique identifier of the Demography. */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    /** Demography's recorded at */
     @Column(name = "recorded_at")
     private LocalDate recordedAt;
 
+    /** Demography's total_pop */
     @Column(name = "total_pop")
     private Long totalPop;
 
+    /** Geographic location associated with the Demography. */
     @ManyToOne
     @JoinColumn(name="location_id")
     private Location location;
 
+    /**
+     * Constructor for: Demography
+     */
     public Demography() {}
 
+    /**
+     * Constructor for: Demography
+     *
+     * @param totalPop
+     * @param recordedAt
+     */
     public Demography(Long totalPop, LocalDate recordedAt) {
         this.totalPop = totalPop;
         this.recordedAt = recordedAt;
     }
 
+    /**
+     * @return toString
+     */
     @Override
     public String toString() {
         return "Demography{" +
