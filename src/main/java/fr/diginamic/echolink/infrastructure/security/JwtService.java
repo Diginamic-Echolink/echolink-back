@@ -1,5 +1,6 @@
-package fr.diginamic.echolink.infrastructure.common;
+package fr.diginamic.echolink.infrastructure.security;
 
+import fr.diginamic.echolink.application.profile.port.out.TokenService;
 import fr.diginamic.echolink.domain.profile.Profile;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,13 +10,13 @@ import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 
-@Service
+@Component
 @RequiredArgsConstructor
-public class JwtService {
+public class JwtService implements TokenService {
 
     private final JwtEncoder jwtEncoder;
 
