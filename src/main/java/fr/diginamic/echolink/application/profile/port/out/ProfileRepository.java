@@ -14,9 +14,7 @@ public interface ProfileRepository {
 
     List<Profile> getAll();
 
-    Profile create(Profile profile);
-
-    void update(Profile profile);
+    Profile save(Profile profile);
 
     void delete(UUID id);
 }

@@ -12,8 +12,3 @@ spring:
 
   flyway:
     enabled: true
-
-
-
-
-

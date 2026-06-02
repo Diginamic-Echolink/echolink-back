@@ -7,7 +7,6 @@ import fr.diginamic.echolink.domain.profile.AuthRequest;
 import fr.diginamic.echolink.domain.profile.Profile;
 import fr.diginamic.echolink.domain.profile.exception.InvalidCredentialsException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,18 +18,18 @@ public class ProfileAuthService implements ProfileAuthUseCase {
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
 
-    public String register(AuthRequest request) {
+    public String register(AuthRequest request) throws InvalidCredentialsException {
 
         if (repository.getByEmail(request.email()).isPresent()) {
             throw new InvalidCredentialsException("Email already exists");
         }
 
         Profile profile = new Profile(request.email(), passwordEncoder.encode(request.password()));
-        return tokenService.generateToken(repository.create(profile));
+        return tokenService.generateToken(repository.save(profile));
     }
 
     @Override
-    public String login(AuthRequest request) throws UsernameNotFoundException {
+    public String login(AuthRequest request) throws InvalidCredentialsException {
 
         Profile profile = repository.getByEmail(request.email())
                 .orElseThrow(() -> new InvalidCredentialsException("User not found : " + request.email()));
