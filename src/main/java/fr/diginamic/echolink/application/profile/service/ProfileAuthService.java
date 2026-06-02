@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +19,6 @@ public class ProfileAuthService implements ProfileAuthUseCase {
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
 
-    @Transactional
     public String register(AuthRequest request) {
 
         if (repository.getByEmail(request.email()).isPresent()) {
@@ -32,7 +30,6 @@ public class ProfileAuthService implements ProfileAuthUseCase {
     }
 
     @Override
-    @Transactional
     public String login(AuthRequest request) throws UsernameNotFoundException {
 
         Profile profile = repository.getByEmail(request.email())

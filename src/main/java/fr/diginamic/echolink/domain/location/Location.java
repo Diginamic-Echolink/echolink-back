@@ -53,19 +53,19 @@ public class Location {
 
     /** Profile lived within this location. */
     @OneToMany(mappedBy="location")
-    private final Set<Profile> profiles = new HashSet<>();
+    private Set<Profile> profiles = new HashSet<>();
 
     /** AirQuality link within this location. */
     @OneToMany(mappedBy="location")
-    private final List<AirQuality> airQualities = new ArrayList<>();
+    private List<AirQuality> airQualities = new ArrayList<>();
 
     /** Demography link within this location. */
     @OneToMany(mappedBy="location")
-    private final List<Demography> demographies = new ArrayList<>();
+    private List<Demography> demographies = new ArrayList<>();
 
     /** Meteo link within this location. */
     @OneToMany(mappedBy="location")
-    private final List<Meteo> meteos = new ArrayList<>();
+    private List<Meteo> meteos = new ArrayList<>();
 
     /** Constructor for: Location */
     public Location() {}
