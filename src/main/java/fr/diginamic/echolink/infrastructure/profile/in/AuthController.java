@@ -2,6 +2,7 @@ package fr.diginamic.echolink.infrastructure.profile.in;
 
 import fr.diginamic.echolink.application.profile.port.in.ProfileAuthUseCase;
 import fr.diginamic.echolink.domain.profile.AuthRequest;
+import fr.diginamic.echolink.domain.profile.exception.InvalidCredentialsException;
 import fr.diginamic.echolink.infrastructure.profile.in.dto.AuthResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,12 +20,14 @@ public class AuthController {
     private final ProfileAuthUseCase profileAuthUseCase;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody AuthRequest request) {
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody AuthRequest request)
+            throws InvalidCredentialsException {
         return ResponseEntity.ok(new AuthResponse(profileAuthUseCase.register(request)));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request) {
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request)
+            throws InvalidCredentialsException {
         return ResponseEntity.ok(new AuthResponse(profileAuthUseCase.login(request)));
     }
 }

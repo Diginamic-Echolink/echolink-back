@@ -32,13 +32,8 @@ public class ProfileRepositoryAdapter implements ProfileRepository {
     }
 
     @Override
-    public Profile create(Profile profile) {
+    public Profile save(Profile profile) {
         return repository.save(profile);
-    }
-
-    @Override
-    public void update(Profile profile) {
-        repository.save(profile);
     }
 
     @Override
