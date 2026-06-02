@@ -30,7 +30,7 @@ public class Profile implements UserDetails {
      * Unique identifier of the profile.
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     /**
@@ -70,7 +70,6 @@ public class Profile implements UserDetails {
     @Column(name = "city")
     private String city;
 
-
     /**
      * User's postal code.
      */
@@ -98,6 +97,7 @@ public class Profile implements UserDetails {
     /**
      * Role of the user.
      */
+    @Enumerated(EnumType.STRING)
     @Column(name = "role")
     private ProfileRole role;
 

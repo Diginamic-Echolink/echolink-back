@@ -22,11 +22,11 @@ import java.util.UUID;
 public class AirQuality {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "timestamp")
-    private LocalDateTime timestamp;
+    @Column(name = "recorded_at")
+    private LocalDateTime recordedAt;
 
     @Column(name = "particles_10")
     private float particles10;
@@ -59,7 +59,7 @@ public class AirQuality {
     public AirQuality() {}
 
     public AirQuality(
-            LocalDateTime timestamp,
+            LocalDateTime recordedAt,
             float particles10,
             float particles25,
             byte euAqi,
@@ -68,7 +68,7 @@ public class AirQuality {
             float dust,
             float nitrogenDioxide,
             float sulfurDioxide) {
-        this.timestamp = timestamp;
+        this.recordedAt = recordedAt;
         this.particles10 = particles10;
         this.particles25 = particles25;
         this.euAqi = euAqi;
@@ -83,7 +83,7 @@ public class AirQuality {
     public String toString() {
         return "AirQuality{" +
                 "id=" + id +
-                ", timestamp=" + timestamp +
+                ", recorded_at=" + recordedAt +
                 ", particles10=" + particles10 +
                 ", particles25=" + particles25 +
                 ", euAqi=" + euAqi +

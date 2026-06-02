@@ -34,7 +34,7 @@ public class Thread {
      * Unique identifier of the thread.
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     /**

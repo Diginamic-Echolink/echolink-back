@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,17 +21,19 @@ public class ProfileAuthService implements ProfileAuthUseCase {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional
     public String register(AuthRequest request) {
 
         if (repository.getByEmail(request.email()).isPresent()) {
             throw new InvalidCredentialsException("Email already exists");
         }
 
-        Profile profile = repository.create(new Profile(request.email(), passwordEncoder.encode(request.password())));
-        return jwtService.generateToken(profile);
+        Profile profile = new Profile(request.email(), passwordEncoder.encode(request.password()));
+        return jwtService.generateToken(repository.create(profile));
     }
 
     @Override
+    @Transactional
     public String login(AuthRequest request) throws UsernameNotFoundException {
 
         Profile profile = repository.getByEmail(request.email())
