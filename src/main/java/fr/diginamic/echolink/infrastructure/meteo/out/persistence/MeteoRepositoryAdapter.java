@@ -14,6 +14,7 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 public class MeteoRepositoryAdapter implements MeteoRepository {
+
     private final MeteoJdbcRepository repository;
 
     @Override

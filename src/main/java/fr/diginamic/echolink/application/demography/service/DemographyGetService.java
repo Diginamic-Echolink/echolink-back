@@ -12,8 +12,9 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class DemographyGetService implements DemographyGetUseCase {
-    private final DemographyRepository repository;
+
     private static final int LIMIT_DEMOGRAPHIC = 50;
+    private final DemographyRepository repository;
 
     @Override
     public Demography getByLocationId(UUID id) {

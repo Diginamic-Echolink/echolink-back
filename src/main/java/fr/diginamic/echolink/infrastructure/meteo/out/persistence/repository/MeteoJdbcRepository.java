@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface MeteoJdbcRepository extends JpaRepository<Meteo, UUID> {
+
     @Query("SELECT m FROM Meteo m WHERE m.location.id = :locationId ORDER BY m.recordedAt DESC LIMIT 1")
     Optional<Meteo> getMeteoByLocationId(@Param("locationId") UUID locationId);
 

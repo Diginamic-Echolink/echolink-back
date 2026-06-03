@@ -21,22 +21,22 @@ import java.util.UUID;
 @RequestMapping(value = "/api/v1/meteo", produces = MediaType.APPLICATION_JSON_VALUE)
 public class MeteoController {
 
-    private final MeteoGetUseCase meteoGetUseCase;
-    private final MeteoQueryMapper meteoQueryMapper;
+    private final MeteoGetUseCase getUseCase;
+    private final MeteoQueryMapper mapper;
 
     @GetMapping("/{locationId}")
     //@Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<MeteoQuery> getMeteoByLocationId(@PathVariable UUID locationId) {
-        Meteo meteos = meteoGetUseCase.getMeteoByLocationId(locationId);
-        MeteoQuery query = meteoQueryMapper.toQuery(meteos);
+        Meteo meteos = getUseCase.getMeteoByLocationId(locationId);
+        MeteoQuery query = mapper.toQuery(meteos);
         return ResponseEntity.ok(query);
     }
 
     @GetMapping("/all/{locationId}")
     //@Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<List<MeteoQuery>> getAllMeteoByLocationId(@PathVariable UUID locationId) {
-        List<Meteo> meteos = meteoGetUseCase.getAllMeteoByLocationId(locationId);
-        List<MeteoQuery> query = meteos.stream().map(meteoQueryMapper::toQuery).toList();
+        List<Meteo> meteos = getUseCase.getAllMeteoByLocationId(locationId);
+        List<MeteoQuery> query = meteos.stream().map(mapper::toQuery).toList();
         return ResponseEntity.ok(query);
     }
 

@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface DemographyJdbcRepository extends JpaRepository<Demography, UUID> {
+
     @Query("SELECT d FROM Demography d WHERE d.location.id = :locationId ORDER BY d.recordedAt DESC LIMIT 1")
     Optional<Demography> getByLocationId(@Param("locationId") UUID locationId);
 
