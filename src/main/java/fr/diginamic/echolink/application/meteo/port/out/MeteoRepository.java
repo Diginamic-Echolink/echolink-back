@@ -12,3 +12,4 @@ public interface MeteoRepository {
 
     List<Meteo> getAllMeteoByLocationId(UUID locationId, int LIMIT_METEO);
 }
+

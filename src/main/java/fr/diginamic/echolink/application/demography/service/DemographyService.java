@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class DemographyGetService implements DemographyGetUseCase {
+public class DemographyService implements DemographyGetUseCase {
 
     private static final int LIMIT_DEMOGRAPHIC = 50;
     private final DemographyRepository repository;
@@ -26,3 +26,4 @@ public class DemographyGetService implements DemographyGetUseCase {
         return repository.getAllByLocationId(locationId, LIMIT_DEMOGRAPHIC);
     }
 }
+

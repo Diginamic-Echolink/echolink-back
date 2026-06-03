@@ -19,3 +19,4 @@ public interface MeteoJdbcRepository extends JpaRepository<Meteo, UUID> {
     List<Meteo> getAllMeteoByLocationId(@Param("locationId") UUID locationId, @Param("limit") int limit);
 
 }
+

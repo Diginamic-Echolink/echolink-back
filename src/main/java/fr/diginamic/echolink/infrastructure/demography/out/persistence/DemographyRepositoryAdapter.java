@@ -27,3 +27,4 @@ public class DemographyRepositoryAdapter implements DemographyRepository {
         return repository.getAllByLocationId(locationId, limit);
     }
 }
+

@@ -13,3 +13,4 @@ public record MeteoQuery(
         int rainFall,
         byte humidity) {
 }
+

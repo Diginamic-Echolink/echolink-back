@@ -25,7 +25,7 @@ public class MeteoController {
     private final MeteoQueryMapper mapper;
 
     @GetMapping("/{locationId}")
-    //@Secured({"ROLE_ADMIN", "ROLE_USER"})
+    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<MeteoQuery> getMeteoByLocationId(@PathVariable UUID locationId) {
         Meteo meteos = getUseCase.getMeteoByLocationId(locationId);
         MeteoQuery query = mapper.toQuery(meteos);
@@ -33,12 +33,11 @@ public class MeteoController {
     }
 
     @GetMapping("/all/{locationId}")
-    //@Secured({"ROLE_ADMIN", "ROLE_USER"})
+    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<List<MeteoQuery>> getAllMeteoByLocationId(@PathVariable UUID locationId) {
         List<Meteo> meteos = getUseCase.getAllMeteoByLocationId(locationId);
         List<MeteoQuery> query = meteos.stream().map(mapper::toQuery).toList();
         return ResponseEntity.ok(query);
     }
-
-
 }
+

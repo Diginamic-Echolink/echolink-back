@@ -11,3 +11,4 @@ public interface DemographyGetUseCase {
 
     List<Demography> getAllByLocationId(UUID locationId);
 }
+

@@ -6,3 +6,4 @@ public record DemographyQuery(
         LocalDate recordedAt,
         Long totalPop) {
 }
+

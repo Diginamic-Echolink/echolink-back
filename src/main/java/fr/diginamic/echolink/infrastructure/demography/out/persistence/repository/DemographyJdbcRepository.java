@@ -18,3 +18,4 @@ public interface DemographyJdbcRepository extends JpaRepository<Demography, UUID
     List<Demography> getAllByLocationId(@Param("locationId") UUID locationId, @Param("limit") int limit);
 
 }
+

@@ -12,3 +12,4 @@ public interface MeteoGetUseCase {
     List<Meteo> getAllMeteoByLocationId(UUID locationId);
 }
 
+

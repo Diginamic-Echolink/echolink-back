@@ -12,10 +12,10 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class MeteoGetService implements MeteoGetUseCase {
+public class MeteoService implements MeteoGetUseCase {
 
-    private final MeteoRepository repository;
     private static final int LIMIT_METEO = 50;
+    private final MeteoRepository repository;
 
     @Override
     public Meteo getMeteoByLocationId(UUID id) {
@@ -27,3 +27,4 @@ public class MeteoGetService implements MeteoGetUseCase {
         return repository.getAllMeteoByLocationId(locationId, LIMIT_METEO);
     }
 }
+
