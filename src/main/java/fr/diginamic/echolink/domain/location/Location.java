@@ -44,11 +44,15 @@ public class Location {
 
     /** Location's longitude */
     @Column(name = "longitude")
-    private float longitude;
+    private double longitude;
 
     /** Location's latitude */
     @Column(name = "latitude")
-    private float latitude;
+    private double latitude;
+
+    /** Location's population */
+    @Column(name = "population")
+    private long population;
 
     /** Profile lived within this location. */
     @OneToMany(mappedBy="location")
@@ -65,12 +69,19 @@ public class Location {
     /** Constructor for: Location */
     public Location() {}
 
-    public Location(String name, String inseeCode, String postalCode, float longitude, float latitude) {
+    public Location(
+            String name,
+            String inseeCode,
+            String postalCode,
+            double longitude,
+            double latitude,
+            long population) {
         this.name = name;
         this.inseeCode = inseeCode;
         this.postalCode = postalCode;
         this.longitude = longitude;
         this.latitude = latitude;
+        this.population = population;
     }
 
     @Override
@@ -80,6 +91,7 @@ public class Location {
                 ", postalCode='" + postalCode + '\'' +
                 ", longitude=" + longitude +
                 ", latitude=" + latitude +
+                ", population=" + population +
                 ", profiles=" + profiles +
                 ", airQualities=" + airQualities +
                 ", meteos=" + meteos +

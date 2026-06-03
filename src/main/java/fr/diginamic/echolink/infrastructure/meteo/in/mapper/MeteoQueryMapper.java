@@ -8,13 +8,17 @@ import org.springframework.stereotype.Component;
 public class MeteoQueryMapper {
 
     public MeteoQuery toQuery(Meteo meteo) {
+
         return new MeteoQuery(
                 meteo.getRecordedAt(),
+                meteo.getWeatherCondition(),
                 meteo.getTemperature(),
                 meteo.getAtmPressure(),
+                meteo.getHumidity(),
                 meteo.getWindSpeed(),
                 meteo.getWindDirection(),
-                meteo.getRainFall(),
-                meteo.getHumidity());
+                meteo.getRainFall()
+        );
     }
 }
+

@@ -36,34 +36,41 @@ public class Meteo {
     private UUID id;
 
     /**
-     * Date and time when the weather data was recorded.
+     * Date and time when the weather data was obtained from the external API.
      */
     @Column(name = "recorded_at")
     private LocalDateTime recordedAt;
 
     /**
+     * Weather condition derived from WMO code.
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "weather_condition")
+    private WeatherCondition weatherCondition;
+
+    /**
      * Measured temperature in °C.
      */
     @Column(name = "temperature")
-    private byte temperature;
+    private float temperature;
 
     /**
      * Measured atmospheric pressure in hPa.
      */
     @Column(name = "atm_pressure")
-    private int atmPressure;
+    private float atmPressure;
 
     /**
      * Measured humidity level in %.
      */
     @Column(name = "humidity")
-    private byte humidity;
+    private float humidity;
 
     /**
      * Measured wind speed in km/h.
      */
     @Column(name = "wind_speed")
-    private byte windSpeed;
+    private float windSpeed;
 
     /**
      * Measured wind direction.
@@ -76,7 +83,7 @@ public class Meteo {
      * Measured rainfall amount in mm.
      */
     @Column(name = "rain_fall")
-    private int rainFall;
+    private float rainFall;
 
     /**
      * Location associated with this weather record.
@@ -95,6 +102,7 @@ public class Meteo {
      * Creates a weather record.
      *
      * @param recordedAt date and time when the weather data was recorded
+     * @param weatherCondition weather condition
      * @param temperature measured temperature
      * @param atmPressure measured atmospheric pressure
      * @param humidity measured humidity level
@@ -104,13 +112,15 @@ public class Meteo {
      */
     public Meteo(
             LocalDateTime recordedAt,
-            byte temperature,
-            int atmPressure,
-            byte humidity,
-            byte windSpeed,
+            WeatherCondition weatherCondition,
+            float temperature,
+            float atmPressure,
+            float humidity,
+            float windSpeed,
             WindDirection windDirection,
-            int rainFall) {
+            float rainFall) {
         this.recordedAt = recordedAt;
+        this.weatherCondition = weatherCondition;
         this.temperature = temperature;
         this.atmPressure = atmPressure;
         this.humidity = humidity;
@@ -122,15 +132,16 @@ public class Meteo {
     @Override
     public String toString() {
         return "Meteo{" +
-                "windDirection=" + windDirection +
-                ", windSpeed=" + windSpeed +
-                ", humidity=" + humidity +
+                "id=" + id +
+                ", recordedAt=" + recordedAt +
+                ", weatherCondition=" + weatherCondition +
                 ", temperature=" + temperature +
-                ", recorded_at=" + recordedAt +
                 ", atmPressure=" + atmPressure +
-                ", id=" + id +
-                ", location=" + location +
+                ", humidity=" + humidity +
+                ", windSpeed=" + windSpeed +
+                ", windDirection=" + windDirection +
                 ", rainFall=" + rainFall +
+                ", location=" + location +
                 '}';
     }
 }

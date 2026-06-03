@@ -14,7 +14,9 @@ import java.util.Set;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ImportLocationService implements LocationSyncUseCase {
+public class LocationSyncService implements LocationSyncUseCase {
+
+    private static final long MIN_POPULATION = 10_000L;
 
     private final LocationProvider provider;
     private final LocationRepository repository;
@@ -29,13 +31,14 @@ public class ImportLocationService implements LocationSyncUseCase {
         List<Location> newLocations = provider.getAllLocations().stream()
                 .filter(location -> location.getInseeCode() != null)
                 .filter(location -> !existingInseeCodes.contains(location.getInseeCode()))
+                .filter(location -> location.getPopulation() > MIN_POPULATION)
                 .toList();
 
         repository.saveAll(newLocations);
 
         log.info("{} Locations synchronised in {}s",
                 newLocations.size(),
-                String.format("%.2f", (System.currentTimeMillis() - currentTimeMillis) / 1000d));
-
+                String.format("%.2f", (System.currentTimeMillis() - currentTimeMillis) / 1000d)
+        );
     }
 }

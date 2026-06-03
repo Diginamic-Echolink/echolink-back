@@ -26,7 +26,7 @@ public class AirQuality {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    /** AirQuality's recorded at */
+    /** AirQuality's recorded at from the external API */
     @Column(name = "recorded_at")
     private LocalDateTime recordedAt;
 
