@@ -14,6 +14,7 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 public class DemographyRepositoryAdapter implements DemographyRepository {
+
     private final DemographyJdbcRepository repository;
 
     @Override

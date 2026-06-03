@@ -23,22 +23,22 @@ import java.util.UUID;
 @RequestMapping(value = "/api/v1/demography", produces = MediaType.APPLICATION_JSON_VALUE)
 public class DemographyController {
 
-    private final DemographyGetUseCase demographyGetUseCase;
-    private final DemographyQueryMapper demographyQueryMapper;
+    private final DemographyGetUseCase getUseCase;
+    private final DemographyQueryMapper mapper;
 
     @GetMapping("/{locationId}")
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<DemographyQuery> getDemographyByLocationId(@PathVariable UUID locationId) {
-        Demography demographies = demographyGetUseCase.getByLocationId(locationId);
-        DemographyQuery query = demographyQueryMapper.toQuery(demographies);
+        Demography demographies = getUseCase.getByLocationId(locationId);
+        DemographyQuery query = mapper.toQuery(demographies);
         return ResponseEntity.ok(query);
     }
 
     @GetMapping("/all/{locationId}")
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<List<DemographyQuery>> getAllByLocationId(@PathVariable UUID locationId) {
-        List<Demography> demographies = demographyGetUseCase.getAllByLocationId(locationId);
-        List<DemographyQuery> query = demographies.stream().map(demographyQueryMapper::toQuery).toList();
+        List<Demography> demographies = getUseCase.getAllByLocationId(locationId);
+        List<DemographyQuery> query = demographies.stream().map(mapper::toQuery).toList();
         return ResponseEntity.ok(query);
     }
 

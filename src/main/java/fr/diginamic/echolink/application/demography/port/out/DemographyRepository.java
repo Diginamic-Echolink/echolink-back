@@ -10,5 +10,5 @@ public interface DemographyRepository {
 
     Optional<Demography> getByLocationId(UUID id);
 
-    List<Demography> getAllByLocationId(UUID id,  int LIMIT_DEMOGRAPHIC);
+    List<Demography> getAllByLocationId(UUID id, int LIMIT_DEMOGRAPHIC);
 }
