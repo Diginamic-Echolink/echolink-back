@@ -1,6 +1,5 @@
 package fr.diginamic.echolink.infrastructure.meteo.out.persistence.repository;
 
-import fr.diginamic.echolink.domain.demography.Demography;
 import fr.diginamic.echolink.domain.meteo.Meteo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
