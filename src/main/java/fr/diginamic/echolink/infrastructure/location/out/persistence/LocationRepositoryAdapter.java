@@ -19,6 +19,11 @@ public class LocationRepositoryAdapter implements LocationRepository {
     private final LocationJdbcRepository repository;
 
     @Override
+    public List<Location> getAllLocations() {
+        return repository.findAll();
+    }
+
+    @Override
     public Set<String> findAllInseeCodes() {
         return repository.findAllInseeCodes();
     }

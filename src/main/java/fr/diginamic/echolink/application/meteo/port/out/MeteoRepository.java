@@ -11,4 +11,6 @@ public interface MeteoRepository {
     Optional<Meteo> getMeteoByLocationId(UUID locationId);
 
     List<Meteo> getAllMeteoByLocationId(UUID locationId, int LIMIT_METEO);
+
+    void saveAll(List<Meteo> meteos);
 }

@@ -9,6 +9,8 @@ import java.util.UUID;
 
 public interface LocationRepository {
 
+    List<Location> getAllLocations();
+
     Set<String> findAllInseeCodes();
 
     void saveAll(List<Location> locations);
