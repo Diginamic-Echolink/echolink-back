@@ -10,5 +10,17 @@ spring:
     username: ${DB_USERNAME:echolink}
     password: ${DB_PASSWORD:echolink}
 
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 500
+        order_inserts: true
+
   flyway:
     enabled: true
+
+  geo-api:
+    base-url: https://geo.api.gouv.fr
+  open-meteo:
+    base-url: https://api.open-meteo.com/v1

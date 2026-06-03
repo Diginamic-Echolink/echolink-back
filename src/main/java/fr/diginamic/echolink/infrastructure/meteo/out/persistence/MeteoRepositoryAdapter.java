@@ -27,4 +27,3 @@ public class MeteoRepositoryAdapter implements MeteoRepository {
         return repository.getAllMeteoByLocationId(locationId, limit);
     }
 }
-

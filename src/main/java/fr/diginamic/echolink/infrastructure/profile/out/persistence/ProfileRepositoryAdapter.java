@@ -27,7 +27,7 @@ public class ProfileRepositoryAdapter implements ProfileRepository {
     }
 
     @Override
-    public List<Profile> getAll() {
+    public List<Profile> getAllProfiles() {
         return repository.findAll();
     }
 

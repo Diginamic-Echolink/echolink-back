@@ -12,7 +12,7 @@ public interface ProfileRepository {
 
     Optional<Profile> getByEmail(String email);
 
-    List<Profile> getAll();
+    List<Profile> getAllProfiles();
 
     Profile save(Profile profile);
 

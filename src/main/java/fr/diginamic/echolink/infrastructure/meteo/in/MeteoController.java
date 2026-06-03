@@ -40,4 +40,3 @@ public class MeteoController {
         return ResponseEntity.ok(query);
     }
 }
-

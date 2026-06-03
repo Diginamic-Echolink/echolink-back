@@ -3,11 +3,8 @@ package fr.diginamic.echolink.application.location.port.out;
 import fr.diginamic.echolink.domain.location.Location;
 
 import java.util.List;
-import java.util.Set;
 
-public interface LocationRepository {
+public interface LocationProvider {
 
-    Set<String> findAllInseeCodes();
-
-    void saveAll(List<Location> locations);
+    List<Location> getAllLocations();
 }
