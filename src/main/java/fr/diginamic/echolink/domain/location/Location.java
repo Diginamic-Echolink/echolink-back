@@ -35,7 +35,7 @@ public class Location {
     @Column(name = "name", nullable = false)
     private String name;
 
-    /** Location's postal code */
+    /** Location's commune code */
     @Column(name = "insee_code", unique = true, nullable = false)
     private String inseeCode;
 
