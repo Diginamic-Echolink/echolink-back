@@ -2,8 +2,8 @@ package fr.diginamic.echolink.infrastructure.location.out.api;
 
 import fr.diginamic.echolink.application.location.port.out.LocationProvider;
 import fr.diginamic.echolink.domain.location.Location;
-import fr.diginamic.echolink.infrastructure.location.out.dto.CommuneDto;
-import fr.diginamic.echolink.infrastructure.location.out.mapper.CommuneMapper;
+import fr.diginamic.echolink.infrastructure.location.out.dto.GeoApiCommuneDto;
+import fr.diginamic.echolink.infrastructure.location.out.mapper.GeoApiCommuneMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -16,23 +16,23 @@ import java.util.List;
 public class GeoApiCommuneProvider implements LocationProvider {
 
     private final RestClient geoApiRestClient;
-    private final CommuneMapper mapper;
+    private final GeoApiCommuneMapper mapper;
 
     @Override
     public List<Location> getAllLocations() {
 
-        CommuneDto[] response = geoApiRestClient.get()
+        GeoApiCommuneDto[] response = geoApiRestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/communes")
                         .queryParam("format", "json")
                         .queryParam(
                                 "fields",
-                                "nom,code,codesPostaux,centre"
+                                "nom,code,codesPostaux,centre,population"
                         )
                         .build())
                 .header("Accept", "application/json")
                 .retrieve()
-                .body(CommuneDto[].class);
+                .body(GeoApiCommuneDto[].class);
 
         if(response == null || response.length == 0) {
             return List.of();

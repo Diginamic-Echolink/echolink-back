@@ -26,4 +26,9 @@ public class MeteoRepositoryAdapter implements MeteoRepository {
     public List<Meteo> getAllMeteoByLocationId(UUID locationId, int limit) {
         return repository.findAllByLocationId(locationId, limit);
     }
+
+    @Override
+    public void saveAll(List<Meteo> meteos) {
+        repository.saveAll(meteos);
+    }
 }

@@ -1,19 +1,19 @@
 package fr.diginamic.echolink.infrastructure.location.out.mapper;
 
 import fr.diginamic.echolink.domain.location.Location;
-import fr.diginamic.echolink.infrastructure.location.out.dto.CommuneDto;
+import fr.diginamic.echolink.infrastructure.location.out.dto.GeoApiCommuneDto;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CommuneMapper {
+public class GeoApiCommuneMapper {
 
-    public Location toLocation(CommuneDto dto) {
+    public Location toLocation(GeoApiCommuneDto dto) {
 
-        float longitude = dto.centre() != null
+        double longitude = dto.centre() != null
                 ? dto.centre().coordinates().get(0)
                 : 0;
 
-        float latitude = dto.centre() != null
+        double latitude = dto.centre() != null
                 ? dto.centre().coordinates().get(1)
                 : 0;
 
@@ -21,6 +21,8 @@ public class CommuneMapper {
                 ? dto.postalCodes().getFirst()
                 : null;
 
-        return new Location(dto.nom(), dto.code(), postalCode, longitude, latitude);
+        long population = dto.population() != null ? dto.population() : 0;
+
+        return new Location(dto.nom(), dto.code(), postalCode, longitude, latitude, population);
     }
 }
