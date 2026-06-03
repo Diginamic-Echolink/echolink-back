@@ -8,12 +8,12 @@ import org.springframework.stereotype.Component;
 public class LocationQueryMapper {
 
     public LocationQuery toQuery(Location location) {
+
         return new LocationQuery(
                 location.getName(),
                 location.getPostalCode(),
                 location.getLongitude(),
-                location.getLatitude(),
-                location.getAltitude()
+                location.getLatitude()
         );
     }
 }

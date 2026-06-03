@@ -15,8 +15,6 @@ public class MeteoQueryMapper {
                 meteo.getWindSpeed(),
                 meteo.getWindDirection(),
                 meteo.getRainFall(),
-                meteo.getHumidity()
-        );
+                meteo.getHumidity());
     }
 }
-
