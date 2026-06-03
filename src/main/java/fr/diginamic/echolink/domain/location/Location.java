@@ -1,7 +1,6 @@
 package fr.diginamic.echolink.domain.location;
 
 import fr.diginamic.echolink.domain.airquality.AirQuality;
-import fr.diginamic.echolink.domain.demography.Demography;
 import fr.diginamic.echolink.domain.meteo.Meteo;
 import fr.diginamic.echolink.domain.profile.Profile;
 import jakarta.persistence.Column;
@@ -59,10 +58,6 @@ public class Location {
     @OneToMany(mappedBy="location")
     private List<AirQuality> airQualities = new ArrayList<>();
 
-    /** Demography link within this location. */
-    @OneToMany(mappedBy="location")
-    private List<Demography> demographies = new ArrayList<>();
-
     /** Meteo link within this location. */
     @OneToMany(mappedBy="location")
     private List<Meteo> meteos = new ArrayList<>();
@@ -87,7 +82,6 @@ public class Location {
                 ", latitude=" + latitude +
                 ", profiles=" + profiles +
                 ", airQualities=" + airQualities +
-                ", demographies=" + demographies +
                 ", meteos=" + meteos +
                 '}';
     }

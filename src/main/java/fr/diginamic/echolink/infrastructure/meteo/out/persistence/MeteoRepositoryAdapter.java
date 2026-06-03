@@ -19,11 +19,11 @@ public class MeteoRepositoryAdapter implements MeteoRepository {
 
     @Override
     public Optional<Meteo> getMeteoByLocationId(UUID locationId) {
-        return repository.getMeteoByLocationId(locationId);
+        return repository.findByLocationId(locationId);
     }
 
     @Override
     public List<Meteo> getAllMeteoByLocationId(UUID locationId, int limit) {
-        return repository.getAllMeteoByLocationId(locationId, limit);
+        return repository.findAllByLocationId(locationId, limit);
     }
 }

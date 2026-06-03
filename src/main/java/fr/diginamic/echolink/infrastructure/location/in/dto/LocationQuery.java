@@ -4,6 +4,5 @@ public record LocationQuery (
     String name,
     String postalCode,
     float longitude,
-    float latitude,
-    float altitude) {
+    float latitude) {
 }
