@@ -1,6 +1,7 @@
 package fr.diginamic.echolink.infrastructure.profile.in.dto;
 
 public record ProfileQuery(
+        String id,
         String firstName,
         String lastName,
         String pseudo,

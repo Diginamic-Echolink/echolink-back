@@ -6,6 +6,7 @@ import fr.diginamic.echolink.application.profile.port.in.ProfileUpdateUseCase;
 import fr.diginamic.echolink.domain.profile.Profile;
 import fr.diginamic.echolink.domain.profile.ProfileUpdateRequest;
 import fr.diginamic.echolink.domain.profile.exception.ProfileNotFoundException;
+import fr.diginamic.echolink.infrastructure.common.in.dto.MessageQuery;
 import fr.diginamic.echolink.infrastructure.profile.in.dto.ProfileQuery;
 import fr.diginamic.echolink.infrastructure.profile.in.mapper.ProfileQueryMapper;
 import lombok.RequiredArgsConstructor;
@@ -76,8 +77,8 @@ public class ProfileController {
 
     @DeleteMapping("/{profileId}")
     @Secured("ROLE_ADMIN")
-    public ResponseEntity<?> deleteProfile(@PathVariable UUID profileId) throws ProfileNotFoundException {
+    public ResponseEntity<MessageQuery> deleteProfile(@PathVariable UUID profileId) throws ProfileNotFoundException {
         deleteUseCase.delete(profileId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(new MessageQuery("Profile with id: " + profileId + " is correctly deleted"));
     }
 }
