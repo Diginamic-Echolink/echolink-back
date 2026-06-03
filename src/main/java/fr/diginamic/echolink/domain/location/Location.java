@@ -36,7 +36,11 @@ public class Location {
     private String name;
 
     /** Location's postal code */
-    @Column(name = "postal_code", nullable = false)
+    @Column(name = "insee_code", unique = true, nullable = false)
+    private String inseeCode;
+
+    /** Location's postal code */
+    @Column(name = "postal_code")
     private String postalCode;
 
     /** Location's longitude */
@@ -46,10 +50,6 @@ public class Location {
     /** Location's latitude */
     @Column(name = "latitude")
     private float latitude;
-
-    /** Location's altitude */
-    @Column(name = "altitude")
-    private float altitude;
 
     /** Profile lived within this location. */
     @OneToMany(mappedBy="location")
@@ -70,20 +70,14 @@ public class Location {
     /** Constructor for: Location */
     public Location() {}
 
-    /**
-     * Constructor for: Location
-     *
-     * @param postalCode
-     * @param longitude
-     * @param latitude
-     */
-    public Location(String postalCode, float longitude, float latitude) {
+    public Location(String name, String inseeCode, String postalCode, float longitude, float latitude) {
+        this.name = name;
+        this.inseeCode = inseeCode;
         this.postalCode = postalCode;
         this.longitude = longitude;
         this.latitude = latitude;
     }
 
-    /** @return toString */
     @Override
     public String toString() {
         return "Location{" +

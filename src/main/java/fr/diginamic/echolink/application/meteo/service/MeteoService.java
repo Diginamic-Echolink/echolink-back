@@ -27,4 +27,3 @@ public class MeteoService implements MeteoGetUseCase {
         return repository.getAllMeteoByLocationId(locationId, LIMIT_METEO);
     }
 }
-

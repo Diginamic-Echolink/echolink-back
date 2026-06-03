@@ -29,7 +29,7 @@ public class ProfileService implements ProfileGetUseCase, ProfileUpdateUseCase, 
 
     @Override
     public List<Profile> getAllProfiles() {
-        return repository.getAll();
+        return repository.getAllProfiles();
     }
 
     @Override
