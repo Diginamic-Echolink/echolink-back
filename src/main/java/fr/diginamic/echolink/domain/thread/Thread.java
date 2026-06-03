@@ -58,18 +58,6 @@ public class Thread {
     private LocalDateTime createdAt;
 
     /**
-     * Number of likes received by the thread.
-     */
-    @Column(name = "like_count")
-    private int likeCount;
-
-    /**
-     * Number of dislikes received by the thread.
-     */
-    @Column(name = "dislike_count")
-    private int dislikeCount;
-
-    /**
      * Forum section to which this thread belongs.
      */
     @ManyToOne
@@ -100,15 +88,15 @@ public class Thread {
      * @param title        title of the thread
      * @param subject      subject of the discussion
      * @param createdAt    date and time when the thread was created
-     * @param likeCount    number of likes received by the thread
-     * @param dislikeCount number of dislikes received by the thread
+     * @param section      section of the thread
+     * @param profile      profile owner
      */
-    public Thread(String title, String subject, LocalDateTime createdAt, int likeCount, int dislikeCount) {
+    public Thread(String title, String subject, LocalDateTime createdAt, Section section, Profile profile) {
         this.title = title;
         this.subject = subject;
         this.createdAt = createdAt;
-        this.likeCount = likeCount;
-        this.dislikeCount = dislikeCount;
+        this.section = section;
+        this.profile = profile;
     }
 
     @Override
@@ -118,8 +106,6 @@ public class Thread {
                 ", title='" + title + '\'' +
                 ", subject='" + subject + '\'' +
                 ", createdAt=" + createdAt +
-                ", likeCount=" + likeCount +
-                ", dislikeCount=" + dislikeCount +
                 ", section=" + section +
                 ", profile=" + profile +
                 ", messages=" + messages +

@@ -1,7 +1,7 @@
 package fr.diginamic.echolink.infrastructure.common.in;
 
 import fr.diginamic.echolink.domain.shared.exception.AbstractBadRequestException;
-import fr.diginamic.echolink.domain.shared.exception.AbstractNonFoundException;
+import fr.diginamic.echolink.domain.shared.exception.AbstractNotFoundException;
 import fr.diginamic.echolink.infrastructure.common.in.dto.ErrorMessageQuery;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -20,8 +20,8 @@ public class RestResponseExceptionHandler {
                 .body(new ErrorMessageQuery(exception.getMessage()));
     }
 
-    @ExceptionHandler(AbstractNonFoundException.class)
-    public ResponseEntity<ErrorMessageQuery> handleNotFoundException(AbstractNonFoundException exception) {
+    @ExceptionHandler(AbstractNotFoundException.class)
+    public ResponseEntity<ErrorMessageQuery> handleNotFoundException(AbstractNotFoundException exception) {
         return ResponseEntity
                 .status(NOT_FOUND)
                 .body(new ErrorMessageQuery(exception.getMessage()));
