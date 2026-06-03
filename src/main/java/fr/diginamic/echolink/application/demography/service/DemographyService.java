@@ -26,4 +26,3 @@ public class DemographyService implements DemographyGetUseCase {
         return repository.getAllByLocationId(locationId, LIMIT_DEMOGRAPHIC);
     }
 }
-
