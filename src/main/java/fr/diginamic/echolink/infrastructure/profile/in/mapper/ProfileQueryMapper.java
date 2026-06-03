@@ -8,7 +8,9 @@ import org.springframework.stereotype.Component;
 public class ProfileQueryMapper {
 
     public ProfileQuery toQuery(Profile profile) {
+
         return new ProfileQuery(
+                profile.getId().toString(),
                 profile.getFirstName(),
                 profile.getLastName(),
                 profile.getPseudo(),
