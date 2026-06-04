@@ -2,6 +2,7 @@ package fr.diginamic.echolink.infrastructure.airquality.in;
 
 import fr.diginamic.echolink.application.airquality.port.in.AirQualityGetUseCase;
 import fr.diginamic.echolink.domain.airquality.AirQuality;
+import fr.diginamic.echolink.domain.location.exception.LocationNotFoundException;
 import fr.diginamic.echolink.infrastructure.airquality.in.dto.AirQualityQuery;
 import fr.diginamic.echolink.infrastructure.airquality.in.mapper.AirQualityQueryMapper;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +45,9 @@ public class AirQualityController {
      */
     @GetMapping("/{locationId}")
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
-    public ResponseEntity<AirQualityQuery> getByLocationId(@PathVariable UUID locationId) {
+    public ResponseEntity<AirQualityQuery> getByLocationId(
+            @PathVariable UUID locationId
+    ) throws LocationNotFoundException {
         AirQuality airQualities = getUseCase.getByLocationId(locationId);
         AirQualityQuery query = mapper.toQuery(airQualities);
         return ResponseEntity.ok(query);

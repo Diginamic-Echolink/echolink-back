@@ -3,6 +3,7 @@ package fr.diginamic.echolink.application.airquality.service;
 import fr.diginamic.echolink.application.airquality.port.in.AirQualityGetUseCase;
 import fr.diginamic.echolink.application.airquality.port.out.AirQualityRepository;
 import fr.diginamic.echolink.domain.airquality.AirQuality;
+import fr.diginamic.echolink.domain.location.exception.LocationNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,12 +32,12 @@ public class AirQualityService implements AirQualityGetUseCase {
      * Retrieves the latest air quality data for a given location.
      *
      * @param locationId unique identifier of the location
-     * @return the air quality data associated with the location,
-     * or {@code null} if no data is available
+     * @return the air quality data associated with the location
      */
     @Override
-    public AirQuality getByLocationId(UUID locationId) {
-        return repository.getByLocationId(locationId).orElse(null);
+    public AirQuality getByLocationId(UUID locationId) throws LocationNotFoundException {
+        return repository.getByLocationId(locationId)
+                .orElseThrow(() -> new LocationNotFoundException("Location with id " + locationId + " not found"));
     }
 
     /**

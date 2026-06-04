@@ -3,6 +3,7 @@ package fr.diginamic.echolink.application.location.service;
 import fr.diginamic.echolink.application.location.port.in.LocationGetUseCase;
 import fr.diginamic.echolink.application.location.port.out.LocationRepository;
 import fr.diginamic.echolink.domain.location.Location;
+import fr.diginamic.echolink.domain.location.exception.LocationNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,8 +22,9 @@ public class LocationService implements LocationGetUseCase {
     private final LocationRepository repository;
 
     @Override
-    public Location getById(UUID id) {
-        return repository.getById(id).orElse(null);
+    public Location getById(UUID id) throws LocationNotFoundException {
+        return repository.getById(id)
+                .orElseThrow(() -> new LocationNotFoundException("Location with id " + id + " not found"));
     }
 
     @Override
