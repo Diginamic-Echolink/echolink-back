@@ -4,6 +4,7 @@ import fr.diginamic.echolink.application.location.port.in.LocationSyncUseCase;
 import fr.diginamic.echolink.application.location.port.out.LocationProvider;
 import fr.diginamic.echolink.application.location.port.out.LocationRepository;
 import fr.diginamic.echolink.domain.location.Location;
+import fr.diginamic.echolink.domain.location.exception.LocationApiSyncException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,8 +19,8 @@ public class LocationSyncService implements LocationSyncUseCase {
 
     private static final long MIN_POPULATION = 10_000L;
 
-    private final LocationProvider provider;
     private final LocationRepository repository;
+    private final LocationProvider provider;
 
     public void syncLocations() {
 
@@ -27,8 +28,18 @@ public class LocationSyncService implements LocationSyncUseCase {
         log.info("Location sync started");
 
         Set<String> existingInseeCodes = repository.findAllInseeCodes();
+        List<Location> locations;
 
-        List<Location> newLocations = provider.getAllLocations().stream()
+        try {
+
+            locations = provider.getAllLocations();
+
+        } catch (LocationApiSyncException ex) {
+            log.warn("Unable to retrieve weather datas due to API failure.", ex);
+            return;
+        }
+
+        List<Location> newLocations = locations.stream()
                 .filter(location -> location.getInseeCode() != null)
                 .filter(location -> !existingInseeCodes.contains(location.getInseeCode()))
                 .filter(location -> location.getPopulation() > MIN_POPULATION)

@@ -2,6 +2,7 @@ package fr.diginamic.echolink.application.meteo.service;
 
 import fr.diginamic.echolink.application.meteo.port.in.MeteoGetUseCase;
 import fr.diginamic.echolink.application.meteo.port.out.MeteoRepository;
+import fr.diginamic.echolink.domain.location.exception.LocationNotFoundException;
 import fr.diginamic.echolink.domain.meteo.Meteo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,11 +33,11 @@ public class MeteoService implements MeteoGetUseCase {
      *
      * @param locationId unique identifier of the location
      * @return the weather data associated with the location,
-     * or {@code null} if no data is available
      */
     @Override
-    public Meteo getMeteoByLocationId(UUID locationId) {
-        return repository.getMeteoByLocationId(locationId).orElse(null);
+    public Meteo getMeteoByLocationId(UUID locationId) throws LocationNotFoundException {
+        return repository.getMeteoByLocationId(locationId)
+                .orElseThrow(() -> new LocationNotFoundException("Location with id " + locationId + " not found"));
     }
 
     /**

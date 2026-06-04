@@ -5,6 +5,7 @@ import fr.diginamic.echolink.application.airquality.port.out.AirQualityProvider;
 import fr.diginamic.echolink.application.airquality.port.out.AirQualityRepository;
 import fr.diginamic.echolink.application.location.port.out.LocationRepository;
 import fr.diginamic.echolink.domain.airquality.AirQuality;
+import fr.diginamic.echolink.domain.airquality.exception.AirQualityApiSyncException;
 import fr.diginamic.echolink.domain.location.Location;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,6 @@ public class AirQualitySyncService implements AirQualitySyncUseCase {
         if (!pendingLocations.isEmpty()) return;
 
         List<Location> locations = locationRepository.getAllLocations();
-
         pendingLocations.addAll(locations);
         syncRunning = true;
 
@@ -73,12 +73,12 @@ public class AirQualitySyncService implements AirQualitySyncUseCase {
 
                 processed++;
 
-            } catch (Exception e) {
+            } catch (AirQualityApiSyncException ex) {
                 log.warn(
-                        "Unable to retrieve air quality for {} ({})",
+                        "Skipping location due to API failure. Unable to retrieve air quality datas for {} ({})",
                         location.getName(),
                         location.getInseeCode(),
-                        e
+                        ex
                 );
             }
         }
