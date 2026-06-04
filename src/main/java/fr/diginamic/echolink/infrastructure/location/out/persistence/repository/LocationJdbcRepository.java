@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.List;
 import java.util.UUID;
@@ -29,4 +30,34 @@ public interface LocationJdbcRepository extends JpaRepository<Location, UUID> {
 
     @Query("SELECT l.inseeCode FROM Location l")
     Set<String> findAllInseeCodes();
+
+    @Query("""
+        SELECT l
+        FROM Location l
+        WHERE l.id NOT IN (
+            SELECT m.location.id
+            FROM Meteo m
+            WHERE m.recordedAt >= :startOfDay
+            AND m.recordedAt < :endOfDay
+        )
+    """)
+    List<Location> findLocationToSyncMeteoToday(
+            LocalDateTime startOfDay,
+            LocalDateTime endOfDay
+    );
+
+    @Query("""
+        SELECT l
+        FROM Location l
+        WHERE l.id NOT IN (
+            SELECT a.location.id
+            FROM AirQuality a
+            WHERE a.recordedAt >= :startOfDay
+            AND a.recordedAt < :endOfDay
+        )
+    """)
+    List<Location> findLocationToSyncAirQualityToday(
+            LocalDateTime startOfDay,
+            LocalDateTime endOfDay
+    );
 }

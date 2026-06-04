@@ -16,5 +16,4 @@ public interface AirQualityJdbcRepository extends JpaRepository<AirQuality, UUID
 
     @Query("SELECT a FROM AirQuality a WHERE a.location.id = :locationId ORDER BY a.recordedAt DESC LIMIT :limit")
     List<AirQuality> findAllByLocationId(@Param("locationId") UUID locationId, @Param("limit") int limit);
-
 }
