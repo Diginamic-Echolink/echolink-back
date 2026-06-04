@@ -5,6 +5,8 @@ import fr.diginamic.echolink.domain.location.Location;
 import fr.diginamic.echolink.infrastructure.location.out.persistence.repository.LocationJdbcRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.Optional;
@@ -39,6 +41,16 @@ public class LocationRepositoryAdapter implements LocationRepository {
     @Override
     public Set<String> findAllInseeCodes() {
         return repository.findAllInseeCodes();
+    }
+
+    @Override
+    public List<Location> findLocationToSyncMeteoToday(LocalDateTime startOfDay, LocalDateTime endOfDay) {
+        return repository.findLocationToSyncMeteoToday(startOfDay, endOfDay);
+    }
+
+    @Override
+    public List<Location> findLocationToSyncAirQualityToday(LocalDateTime startOfDay, LocalDateTime endOfDay) {
+        return repository.findLocationToSyncAirQualityToday(startOfDay, endOfDay);
     }
 
     @Override
