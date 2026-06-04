@@ -1,4 +1,4 @@
-package fr.diginamic.echolink.infrastructure.configuration;
+package fr.diginamic.echolink.infrastructure.common.configuration;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import org.springframework.beans.factory.annotation.Value;

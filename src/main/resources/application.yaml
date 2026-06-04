@@ -23,4 +23,7 @@ spring:
   geo-api:
     base-url: https://geo.api.gouv.fr
   open-meteo:
-    base-url: https://api.open-meteo.com/v1
+    weather:
+      base-url: https://api.open-meteo.com/v1
+    air-quality:
+      base-url: https://air-quality-api.open-meteo.com/v1/
