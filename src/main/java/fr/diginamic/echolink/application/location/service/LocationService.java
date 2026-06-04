@@ -28,6 +28,11 @@ public class LocationService implements LocationGetUseCase {
     }
 
     @Override
+    public List<Location> getAllLocations() {
+        return repository.getAllLocations();
+    }
+
+    @Override
     public List<Location> getByGeo(double latitude, double longitude, int delta) {
 
         double deltaDegreLatitude = delta / DEGRE_TO_KM_CONVERSION;
