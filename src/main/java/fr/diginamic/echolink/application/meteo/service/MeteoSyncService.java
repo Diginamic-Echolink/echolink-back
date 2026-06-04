@@ -6,6 +6,7 @@ import fr.diginamic.echolink.application.meteo.port.out.MeteoProvider;
 import fr.diginamic.echolink.application.meteo.port.out.MeteoRepository;
 import fr.diginamic.echolink.domain.location.Location;
 import fr.diginamic.echolink.domain.meteo.Meteo;
+import fr.diginamic.echolink.domain.meteo.exception.MeteoApiSyncException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -68,12 +69,12 @@ public class MeteoSyncService implements MeteoSyncUseCase {
 
                 processed++;
 
-            } catch (Exception e) {
+            } catch (MeteoApiSyncException ex) {
                 log.warn(
-                        "Unable to retrieve weather for {} ({})",
+                        "Skipping location due to API failure. Unable to retrieve weather datas for {} ({})",
                         location.getName(),
                         location.getInseeCode(),
-                        e
+                        ex
                 );
             }
         }

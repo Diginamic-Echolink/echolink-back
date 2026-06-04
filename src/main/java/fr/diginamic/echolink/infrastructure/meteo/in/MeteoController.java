@@ -1,6 +1,7 @@
 package fr.diginamic.echolink.infrastructure.meteo.in;
 
 import fr.diginamic.echolink.application.meteo.port.in.MeteoGetUseCase;
+import fr.diginamic.echolink.domain.location.exception.LocationNotFoundException;
 import fr.diginamic.echolink.domain.meteo.Meteo;
 import fr.diginamic.echolink.infrastructure.meteo.in.dto.MeteoQuery;
 import fr.diginamic.echolink.infrastructure.meteo.in.mapper.MeteoQueryMapper;
@@ -44,7 +45,9 @@ public class MeteoController {
      */
     @GetMapping("/{locationId}")
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
-    public ResponseEntity<MeteoQuery> getMeteoByLocationId(@PathVariable UUID locationId) {
+    public ResponseEntity<MeteoQuery> getMeteoByLocationId(
+            @PathVariable UUID locationId
+    ) throws LocationNotFoundException {
         Meteo meteo = getUseCase.getMeteoByLocationId(locationId);
         MeteoQuery query = mapper.toQuery(meteo);
         return ResponseEntity.ok(query);
