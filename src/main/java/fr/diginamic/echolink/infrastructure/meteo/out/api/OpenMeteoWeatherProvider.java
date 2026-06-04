@@ -2,8 +2,8 @@ package fr.diginamic.echolink.infrastructure.meteo.out.api;
 
 import fr.diginamic.echolink.application.meteo.port.out.MeteoProvider;
 import fr.diginamic.echolink.domain.meteo.Meteo;
-import fr.diginamic.echolink.infrastructure.meteo.out.dto.OpenMeteoResponse;
-import fr.diginamic.echolink.infrastructure.meteo.out.mapper.OpenMeteoResponseMapper;
+import fr.diginamic.echolink.infrastructure.meteo.out.dto.OpenMeteoWeatherResponse;
+import fr.diginamic.echolink.infrastructure.meteo.out.mapper.OpenMeteoWeatherResponseMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -12,12 +12,12 @@ import org.springframework.web.client.RestClient;
 @RequiredArgsConstructor
 public class OpenMeteoWeatherProvider implements MeteoProvider {
 
-    private final RestClient openMeteoRestClient;
-    private final OpenMeteoResponseMapper mapper;
+    private final RestClient openMeteoWeatherRestClient;
+    private final OpenMeteoWeatherResponseMapper mapper;
 
     public Meteo getCurrentWeather(double latitude, double longitude) {
 
-        OpenMeteoResponse response = openMeteoRestClient.get()
+        OpenMeteoWeatherResponse response = openMeteoWeatherRestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/forecast")
                         .queryParam("latitude", latitude)
@@ -29,7 +29,7 @@ public class OpenMeteoWeatherProvider implements MeteoProvider {
                         .queryParam("timezone", "Europe/Paris")
                         .build())
                 .retrieve()
-                .body(OpenMeteoResponse.class);
+                .body(OpenMeteoWeatherResponse.class);
 
         if (response == null) {
             return null;

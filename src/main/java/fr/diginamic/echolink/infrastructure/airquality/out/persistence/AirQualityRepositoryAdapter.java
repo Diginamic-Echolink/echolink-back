@@ -25,4 +25,9 @@ public class AirQualityRepositoryAdapter implements AirQualityRepository {
     public List<AirQuality> getAllByLocationId(UUID locationId, int limit) {
         return repository.findAllByLocationId(locationId, limit);
     }
+
+    @Override
+    public void saveAll(List<AirQuality> airQualities) {
+        repository.saveAll(airQualities);
+    }
 }

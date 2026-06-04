@@ -1,11 +1,11 @@
-package fr.diginamic.echolink.application.meteo.service;
+package fr.diginamic.echolink.application.airquality.service;
 
+import fr.diginamic.echolink.application.airquality.port.in.AirQualitySyncUseCase;
+import fr.diginamic.echolink.application.airquality.port.out.AirQualityProvider;
+import fr.diginamic.echolink.application.airquality.port.out.AirQualityRepository;
 import fr.diginamic.echolink.application.location.port.out.LocationRepository;
-import fr.diginamic.echolink.application.meteo.port.in.MeteoSyncUseCase;
-import fr.diginamic.echolink.application.meteo.port.out.MeteoProvider;
-import fr.diginamic.echolink.application.meteo.port.out.MeteoRepository;
+import fr.diginamic.echolink.domain.airquality.AirQuality;
 import fr.diginamic.echolink.domain.location.Location;
-import fr.diginamic.echolink.domain.meteo.Meteo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,14 +18,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MeteoSyncService implements MeteoSyncUseCase {
+public class AirQualitySyncService implements AirQualitySyncUseCase {
 
     private static final int BATCH_SIZE = 200;
     private volatile boolean syncRunning = false;
 
     private final LocationRepository locationRepository;
-    private final MeteoRepository meteoRepository;
-    private final MeteoProvider meteoProvider;
+    private final AirQualityRepository airQualityRepository;
+    private final AirQualityProvider airQualityProvider;
 
     private final Queue<Location> pendingLocations = new ConcurrentLinkedQueue<>();
 
@@ -35,21 +35,22 @@ public class MeteoSyncService implements MeteoSyncUseCase {
         if (!pendingLocations.isEmpty()) return;
 
         List<Location> locations = locationRepository.getAllLocations();
+
         pendingLocations.addAll(locations);
         syncRunning = true;
 
-        log.info("Weather synchronization : {} Locations loaded", locations.size());
+        log.info("Air quality synchronization : {} locations loaded", locations.size());
     }
 
     @Override
-    public void syncTodayMeteo() {
+    public void syncTodayAirQuality() {
 
         if (!syncRunning) return;
 
-        long currentTimeMillis = System.currentTimeMillis();
-        log.info("Weather datas sync started");
+        long startTime = System.currentTimeMillis();
+        log.info("Air quality synchronization started");
 
-        List<Meteo> meteos = new ArrayList<>();
+        List<AirQuality> airQualities = new ArrayList<>();
         int processed = 0;
 
         while (!pendingLocations.isEmpty() && processed < BATCH_SIZE) {
@@ -59,18 +60,22 @@ public class MeteoSyncService implements MeteoSyncUseCase {
 
             try {
 
-                Meteo meteo = meteoProvider.getCurrentWeather(location.getLatitude(), location.getLongitude());
+                AirQuality airQuality =
+                        airQualityProvider.getCurrentAirQuality(
+                                location.getLatitude(),
+                                location.getLongitude()
+                        );
 
-                if (meteo != null) {
-                    meteo.setLocation(location);
-                    meteos.add(meteo);
+                if (airQuality != null) {
+                    airQuality.setLocation(location);
+                    airQualities.add(airQuality);
                 }
 
                 processed++;
 
             } catch (Exception e) {
                 log.warn(
-                        "Unable to retrieve weather for {} ({})",
+                        "Unable to retrieve air quality for {} ({})",
                         location.getName(),
                         location.getInseeCode(),
                         e
@@ -78,19 +83,19 @@ public class MeteoSyncService implements MeteoSyncUseCase {
             }
         }
 
-        if (!meteos.isEmpty()) {
-            meteoRepository.saveAll(meteos);
+        if (!airQualities.isEmpty()) {
+            airQualityRepository.saveAll(airQualities);
         }
 
-        log.info("Processed {} weather datas in {}s. Remaining: {}",
+        log.info("Processed {} air quality records in {}s. Remaining: {}",
                 processed,
-                String.format("%.2f", (System.currentTimeMillis() - currentTimeMillis) / 1000d),
+                String.format("%.2f", (System.currentTimeMillis() - startTime) / 1000d),
                 pendingLocations.size()
         );
 
         if (pendingLocations.isEmpty()) {
             syncRunning = false;
-            log.info("Weather synchronization completed");
+            log.info("Air quality synchronization completed");
         }
     }
 }

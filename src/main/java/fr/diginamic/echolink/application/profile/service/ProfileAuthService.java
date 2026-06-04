@@ -2,7 +2,7 @@ package fr.diginamic.echolink.application.profile.service;
 
 import fr.diginamic.echolink.application.profile.port.in.ProfileAuthUseCase;
 import fr.diginamic.echolink.application.profile.port.out.ProfileRepository;
-import fr.diginamic.echolink.application.profile.port.out.TokenService;
+import fr.diginamic.echolink.application.profile.port.out.TokenProvider;
 import fr.diginamic.echolink.domain.profile.AuthRequest;
 import fr.diginamic.echolink.domain.profile.Profile;
 import fr.diginamic.echolink.domain.profile.exception.InvalidCredentialsException;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 public class ProfileAuthService implements ProfileAuthUseCase {
 
     private final ProfileRepository repository;
-    private final TokenService tokenService;
+    private final TokenProvider tokenProvider;
     private final PasswordEncoder passwordEncoder;
 
     public String register(AuthRequest request) throws InvalidCredentialsException {
@@ -25,7 +25,7 @@ public class ProfileAuthService implements ProfileAuthUseCase {
         }
 
         Profile profile = new Profile(request.email(), passwordEncoder.encode(request.password()));
-        return tokenService.generateToken(repository.save(profile));
+        return tokenProvider.generateToken(repository.save(profile));
     }
 
     @Override
@@ -35,7 +35,7 @@ public class ProfileAuthService implements ProfileAuthUseCase {
                 .orElseThrow(() -> new InvalidCredentialsException("User not found : " + request.email()));
 
         if (passwordEncoder.matches(request.password(), profile.getPassword())) {
-            return tokenService.generateToken(profile);
+            return tokenProvider.generateToken(profile);
         }
 
         throw new InvalidCredentialsException("Password incorrect for user : " + request.email());

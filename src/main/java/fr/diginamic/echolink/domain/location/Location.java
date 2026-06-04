@@ -42,13 +42,13 @@ public class Location {
     @Column(name = "postal_code")
     private String postalCode;
 
-    /** Location's longitude */
-    @Column(name = "longitude")
-    private double longitude;
-
     /** Location's latitude */
     @Column(name = "latitude")
     private double latitude;
+
+    /** Location's longitude */
+    @Column(name = "longitude")
+    private double longitude;
 
     /** Location's population */
     @Column(name = "population")
@@ -89,8 +89,8 @@ public class Location {
         return "Location{" +
                 "id=" + id +
                 ", postalCode='" + postalCode + '\'' +
-                ", longitude=" + longitude +
                 ", latitude=" + latitude +
+                ", longitude=" + longitude +
                 ", population=" + population +
                 ", profiles=" + profiles +
                 ", airQualities=" + airQualities +

@@ -1,4 +1,4 @@
-package fr.diginamic.echolink.infrastructure.configuration;
+package fr.diginamic.echolink.infrastructure.common.configuration;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -11,8 +11,10 @@ public class RestClientConfig {
 
     @Value("${spring.geo-api.base-url}")
     private String baseUrlGeoApi;
-    @Value("${spring.open-meteo.base-url}")
-    private String baseUrlOpenMeteo;
+    @Value("${spring.open-meteo.weather.base-url}")
+    private String baseUrlOpenMeteoWeather;
+    @Value("${spring.open-meteo.air-quality.base-url}")
+    private String baseUrlOpenMeteoAirQuality;
 
     @Bean
     public RestClient restClient() {
@@ -36,10 +38,18 @@ public class RestClientConfig {
                 .build();
     }
 
-    @Bean(name = "openMeteoRestClient")
+    @Bean(name = "openMeteoWeatherRestClient")
     public RestClient openMeteoRestClient() {
         return RestClient.builder()
-                .baseUrl(baseUrlOpenMeteo)
+                .baseUrl(baseUrlOpenMeteoWeather)
+                .requestFactory(clientHttpRequestFactory())
+                .build();
+    }
+
+    @Bean(name = "openMeteoAirQualityRestClient")
+    public RestClient openMeteoAirQualityRestClient() {
+        return RestClient.builder()
+                .baseUrl(baseUrlOpenMeteoAirQuality)
                 .requestFactory(clientHttpRequestFactory())
                 .build();
     }
