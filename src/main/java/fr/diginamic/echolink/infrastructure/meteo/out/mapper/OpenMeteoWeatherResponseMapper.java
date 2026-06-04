@@ -3,21 +3,21 @@ package fr.diginamic.echolink.infrastructure.meteo.out.mapper;
 import fr.diginamic.echolink.domain.meteo.Meteo;
 import fr.diginamic.echolink.domain.meteo.WeatherCondition;
 import fr.diginamic.echolink.domain.meteo.WindDirection;
-import fr.diginamic.echolink.infrastructure.meteo.out.dto.OpenMeteoResponse;
+import fr.diginamic.echolink.infrastructure.meteo.out.dto.OpenMeteoWeatherResponse;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
 @Component
-public class OpenMeteoResponseMapper {
+public class OpenMeteoWeatherResponseMapper {
 
     private static final int DAILY_INDEX = 0;
     private static final int NOON_INDEX = 12;
 
-    public Meteo toMeteo(OpenMeteoResponse dto) {
+    public Meteo toMeteo(OpenMeteoWeatherResponse dto) {
 
-        OpenMeteoResponse.Daily dailyDatas = dto.daily();
-        OpenMeteoResponse.Hourly hourlyDatas = dto.hourly();
+        OpenMeteoWeatherResponse.Daily dailyDatas = dto.daily();
+        OpenMeteoWeatherResponse.Hourly hourlyDatas = dto.hourly();
 
         return new Meteo(
                 LocalDateTime.now(),

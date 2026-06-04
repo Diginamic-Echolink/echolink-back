@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-public record OpenMeteoResponse(Daily daily, Hourly hourly) {
+public record OpenMeteoWeatherResponse(Daily daily, Hourly hourly) {
 
     public record Daily(
             List<String> time,
