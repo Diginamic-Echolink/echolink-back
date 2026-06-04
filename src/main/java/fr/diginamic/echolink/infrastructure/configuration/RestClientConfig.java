@@ -23,8 +23,8 @@ public class RestClientConfig {
 
     private SimpleClientHttpRequestFactory clientHttpRequestFactory() {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(5000);
-        factory.setReadTimeout(10000);
+        factory.setConnectTimeout(8000);
+        factory.setReadTimeout(20000);
         return factory;
     }
 

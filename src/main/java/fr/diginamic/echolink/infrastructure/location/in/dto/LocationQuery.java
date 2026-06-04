@@ -4,5 +4,6 @@ public record LocationQuery (
     String name,
     String postalCode,
     double longitude,
-    double latitude) {
+    double latitude,
+    long population) {
 }
