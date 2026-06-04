@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 public class SectionQueryMapper {
 
     public SectionQuery toQuery(Section section) {
+
         return new SectionQuery(
                 section.getId().toString(),
                 section.getName(),

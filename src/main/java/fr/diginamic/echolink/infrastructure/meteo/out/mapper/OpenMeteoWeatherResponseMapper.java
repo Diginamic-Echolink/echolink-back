@@ -7,31 +7,28 @@ import fr.diginamic.echolink.infrastructure.meteo.out.dto.OpenMeteoWeatherRespon
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
+import static fr.diginamic.echolink.domain.shared.utils.CalcUtils.averageFloat;
+import static fr.diginamic.echolink.domain.shared.utils.CalcUtils.averageInteger;
 
 @Component
 public class OpenMeteoWeatherResponseMapper {
 
-    private static final int DAILY_INDEX = 0;
-    private static final int NOON_INDEX = 12;
-
     public Meteo toMeteo(OpenMeteoWeatherResponse dto) {
 
-        OpenMeteoWeatherResponse.Daily dailyDatas = dto.daily();
-        OpenMeteoWeatherResponse.Hourly hourlyDatas = dto.hourly();
+        OpenMeteoWeatherResponse.Daily daily = dto.daily();
+        OpenMeteoWeatherResponse.Hourly hourly = dto.hourly();
 
         return new Meteo(
                 LocalDateTime.now(),
-                WeatherCondition.fromWmoCode(dailyDatas.weatherCode().get(DAILY_INDEX)),
-                average(dailyDatas.tempMin().get(DAILY_INDEX), dailyDatas.tempMax().get(DAILY_INDEX)),
-                hourlyDatas.pressure().get(NOON_INDEX),
-                hourlyDatas.humidity().get(NOON_INDEX),
-                hourlyDatas.windSpeed().get(NOON_INDEX),
-                WindDirection.fromDegrees(hourlyDatas.windDirection().get(NOON_INDEX)),
-                dailyDatas.precipitationSum().get(DAILY_INDEX)
+                WeatherCondition.fromWmoCode(daily.weatherCode().getFirst()),
+                averageFloat(List.of(daily.tempMin().getFirst(), daily.tempMax().getFirst())),
+                averageFloat(hourly.pressure()),
+                averageFloat(hourly.humidity()),
+                averageFloat(hourly.windSpeed()),
+                WindDirection.fromDegrees(averageInteger(hourly.windDirection())),
+                daily.precipitationSum().getFirst()
         );
-    }
-
-    private float average(float min, float max) {
-        return (min + max) / 2f;
     }
 }

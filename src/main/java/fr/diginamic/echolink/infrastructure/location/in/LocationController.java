@@ -2,6 +2,7 @@ package fr.diginamic.echolink.infrastructure.location.in;
 
 import fr.diginamic.echolink.application.location.service.LocationService;
 import fr.diginamic.echolink.domain.location.Location;
+import fr.diginamic.echolink.domain.location.exception.LocationNotFoundException;
 import fr.diginamic.echolink.infrastructure.location.in.dto.LocationQuery;
 import fr.diginamic.echolink.infrastructure.location.in.mapper.LocationQueryMapper;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,9 @@ public class LocationController {
 
     @GetMapping("/{locationId}")
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
-    public ResponseEntity<LocationQuery> getLocationById(@PathVariable UUID locationId) {
+    public ResponseEntity<LocationQuery> getLocationById(
+            @PathVariable UUID locationId
+    ) throws LocationNotFoundException {
         Location location = locationService.getById(locationId);
         LocationQuery query = locationQueryMapper.toQuery(location);
         return ResponseEntity.ok(query);
