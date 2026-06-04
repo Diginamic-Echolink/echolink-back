@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -35,11 +37,15 @@ public class MeteoSyncService implements MeteoSyncUseCase {
 
         if (!pendingLocations.isEmpty()) return;
 
-        List<Location> locations = locationRepository.getAllLocations();
-        pendingLocations.addAll(locations);
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1);
+
+        List<Location> locationsToSync = locationRepository.findLocationToSyncMeteoToday(startOfDay, endOfDay);
+
+        pendingLocations.addAll(locationsToSync);
         syncRunning = true;
 
-        log.info("Weather synchronization : {} Locations loaded", locations.size());
+        log.info("Weather synchronization for today: {} Locations loaded", locationsToSync.size());
     }
 
     @Override

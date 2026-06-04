@@ -2,6 +2,7 @@ package fr.diginamic.echolink.application.location.port.out;
 
 import fr.diginamic.echolink.domain.location.Location;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.Optional;
@@ -22,6 +23,10 @@ public interface LocationRepository {
     List<Location> getAllLocations();
 
     Set<String> findAllInseeCodes();
+
+    List<Location> findLocationToSyncMeteoToday(LocalDateTime startOfDay, LocalDateTime endOfDay);
+
+    List<Location> findLocationToSyncAirQualityToday(LocalDateTime startOfDay, LocalDateTime endOfDay);
 
     void saveAll(List<Location> locations);
 }

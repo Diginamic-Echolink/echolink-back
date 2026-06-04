@@ -35,6 +35,14 @@ public class LocationController {
         return ResponseEntity.ok(query);
     }
 
+    @GetMapping("/all")
+    @Secured({"ROLE_ADMIN", "ROLE_USER"})
+    public ResponseEntity<List<LocationQuery>> getLocationById() {
+        List<Location> locations = locationService.getAllLocations();
+        List<LocationQuery> query = locations.stream().map(locationQueryMapper::toQuery).toList();
+        return ResponseEntity.ok(query);
+    }
+
     @GetMapping("/geo/{latitude}/{longitude}/{delta}")
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<List<LocationQuery>> getLocationByGeo(
