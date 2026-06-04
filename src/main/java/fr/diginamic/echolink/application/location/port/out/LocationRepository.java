@@ -9,13 +9,19 @@ import java.util.UUID;
 
 public interface LocationRepository {
 
+    Optional<Location> getById(UUID id);
+
+    List<Location> getByGeo(
+            double latitudeMin,
+            double latitudeMax,
+            double longitudeMin,
+            double longitudeMax,
+            int limit
+    );
+
     List<Location> getAllLocations();
 
     Set<String> findAllInseeCodes();
 
     void saveAll(List<Location> locations);
-
-    Optional<Location> getById(UUID id);
-
-    List<Location> getByGeo(float latitudeMin, float latitudeMax, float longitudeMin, float longitudeMax, int limit);
 }

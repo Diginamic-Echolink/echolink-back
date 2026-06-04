@@ -9,5 +9,5 @@ public interface LocationGetUseCase {
 
     Location getById(UUID id);
 
-    List<Location> getByGeo(float latitude, float longitude, int delta);
+    List<Location> getByGeo(double latitude, double longitude, int delta);
 }
