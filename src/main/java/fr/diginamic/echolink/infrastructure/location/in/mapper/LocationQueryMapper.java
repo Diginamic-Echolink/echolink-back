@@ -13,7 +13,8 @@ public class LocationQueryMapper {
                 location.getName(),
                 location.getPostalCode(),
                 location.getLongitude(),
-                location.getLatitude()
+                location.getLatitude(),
+                location.getPopulation()
         );
     }
 }

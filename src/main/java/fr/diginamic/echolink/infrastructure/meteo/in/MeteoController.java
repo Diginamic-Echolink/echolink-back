@@ -45,8 +45,8 @@ public class MeteoController {
     @GetMapping("/{locationId}")
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<MeteoQuery> getMeteoByLocationId(@PathVariable UUID locationId) {
-        Meteo meteos = getUseCase.getMeteoByLocationId(locationId);
-        MeteoQuery query = mapper.toQuery(meteos);
+        Meteo meteo = getUseCase.getMeteoByLocationId(locationId);
+        MeteoQuery query = mapper.toQuery(meteo);
         return ResponseEntity.ok(query);
     }
 
