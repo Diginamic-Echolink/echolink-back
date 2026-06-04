@@ -12,8 +12,8 @@ public class LocationQueryMapper {
         return new LocationQuery(
                 location.getName(),
                 location.getPostalCode(),
-                location.getLongitude(),
                 location.getLatitude(),
+                location.getLongitude(),
                 location.getPopulation()
         );
     }

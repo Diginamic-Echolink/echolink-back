@@ -1,6 +1,6 @@
 package fr.diginamic.echolink.infrastructure.common.out;
 
-import fr.diginamic.echolink.application.profile.port.out.TokenService;
+import fr.diginamic.echolink.application.profile.port.out.TokenProvider;
 import fr.diginamic.echolink.domain.profile.Profile;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +16,7 @@ import java.time.Instant;
 
 @Component
 @RequiredArgsConstructor
-public class JwtService implements TokenService {
+public class JwtTokenProvider implements TokenProvider {
 
     private final JwtEncoder jwtEncoder;
 

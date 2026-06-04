@@ -37,7 +37,7 @@ public class LocationSyncService implements LocationSyncUseCase {
         repository.saveAll(newLocations);
 
         log.info("{} Locations synchronised in {}s",
-                newLocations.size(),
+                existingInseeCodes.size() + newLocations.size(),
                 String.format("%.2f", (System.currentTimeMillis() - currentTimeMillis) / 1000d)
         );
     }
