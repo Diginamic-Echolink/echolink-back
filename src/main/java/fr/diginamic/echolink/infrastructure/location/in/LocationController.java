@@ -1,6 +1,6 @@
 package fr.diginamic.echolink.infrastructure.location.in;
 
-import fr.diginamic.echolink.application.location.service.LocationService;
+import fr.diginamic.echolink.application.location.service.LocationGetService;
 import fr.diginamic.echolink.domain.location.Location;
 import fr.diginamic.echolink.infrastructure.location.in.dto.LocationQuery;
 import fr.diginamic.echolink.infrastructure.location.in.mapper.LocationQueryMapper;
@@ -11,6 +11,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
