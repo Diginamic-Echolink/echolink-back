@@ -27,23 +27,49 @@ public class SectionService
      */
     private final SectionRepository repository;
 
+    /**
+     * Retrieves a section by its unique identifier.
+     *
+     * @param id unique identifier of the section
+     * @return the matching section
+     * @throws SectionNotFoundException if no section is found with the specified identifier
+     */
     @Override
     public Section getById(UUID id) throws SectionNotFoundException {
         return repository.getById(id)
                 .orElseThrow(() -> new SectionNotFoundException("Section not found : " + id));
     }
 
+    /**
+     * Retrieves all available sections.
+     *
+     * @return list of all sections
+     */
     @Override
     public List<Section> getAllSections() {
         return repository.getAllSections();
     }
 
+    /**
+     * Creates a new section.
+     *
+     * @param request request containing section information
+     * @return the created section
+     */
     @Override
     public Section create(SectionUpsertRequest request) {
         Section section = new Section(request.name(), request.topic());
         return repository.save(section);
     }
 
+    /**
+     * Updates an existing section.
+     *
+     * @param id unique identifier of the section to update
+     * @param request request containing updated section information
+     * @return the updated section
+     * @throws SectionNotFoundException if no section is found with the specified identifier
+     */
     @Override
     public Section update(UUID id, SectionUpsertRequest request) throws SectionNotFoundException {
         Section section = getById(id);
@@ -52,6 +78,12 @@ public class SectionService
         return repository.save(section);
     }
 
+    /**
+     * Deletes a section.
+     *
+     * @param id unique identifier of the section to delete
+     * @throws SectionNotFoundException if no section is found with the specified identifier
+     */
     @Override
     public void delete(UUID id) throws SectionNotFoundException {
         getById(id);
