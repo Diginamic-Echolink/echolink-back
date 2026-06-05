@@ -5,4 +5,4 @@ package fr.diginamic.echolink.infrastructure.common.in.dto;
  *
  * @param message message returned to the client
  */
-public record MessageQuery(String message) {}
+public record MessageResponse(String message) {}

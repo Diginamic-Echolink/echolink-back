@@ -10,9 +10,9 @@ import fr.diginamic.echolink.application.thread.port.in.ThreadGetUseCase;
 import fr.diginamic.echolink.domain.message.Message;
 import fr.diginamic.echolink.domain.message.MessageCreateRequest;
 import fr.diginamic.echolink.domain.message.MessageUpdateRequest;
-import fr.diginamic.echolink.domain.message.exception.MessageAccessDeniedException;
-import fr.diginamic.echolink.domain.message.exception.MessageNotFoundsException;
+import fr.diginamic.echolink.domain.message.exception.MessageNotFoundException;
 import fr.diginamic.echolink.domain.profile.Profile;
+import fr.diginamic.echolink.domain.profile.exception.ProfileNotAllowedException;
 import fr.diginamic.echolink.domain.profile.exception.ProfileNotFoundException;
 import fr.diginamic.echolink.domain.thread.Thread;
 import fr.diginamic.echolink.domain.thread.exception.ThreadNotFoundException;
@@ -22,25 +22,43 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Service responsible for managing messages.
+ * <p>
+ * Provides business operations such as retrieval, creation, update, and deletion
+ * of messages. Enforces authorization rules ensuring that only message owners
+ * or administrators can modify or delete messages.
+ */
 @Service
 @RequiredArgsConstructor
-public class MessageService implements MessageGetUseCase, MessageCreateUseCase, MessageUpdateUseCase, MessageDeleteUseCase {
+public class MessageService
+        implements MessageGetUseCase, MessageCreateUseCase, MessageUpdateUseCase, MessageDeleteUseCase {
 
+    /**
+     * Use case responsible for retrieving threads.
+     */
     private final ThreadGetUseCase threadGetUseCase;
+
+    /**
+     * Use case responsible for retrieving profiles.
+     */
     private final ProfileGetUseCase profileGetUseCase;
 
+    /**
+     * Repository used to persist and retrieve messages.
+     */
     private final MessageRepository repository;
 
-
     @Override
-    public Message getById(UUID id) throws MessageNotFoundsException {
+    public Message getById(UUID id) throws MessageNotFoundException {
         return repository.getById(id)
-                .orElseThrow(() -> new MessageNotFoundsException("Message with id " + id + " not found"));
+                .orElseThrow(() -> new MessageNotFoundException("Message with id " + id + " not found"));
     }
 
     @Override
-    public List<Message> getAllByThread(UUID id) {
-        return repository.getAllByThread(id);
+    public List<Message> getAllByThreadId(UUID id) throws ThreadNotFoundException {
+        Thread thread = threadGetUseCase.getById(id);
+        return repository.getAllByThreadId(thread.getId());
     }
 
     @Override
@@ -57,44 +75,37 @@ public class MessageService implements MessageGetUseCase, MessageCreateUseCase, 
     }
 
     @Override
-    public Message update(UUID id, MessageUpdateRequest request) throws ThreadNotFoundException, ProfileNotFoundException, MessageAccessDeniedException, MessageNotFoundsException {
+    public Message update(
+            Profile profile,
+            UUID id,
+            MessageUpdateRequest request
+    ) throws MessageNotFoundException, ProfileNotAllowedException {
+
         Message message = getById(id);
+
+        if (!profile.isAdmin() && !profile.getId().equals(message.getProfile().getId())) {
+            throw new ProfileNotAllowedException("You are not allowed to modify this message");
+        }
 
         if (request.text() != null && !request.text().isBlank()) {
             message.setText(request.text());
-        }
-
-        if (request.threadId() != null) {
-            Thread thread = threadGetUseCase.getById(request.threadId());
-            message.setThread(thread);
-        }
-
-        if (request.profileId() != null) {
-            Profile profile = profileGetUseCase.getById(request.profileId());
-            message.setProfile(profile);
-            /*if (request.profileId().equals(message.getProfile().getId()) && !request.isAdmin()) {
-                Profile profile = profileGetUseCase.getById(request.profileId());
-                message.setProfile(profile);
-            } else if (!request.profileId().equals(message.getProfile().getId()) && request.isAdmin()) {
-
-            } else {
-                throw new MessageAccessDeniedException("You are not allowed to edit this message");
-            }
-
-            {
-                text : fjhfejke
-                profileId : 1216546-45646cdd-vdvldvmd
-                thread : 1216546-45646cdd-vdvldvmd
-                isAdmin : true
-            }*/
         }
 
         return repository.save(message);
     }
 
     @Override
-    public void delete(UUID id) throws MessageNotFoundsException {
+    public void delete(
+            Profile profile,
+            UUID id
+    ) throws MessageNotFoundException, ProfileNotAllowedException {
+
         Message message = getById(id);
+
+        if (!profile.isAdmin() && !profile.getId().equals(message.getProfile().getId())) {
+            throw new ProfileNotAllowedException("You are not allowed to delete this message");
+        }
+
         message.setText("This message was deleted by the moderator or the user");
 
         repository.save(message);

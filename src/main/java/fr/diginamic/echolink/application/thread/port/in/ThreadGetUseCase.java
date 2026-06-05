@@ -1,5 +1,6 @@
 package fr.diginamic.echolink.application.thread.port.in;
 
+import fr.diginamic.echolink.domain.section.exception.SectionNotFoundException;
 import fr.diginamic.echolink.domain.thread.Thread;
 import fr.diginamic.echolink.domain.thread.exception.ThreadNotFoundException;
 
@@ -26,5 +27,5 @@ public interface ThreadGetUseCase {
      * @param sectionId unique identifier of the section
      * @return list of threads belonging to the section
      */
-    List<Thread> getAllBySectionId(UUID sectionId);
+    List<Thread> getAllBySectionId(UUID sectionId) throws SectionNotFoundException;
 }
