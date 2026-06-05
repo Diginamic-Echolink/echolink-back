@@ -52,23 +52,28 @@ class ThreadServiceTest {
 
     @Test
     void should_return_thread_by_id() throws ThreadNotFoundException {
+        // GIVEN
         UUID id = givenUUID();
         Thread thread = givenThread1();
 
         when(repository.getById(id)).thenReturn(Optional.of(thread));
 
+        // WHEN
         Thread result = service.getById(id);
 
+        // THEN
         assertThat(result).isEqualTo(thread);
         verify(repository).getById(id);
     }
 
     @Test
     void should_throw_exception_when_thread_not_found() {
+        // GIVEN
         UUID id = givenUUID();
 
         when(repository.getById(id)).thenReturn(Optional.empty());
 
+        // WHEN / THEN
         assertThatThrownBy(() -> service.getById(id))
                 .isInstanceOf(ThreadNotFoundException.class)
                 .hasMessage("Thread not found : " + id);
@@ -76,23 +81,30 @@ class ThreadServiceTest {
 
     @Test
     void should_return_all_threads_of_section() throws SectionNotFoundException {
+        // GIVEN
         UUID sectionId = givenUUID();
 
+        Section section = givenSection1();
         List<Thread> threads = List.of(givenThread1(), givenThread2());
 
-        when(repository.getAllBySectionId(sectionId)).thenReturn(threads);
+        when(sectionGetUseCase.getById(sectionId)).thenReturn(section);
+        when(repository.getAllBySectionId(section.getId())).thenReturn(threads);
 
+        // WHEN
         List<Thread> result = service.getAllBySectionId(sectionId);
 
+        // THEN
         assertThat(result).containsExactlyElementsOf(threads);
 
-        verify(repository).getAllBySectionId(sectionId);
+        verify(sectionGetUseCase).getById(sectionId);
+        verify(repository).getAllBySectionId(section.getId());
     }
 
     @Test
     void should_create_thread_with_correct_values()
             throws SectionNotFoundException, ProfileNotFoundException {
 
+        // GIVEN
         UUID sectionId = givenUUID();
         UUID profileId = givenUUID();
 
@@ -108,8 +120,10 @@ class ThreadServiceTest {
 
         ArgumentCaptor<Thread> captor = ArgumentCaptor.forClass(Thread.class);
 
+        // WHEN
         service.create(request);
 
+        // THEN
         verify(repository).save(captor.capture());
 
         Thread saved = captor.getValue();
@@ -123,6 +137,7 @@ class ThreadServiceTest {
 
     @Test
     void should_update_thread_when_profile_is_owner() throws Exception {
+        // GIVEN
         UUID threadId = givenUUID();
 
         Profile profile = givenProfile1();
@@ -137,14 +152,17 @@ class ThreadServiceTest {
 
         when(repository.save(thread)).thenReturn(thread);
 
+        // WHEN
         Thread result = service.update(profile, threadId, request);
 
+        // THEN
         assertThat(result).isNotNull();
         verify(repository).save(thread);
     }
 
     @Test
     void should_throw_when_profile_not_allowed() {
+        // GIVEN
         UUID threadId = givenUUID();
 
         Profile owner = givenProfile1();
@@ -158,6 +176,7 @@ class ThreadServiceTest {
 
         when(repository.getById(threadId)).thenReturn(Optional.of(thread));
 
+        // WHEN / THEN
         assertThatThrownBy(() -> service.update(attacker, threadId, request))
                 .isInstanceOf(ProfileNotAllowedException.class)
                 .hasMessage("You are not allowed to modify this thread");
@@ -165,6 +184,7 @@ class ThreadServiceTest {
 
     @Test
     void should_soft_delete_thread() throws Exception {
+        // GIVEN
         UUID id = givenUUID();
 
         Profile profile = givenProfile1();
@@ -174,8 +194,10 @@ class ThreadServiceTest {
         when(repository.getById(id)).thenReturn(Optional.of(thread));
         when(repository.save(thread)).thenReturn(thread);
 
+        // WHEN
         service.delete(profile, id);
 
+        // THEN
         assertThat(thread.getTitle()).isEqualTo("This thread has been deleted");
         assertThat(thread.getSubject()).isEqualTo("This thread has been deleted");
 
@@ -184,6 +206,7 @@ class ThreadServiceTest {
 
     @Test
     void should_throw_when_delete_not_allowed() {
+        // GIVEN
         UUID id = givenUUID();
 
         Profile owner = givenProfile1();
@@ -195,6 +218,7 @@ class ThreadServiceTest {
 
         when(repository.getById(id)).thenReturn(Optional.of(thread));
 
+        // WHEN / THEN
         assertThatThrownBy(() -> service.delete(attacker, id))
                 .isInstanceOf(ProfileNotAllowedException.class)
                 .hasMessage("You are not allowed to modify this thread");
