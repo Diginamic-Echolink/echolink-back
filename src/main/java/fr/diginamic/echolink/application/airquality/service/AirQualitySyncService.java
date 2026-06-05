@@ -40,10 +40,13 @@ public class AirQualitySyncService implements AirQualitySyncUseCase {
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
         LocalDateTime endOfDay = startOfDay.plusDays(1);
 
-        List<Location> locationsToSync = locationRepository.findLocationToSyncAirQualityToday(startOfDay, endOfDay);
+        List<Location> locationsToSync = locationRepository.getAllLocationsToSyncAirQualityToday(startOfDay, endOfDay);
 
         pendingLocations.addAll(locationsToSync);
-        syncRunning = true;
+
+        if (!locationsToSync.isEmpty()) {
+            syncRunning = true;
+        }
 
         log.info("Air quality synchronization for today: {} locations loaded", locationsToSync.size());
     }

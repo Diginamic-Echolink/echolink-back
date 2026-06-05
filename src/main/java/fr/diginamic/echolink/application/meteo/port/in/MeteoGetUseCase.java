@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface MeteoGetUseCase {
 
-    Meteo getMeteoByLocationId(UUID locationId) throws LocationNotFoundException;
+    Meteo getLastMeteoByLocationId(UUID locationId) throws LocationNotFoundException;
 
     List<Meteo> getAllMeteoByLocationId(UUID locationId);
 }

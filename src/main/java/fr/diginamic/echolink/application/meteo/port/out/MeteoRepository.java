@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface MeteoRepository {
 
-    Optional<Meteo> getMeteoByLocationId(UUID locationId);
+    Optional<Meteo> getLastMeteoByLocationId(UUID locationId);
 
     List<Meteo> getAllMeteoByLocationId(UUID locationId, int LIMIT_METEO);
 
