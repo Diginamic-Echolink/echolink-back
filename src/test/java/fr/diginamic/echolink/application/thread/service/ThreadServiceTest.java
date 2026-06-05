@@ -75,7 +75,7 @@ class ThreadServiceTest {
     }
 
     @Test
-    void should_return_all_threads_of_section() {
+    void should_return_all_threads_of_section() throws SectionNotFoundException {
         UUID sectionId = givenUUID();
 
         List<Thread> threads = List.of(givenThread1(), givenThread2());

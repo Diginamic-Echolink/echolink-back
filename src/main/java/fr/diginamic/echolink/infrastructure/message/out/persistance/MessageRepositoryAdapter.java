@@ -10,10 +10,19 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Adapter implementation of {@link MessageRepository} using Spring Data JPA.
+ * <p>
+ * This class acts as a bridge between the domain layer and the persistence layer,
+ * delegating operations to {@link MessageJdbcRepository}.
+ */
 @Component
 @RequiredArgsConstructor
 public class MessageRepositoryAdapter implements MessageRepository {
 
+    /**
+     * Underlying JPA repository used by this adapter to perform persistence operations.
+     */
     private final MessageJdbcRepository repository;
 
     @Override
@@ -22,8 +31,8 @@ public class MessageRepositoryAdapter implements MessageRepository {
     }
 
     @Override
-    public List<Message> getAllByThread(UUID id) {
-        return repository.findByThreadId(id);
+    public List<Message> getAllByThreadId(UUID id) {
+        return repository.findAllByThreadId(id);
     }
 
     @Override

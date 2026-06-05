@@ -65,8 +65,9 @@ public class ThreadService implements ThreadGetUseCase, ThreadCreateUseCase, Thr
      * @return list of threads belonging to the section
      */
     @Override
-    public List<Thread> getAllBySectionId(UUID sectionId) {
-        return repository.getAllBySectionId(sectionId);
+    public List<Thread> getAllBySectionId(UUID sectionId) throws SectionNotFoundException {
+        Section section = sectionGetUseCase.getById(sectionId);
+        return repository.getAllBySectionId(section.getId());
     }
 
     /**
@@ -74,7 +75,6 @@ public class ThreadService implements ThreadGetUseCase, ThreadCreateUseCase, Thr
      *
      * @param request request containing thread information
      * @return the created thread
-     * @throws ThreadCreationNotValidException if the thread data is invalid
      * @throws SectionNotFoundException if the associated section cannot be found
      * @throws ProfileNotFoundException if the associated profile cannot be found
      */
@@ -106,7 +106,7 @@ public class ThreadService implements ThreadGetUseCase, ThreadCreateUseCase, Thr
             Profile profile,
             UUID id,
             ThreadUpdateRequest request
-    ) throws ThreadNotFoundException, SectionNotFoundException, ProfileNotFoundException, ProfileNotAllowedException {
+    ) throws ThreadNotFoundException, SectionNotFoundException, ProfileNotAllowedException {
 
         Thread thread = getById(id);
 
@@ -138,7 +138,7 @@ public class ThreadService implements ThreadGetUseCase, ThreadCreateUseCase, Thr
     public void delete(
             Profile profile,
             UUID id
-    ) throws ThreadNotFoundException, ProfileNotAllowedException, ProfileNotFoundException {
+    ) throws ThreadNotFoundException, ProfileNotAllowedException {
 
         Thread thread = getById(id);
 

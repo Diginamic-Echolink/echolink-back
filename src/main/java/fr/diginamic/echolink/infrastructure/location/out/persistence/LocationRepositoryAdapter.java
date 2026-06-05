@@ -29,22 +29,6 @@ public class LocationRepositoryAdapter implements LocationRepository {
     }
 
     @Override
-    public List<Location> getByGeo(
-            double latitudeMin,
-            double latitudeMax,
-            double longitudeMin,
-            double longitudeMax,
-            int limit
-    ) {
-        return repository.findLocationsByCordonneeBetween(latitudeMin, latitudeMax, longitudeMin, longitudeMax, limit);
-    }
-
-    @Override
-    public Optional<Location> getById(UUID id) {
-        return repository.findById(id);
-    }
-
-    @Override
     public List<Location> getAllByNameContaining(String name) {
         return repository.findAllByNameContaining(name);
     }

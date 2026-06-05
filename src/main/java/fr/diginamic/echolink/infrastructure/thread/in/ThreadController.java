@@ -13,7 +13,7 @@ import fr.diginamic.echolink.domain.thread.Thread;
 import fr.diginamic.echolink.domain.thread.ThreadCreateRequest;
 import fr.diginamic.echolink.domain.thread.ThreadUpdateRequest;
 import fr.diginamic.echolink.domain.thread.exception.ThreadNotFoundException;
-import fr.diginamic.echolink.infrastructure.common.in.dto.MessageQuery;
+import fr.diginamic.echolink.infrastructure.common.in.dto.MessageResponse;
 import fr.diginamic.echolink.infrastructure.thread.in.dto.ThreadQuery;
 import fr.diginamic.echolink.infrastructure.thread.in.mapper.ThreadQueryMapper;
 import jakarta.validation.Valid;
@@ -82,7 +82,9 @@ public class ThreadController {
      */
     @GetMapping("/all/{sectionId}")
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
-    public ResponseEntity<List<ThreadQuery>> getAllBySectionId(@PathVariable UUID sectionId) {
+    public ResponseEntity<List<ThreadQuery>> getAllBySectionId(
+            @PathVariable UUID sectionId
+    ) throws SectionNotFoundException {
         List<Thread> threads = getUseCase.getAllBySectionId(sectionId);
         List<ThreadQuery> query = threads.stream().map(mapper::toQuery).toList();
         return ResponseEntity.ok(query);
@@ -140,7 +142,7 @@ public class ThreadController {
      */
     @DeleteMapping("/{threadId}")
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
-    public ResponseEntity<MessageQuery> updateThread(
+    public ResponseEntity<MessageResponse> updateThread(
             @PathVariable UUID threadId,
             Authentication authentication
     ) throws ThreadNotFoundException, ProfileNotAllowedException, ProfileNotFoundException {
@@ -149,6 +151,6 @@ public class ThreadController {
         Profile profile = profileGetUseCase.getById(profileId);
 
         deleteUseCase.delete(profile, threadId);
-        return ResponseEntity.ok(new MessageQuery("Thread with id: " + threadId + " is correctly deleted"));
+        return ResponseEntity.ok(new MessageResponse("Thread with id: " + threadId + " is correctly deleted"));
     }
 }

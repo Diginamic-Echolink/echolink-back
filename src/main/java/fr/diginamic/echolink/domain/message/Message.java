@@ -15,6 +15,12 @@ import lombok.Setter;
 
 import java.util.UUID;
 
+/**
+ * Entity representing a message posted by a user inside a thread.
+ * <p>
+ * A message belongs to a {@link Thread} and is authored by a {@link Profile}.
+ * It contains the textual content written by the user.
+ */
 @Getter
 @Setter
 @Entity
@@ -44,22 +50,23 @@ public class Message {
     public Message() {}
 
     /**
-     * Constructor for: Message
+     * Constructs a new Message.
      *
-     * @param text
+     * @param text content of the message
+     * @param profile author of the message
+     * @param thread thread in which the message is posted
      */
-    public Message(String text) {
-        this.text = text;
-    }
-
     public Message(String text, Profile profile, Thread thread) {
         this.text = text;
         this.profile = profile;
         this.thread = thread;
-
     }
 
-    /** @return toString */
+    /**
+     * Returns a string representation of the Message entity.
+     *
+     * @return string representation containing id, text, thread and profile
+     */
     @Override
     public String toString() {
         return "Message{" +
