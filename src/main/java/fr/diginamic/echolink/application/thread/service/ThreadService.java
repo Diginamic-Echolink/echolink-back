@@ -45,17 +45,39 @@ public class ThreadService implements ThreadGetUseCase, ThreadCreateUseCase, Thr
      */
     private final ThreadRepository repository;
 
+    /**
+     * Retrieves a thread by its unique identifier.
+     *
+     * @param id unique identifier of the thread
+     * @return the matching thread
+     * @throws ThreadNotFoundException if no thread is found with the specified identifier
+     */
     @Override
     public Thread getById(UUID id) throws ThreadNotFoundException {
         return repository.getById(id)
                 .orElseThrow(() -> new ThreadNotFoundException("Thread not found : " + id));
     }
 
+    /**
+     * Retrieves all threads associated with a section.
+     *
+     * @param sectionId unique identifier of the section
+     * @return list of threads belonging to the section
+     */
     @Override
     public List<Thread> getAllBySectionId(UUID sectionId) {
         return repository.getAllBySectionId(sectionId);
     }
 
+    /**
+     * Creates a new thread.
+     *
+     * @param request request containing thread information
+     * @return the created thread
+     * @throws ThreadCreationNotValidException if the thread data is invalid
+     * @throws SectionNotFoundException if the associated section cannot be found
+     * @throws ProfileNotFoundException if the associated profile cannot be found
+     */
     @Override
     public Thread create(ThreadCreateRequest request) throws SectionNotFoundException, ProfileNotFoundException {
         Section section = sectionGetUseCase.getById(request.sectionId());
@@ -71,6 +93,14 @@ public class ThreadService implements ThreadGetUseCase, ThreadCreateUseCase, Thr
         return repository.save(thread);
     }
 
+    /**
+     * Updates an existing thread.
+     *
+     * @param id unique identifier of the thread to update
+     * @param request request containing updated thread information
+     * @return the updated thread
+     * @throws ThreadNotFoundException if no thread is found with the specified identifier
+     */
     @Override
     public Thread update(
             Profile profile,
@@ -98,6 +128,12 @@ public class ThreadService implements ThreadGetUseCase, ThreadCreateUseCase, Thr
         return repository.save(thread);
     }
 
+    /**
+     * Marks a thread as deleted.
+     *
+     * @param id unique identifier of the thread to delete
+     * @throws ThreadNotFoundException if no thread is found with the specified identifier
+     */
     @Override
     public void delete(
             Profile profile,

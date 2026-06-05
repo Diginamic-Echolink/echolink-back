@@ -59,6 +59,10 @@ public class MeteoSyncService implements MeteoSyncUseCase {
      */
     private final Queue<Location> pendingLocations = new ConcurrentLinkedQueue<>();
 
+    /**
+     * Initializes the synchronization queue with locations that have not yet
+     * received weather data for the current day.
+     */
     @Override
     public synchronized void initializeQueue() {
 
@@ -78,6 +82,10 @@ public class MeteoSyncService implements MeteoSyncUseCase {
         log.info("Weather synchronization for today: {} Locations loaded", locationsToSync.size());
     }
 
+    /**
+     * Processes a batch of locations and synchronizes their current weather data.
+     * Retrieved weather records are persisted once the batch is completed.
+     */
     @Override
     public void syncTodayMeteo() {
 
