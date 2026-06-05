@@ -1,9 +1,12 @@
 package fr.diginamic.echolink.infrastructure.thread.in;
 
+import fr.diginamic.echolink.application.profile.port.in.ProfileGetUseCase;
 import fr.diginamic.echolink.application.thread.port.in.ThreadCreateUseCase;
 import fr.diginamic.echolink.application.thread.port.in.ThreadDeleteUseCase;
 import fr.diginamic.echolink.application.thread.port.in.ThreadGetUseCase;
 import fr.diginamic.echolink.application.thread.port.in.ThreadUpdateUseCase;
+import fr.diginamic.echolink.domain.profile.Profile;
+import fr.diginamic.echolink.domain.profile.exception.ProfileNotAllowedException;
 import fr.diginamic.echolink.domain.profile.exception.ProfileNotFoundException;
 import fr.diginamic.echolink.domain.section.exception.SectionNotFoundException;
 import fr.diginamic.echolink.domain.thread.Thread;
@@ -18,6 +21,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -59,6 +65,11 @@ public class ThreadController {
     private final ThreadDeleteUseCase deleteUseCase;
 
     /**
+     * Use case responsible for retrieving threads.
+     */
+    private final ProfileGetUseCase profileGetUseCase;
+
+    /**
      * Mapper used to convert thread domain objects into query DTOs.
      */
     private final ThreadQueryMapper mapper;
@@ -86,7 +97,7 @@ public class ThreadController {
      * @throws ProfileNotFoundException if the associated profile cannot be found
      */
     @PostMapping
-    @Secured("ROLE_ADMIN")
+    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<ThreadQuery> createThread(
             @Valid @RequestBody ThreadCreateRequest request
     ) throws SectionNotFoundException, ProfileNotFoundException {
@@ -105,12 +116,17 @@ public class ThreadController {
      * @throws SectionNotFoundException if the associated section cannot be found
      */
     @PutMapping("/{threadId}")
-    @Secured({"ROLE_ADMIN"})
+    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<ThreadQuery> updateThread(
             @PathVariable UUID threadId,
-            @RequestBody ThreadUpdateRequest request
-    ) throws ThreadNotFoundException, SectionNotFoundException {
-        Thread thread = updateUseCase.update(threadId, request);
+            @RequestBody ThreadUpdateRequest request,
+            Authentication authentication
+    ) throws ThreadNotFoundException, SectionNotFoundException, ProfileNotAllowedException, ProfileNotFoundException {
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        UUID profileId = UUID.fromString(Objects.requireNonNull(jwt).getSubject());
+        Profile profile = profileGetUseCase.getById(profileId);
+
+        Thread thread = updateUseCase.update(profile, threadId, request);
         ThreadQuery query = mapper.toQuery(thread);
         return ResponseEntity.ok(query);
     }
@@ -123,9 +139,16 @@ public class ThreadController {
      * @throws ThreadNotFoundException if no thread is found with the specified identifier
      */
     @DeleteMapping("/{threadId}")
-    @Secured({"ROLE_ADMIN"})
-    public ResponseEntity<MessageQuery> updateThread(@PathVariable UUID threadId) throws ThreadNotFoundException {
-        deleteUseCase.delete(threadId);
+    @Secured({"ROLE_ADMIN", "ROLE_USER"})
+    public ResponseEntity<MessageQuery> updateThread(
+            @PathVariable UUID threadId,
+            Authentication authentication
+    ) throws ThreadNotFoundException, ProfileNotAllowedException, ProfileNotFoundException {
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        UUID profileId = UUID.fromString(Objects.requireNonNull(jwt).getSubject());
+        Profile profile = profileGetUseCase.getById(profileId);
+
+        deleteUseCase.delete(profile, threadId);
         return ResponseEntity.ok(new MessageQuery("Thread with id: " + threadId + " is correctly deleted"));
     }
 }

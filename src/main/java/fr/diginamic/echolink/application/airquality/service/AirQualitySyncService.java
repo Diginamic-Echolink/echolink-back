@@ -58,10 +58,6 @@ public class AirQualitySyncService implements AirQualitySyncUseCase {
      */
     private final Queue<Location> pendingLocations = new ConcurrentLinkedQueue<>();
 
-    /**
-     * Initializes the queue with locations that require air quality synchronization for the current day.
-     * If the queue already contains locations, the initialization is skipped.
-     */
     @Override
     public synchronized void initializeQueue() {
 
@@ -81,11 +77,6 @@ public class AirQualitySyncService implements AirQualitySyncUseCase {
         log.info("Air quality synchronization for today: {} locations loaded", locationsToSync.size());
     }
 
-    /**
-     * Synchronizes air quality data for the current day.
-     * Processes locations in batches, retrieves their air quality data,
-     * saves the collected records, and stops the synchronization when the queue is empty.
-     */
     @Override
     public void syncTodayAirQuality() {
 

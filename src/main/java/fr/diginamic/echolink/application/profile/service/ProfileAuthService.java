@@ -32,13 +32,6 @@ public class ProfileAuthService implements ProfileAuthUseCase {
      */
     private final PasswordEncoder passwordEncoder;
 
-    /**
-     * Registers a new profile and generates an authentication token.
-     *
-     * @param request authentication request containing registration data
-     * @return generated authentication token
-     * @throws InvalidCredentialsException if the email address already exists
-     */
     public String register(AuthRequest request) throws InvalidCredentialsException {
 
         if (repository.getByEmail(request.email()).isPresent()) {
@@ -49,13 +42,6 @@ public class ProfileAuthService implements ProfileAuthUseCase {
         return tokenProvider.generateToken(repository.save(profile));
     }
 
-    /**
-     * Authenticates a profile and generates an authentication token.
-     *
-     * @param request authentication request containing login credentials
-     * @return generated authentication token
-     * @throws InvalidCredentialsException if the credentials are invalid
-     */
     @Override
     public String login(AuthRequest request) throws InvalidCredentialsException {
 

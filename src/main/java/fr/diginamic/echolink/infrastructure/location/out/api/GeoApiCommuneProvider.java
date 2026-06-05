@@ -31,12 +31,6 @@ public class GeoApiCommuneProvider implements LocationProvider {
      */
     private final GeoApiCommuneMapper mapper;
 
-    /**
-     * Retrieves all available locations from the Geo API.
-     *
-     * @return list of available locations
-     * @throws LocationApiSyncException if the location data cannot be retrieved
-     */
     @Override
     public List<Location> getAllLocations() {
 
