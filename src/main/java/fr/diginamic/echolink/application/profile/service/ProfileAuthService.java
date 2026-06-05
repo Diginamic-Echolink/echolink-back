@@ -32,6 +32,7 @@ public class ProfileAuthService implements ProfileAuthUseCase {
      */
     private final PasswordEncoder passwordEncoder;
 
+    @Override
     public String register(AuthRequest request) throws InvalidCredentialsException {
 
         if (repository.getByEmail(request.email()).isPresent()) {
