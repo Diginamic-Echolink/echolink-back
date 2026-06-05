@@ -14,6 +14,11 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 
+/**
+ * JWT-based implementation of the {@link TokenProvider} interface.
+ * <p>
+ * Generates signed JWT tokens containing user identity and roles.
+ */
 @Component
 @RequiredArgsConstructor
 public class JwtTokenProvider implements TokenProvider {
@@ -23,6 +28,13 @@ public class JwtTokenProvider implements TokenProvider {
     @Value("${spring.application.jwt.expiration}")
     private long expiration;
 
+    /**
+     * Generates a JWT token for the specified user.
+     *
+     * @param user authenticated user
+     * @return generated JWT token
+     */
+    @Override
     public String generateToken(Profile user) {
 
         Instant now = Instant.now();

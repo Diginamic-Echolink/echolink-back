@@ -13,11 +13,26 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
+/**
+ * Configuration class responsible for application security.
+ * <p>
+ * Defines HTTP security rules, JWT authentication handling,
+ * stateless session management, and password encoding.
+ */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfig {
 
+    /**
+     * Configures the main security filter chain.
+     * <p>
+     * Authentication endpoints are publicly accessible, while all
+     * other requests require authentication.
+     *
+     * @param http HTTP security configuration
+     * @return configured security filter chain
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         return http
@@ -33,6 +48,12 @@ public class SecurityConfig {
                 .build();
     }
 
+    /**
+     * Creates the JWT authentication converter used to extract
+     * roles from JWT claims.
+     *
+     * @return configured JWT authentication converter
+     */
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter authoritiesConverter = new JwtGrantedAuthoritiesConverter();
@@ -47,6 +68,11 @@ public class SecurityConfig {
         return converter;
     }
 
+    /**
+     * Creates the password encoder used to hash user passwords.
+     *
+     * @return BCrypt password encoder
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

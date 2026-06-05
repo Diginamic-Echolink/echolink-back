@@ -15,54 +15,57 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Represents air quality measurements recorded for a specific location.
+ */
 @Getter
 @Setter
 @Entity
 @Table(name = "air_quality")
 public class AirQuality {
 
-    /** Unique identifier of the AirQuality. */
+    /** Unique identifier of the air quality record. */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    /** AirQuality's recorded at from the external API */
+    /** Date and time when the air quality data was recorded. */
     @Column(name = "recorded_at")
     private LocalDateTime recordedAt;
 
-    /** AirQuality's particles 10 */
+    /** Concentration of PM10 particles. */
     @Column(name = "particles_10")
     private float particles10;
 
-    /** AirQuality's particles 25 */
+    /** Concentration of PM2.5 particles. */
     @Column(name = "particles_25")
     private float particles25;
 
-    /** AirQuality's EU AQI */
+    /** European Air Quality Index value. */
     @Column(name = "eu_aqi")
     private byte euAqi;
 
-    /** AirQuality's carbon monoxide */
+    /** Carbon monoxide concentration. */
     @Column(name = "carbon_monoxide")
     private float carbonMonoxide;
 
-    /** AirQuality's ozone */
+    /** Ozone concentration. */
     @Column(name = "ozone")
     private float ozone;
 
-    /** AirQuality's dust */
+    /** Dust concentration. */
     @Column(name = "dust")
     private float dust;
 
-    /** AirQuality's nitrogen dioxide */
+    /** Nitrogen dioxide concentration. */
     @Column(name = "nitrogen_dioxide")
     private float nitrogenDioxide;
 
-    /** AirQuality's sulfure dioxide */
+    /** Sulfur dioxide concentration. */
     @Column(name = "sulfur_dioxide")
     private float sulfurDioxide;
 
-    /** Geographic location associated with the AirQuality */
+    /** Geographic location associated with the air quality record. */
     @ManyToOne
     @JoinColumn(name="location_id")
     private Location location;
@@ -73,15 +76,15 @@ public class AirQuality {
     /**
      * Constructor for: AirQuality
      *
-     * @param recordedAt
-     * @param particles10
-     * @param particles25
-     * @param euAqi
-     * @param carbonMonoxide
-     * @param ozone
-     * @param dust
-     * @param nitrogenDioxide
-     * @param sulfurDioxide
+     * @param recordedAt date and time when the data was recorded
+     * @param particles10 concentration of PM10 particles
+     * @param particles25 concentration of PM2.5 particles
+     * @param euAqi European Air Quality Index value
+     * @param carbonMonoxide carbon monoxide concentration
+     * @param ozone ozone concentration
+     * @param dust dust concentration
+     * @param nitrogenDioxide nitrogen dioxide concentration
+     * @param sulfurDioxide sulfur dioxide concentration
      */
     public AirQuality(
             LocalDateTime recordedAt,
@@ -104,7 +107,11 @@ public class AirQuality {
         this.sulfurDioxide = sulfurDioxide;
     }
 
-    /** @return toString */
+    /**
+     * Returns a string representation of the air quality record.
+     *
+     * @return string representation of the air quality record
+     */
     @Override
     public String toString() {
         return "AirQuality{" +
