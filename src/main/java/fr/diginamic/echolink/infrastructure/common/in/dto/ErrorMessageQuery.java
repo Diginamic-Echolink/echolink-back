@@ -1,3 +1,5 @@
 package fr.diginamic.echolink.infrastructure.common.in.dto;
 
-public record ErrorMessageQuery(String message) {}
+import java.util.List;
+
+public record ErrorMessageQuery(String message, List<FieldErrorQuery> fieldErrors) {}
