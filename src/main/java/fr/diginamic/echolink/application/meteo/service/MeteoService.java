@@ -35,8 +35,8 @@ public class MeteoService implements MeteoGetUseCase {
      * @return the weather data associated with the location,
      */
     @Override
-    public Meteo getMeteoByLocationId(UUID locationId) throws LocationNotFoundException {
-        return repository.getMeteoByLocationId(locationId)
+    public Meteo getLastMeteoByLocationId(UUID locationId) throws LocationNotFoundException {
+        return repository.getLastMeteoByLocationId(locationId)
                 .orElseThrow(() -> new LocationNotFoundException("Location with id " + locationId + " not found"));
     }
 

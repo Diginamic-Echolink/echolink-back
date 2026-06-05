@@ -10,7 +10,9 @@ public interface LocationGetUseCase {
 
     Location getById(UUID id) throws LocationNotFoundException;
 
+    List<Location> getAllByNameContaining(String search);
+
     List<Location> getAllLocations();
 
-    List<Location> getByGeo(double latitude, double longitude, int delta);
+    List<Location> getAllByGeolocalizationBetween(double latitude, double longitude, int delta);
 }

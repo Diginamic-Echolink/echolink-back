@@ -18,8 +18,8 @@ public class MeteoRepositoryAdapter implements MeteoRepository {
     private final MeteoJdbcRepository repository;
 
     @Override
-    public Optional<Meteo> getMeteoByLocationId(UUID locationId) {
-        return repository.findByLocationId(locationId);
+    public Optional<Meteo> getLastMeteoByLocationId(UUID locationId) {
+        return repository.findLastByLocationId(locationId);
     }
 
     @Override

@@ -48,7 +48,7 @@ public class MeteoController {
     public ResponseEntity<MeteoQuery> getMeteoByLocationId(
             @PathVariable UUID locationId
     ) throws LocationNotFoundException {
-        Meteo meteo = getUseCase.getMeteoByLocationId(locationId);
+        Meteo meteo = getUseCase.getLastMeteoByLocationId(locationId);
         MeteoQuery query = mapper.toQuery(meteo);
         return ResponseEntity.ok(query);
     }
@@ -61,7 +61,7 @@ public class MeteoController {
      */
     @GetMapping("/all/{locationId}")
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
-    public ResponseEntity<List<MeteoQuery>> getAllMeteoByLocationId(@PathVariable UUID locationId) {
+    public ResponseEntity<List<MeteoQuery>> getAllMeteosByLocationId(@PathVariable UUID locationId) {
         List<Meteo> meteos = getUseCase.getAllMeteoByLocationId(locationId);
         List<MeteoQuery> query = meteos.stream().map(mapper::toQuery).toList();
         return ResponseEntity.ok(query);
