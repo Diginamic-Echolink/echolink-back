@@ -8,6 +8,10 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+/**
+ * Component responsible for initializing application data
+ * and synchronization processes at startup.
+ */
 @Component
 @RequiredArgsConstructor
 public class StartupInitializer {
@@ -16,6 +20,13 @@ public class StartupInitializer {
     private final MeteoSyncUseCase meteoSyncUseCase;
     private final AirQualitySyncUseCase airQualitySyncUseCase;
 
+    /**
+     * Executes startup initialization tasks once the application
+     * is fully ready.
+     * <p>
+     * Synchronizes locations and initializes weather and air quality
+     * synchronization queues.
+     */
     @EventListener(ApplicationReadyEvent.class)
     public void onStartup() {
         locationSyncUseCase.syncLocations();
