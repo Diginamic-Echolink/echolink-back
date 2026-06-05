@@ -22,34 +22,16 @@ public class ThreadRepositoryAdapter implements ThreadRepository {
      */
     private final ThreadJdbcRepository repository;
 
-    /**
-     * Retrieves a thread by its unique identifier.
-     *
-     * @param id unique identifier of the thread
-     * @return an {@link Optional} containing the thread if found
-     */
     @Override
     public Optional<Thread> getById(UUID id) {
         return repository.findById(id);
     }
 
-    /**
-     * Retrieves all threads associated with a section.
-     *
-     * @param sectionId unique identifier of the section
-     * @return list of threads belonging to the section
-     */
     @Override
     public List<Thread> getAllBySectionId(UUID sectionId) {
         return repository.findAllBySectionId(sectionId);
     }
 
-    /**
-     * Persists a thread.
-     *
-     * @param thread thread to save
-     * @return the saved thread
-     */
     @Override
     public Thread save(Thread thread) {
         return repository.save(thread);

@@ -28,14 +28,7 @@ public class OpenMeteoWeatherProvider implements MeteoProvider {
      */
     private final OpenMeteoWeatherResponseMapper mapper;
 
-    /**
-     * Retrieves the current weather data for the specified coordinates.
-     *
-     * @param latitude latitude of the requested location
-     * @param longitude longitude of the requested location
-     * @return weather data corresponding to the specified coordinates
-     * @throws MeteoApiSyncException if the weather data cannot be retrieved
-     */
+    @Override
     public Meteo getCurrentWeather(double latitude, double longitude) throws MeteoApiSyncException {
 
         try {

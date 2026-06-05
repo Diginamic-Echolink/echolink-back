@@ -22,54 +22,26 @@ public class ProfileRepositoryAdapter implements ProfileRepository {
      */
     private final ProfileJdbcRepository repository;
 
-    /**
-     * Retrieves a profile by its unique identifier.
-     *
-     * @param id unique identifier of the profile
-     * @return an {@link Optional} containing the profile if found
-     */
     @Override
     public Optional<Profile> getById(UUID id) {
         return repository.findById(id);
     }
 
-    /**
-     * Retrieves a profile by its email address.
-     *
-     * @param email email address of the profile
-     * @return an {@link Optional} containing the profile if found
-     */
     @Override
     public Optional<Profile> getByEmail(String email) {
         return repository.findByEmail(email);
     }
 
-    /**
-     * Retrieves all available profiles.
-     *
-     * @return list of all profiles
-     */
     @Override
     public List<Profile> getAllProfiles() {
         return repository.findAll();
     }
 
-    /**
-     * Persists a profile.
-     *
-     * @param profile profile to save
-     * @return the saved profile
-     */
     @Override
     public Profile save(Profile profile) {
         return repository.save(profile);
     }
 
-    /**
-     * Deletes a profile by its unique identifier.
-     *
-     * @param id unique identifier of the profile to delete
-     */
     @Override
     public void delete(UUID id) {
         repository.deleteById(id);

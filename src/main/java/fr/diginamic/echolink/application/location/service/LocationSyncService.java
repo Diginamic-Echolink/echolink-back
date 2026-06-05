@@ -35,9 +35,7 @@ public class LocationSyncService implements LocationSyncUseCase {
      */
     private final LocationProvider provider;
 
-    /**
-     * Synchronizes locations from the external provider and persists new entries.
-     */
+    @Override
     public void syncLocations() {
 
         long currentTimeMillis = System.currentTimeMillis();

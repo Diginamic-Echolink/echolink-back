@@ -28,24 +28,12 @@ public class MeteoService implements MeteoGetUseCase {
      */
     private final MeteoRepository repository;
 
-    /**
-     * Retrieves the latest weather data for a given location.
-     *
-     * @param locationId unique identifier of the location
-     * @return the weather data associated with the location,
-     */
     @Override
     public Meteo getLastMeteoByLocationId(UUID locationId) throws LocationNotFoundException {
         return repository.getLastMeteoByLocationId(locationId)
                 .orElseThrow(() -> new LocationNotFoundException("Location with id " + locationId + " not found"));
     }
 
-    /**
-     * Retrieves a list of weather records for a given location.
-     *
-     * @param locationId unique identifier of the location
-     * @return a list of weather records associated with the location
-     */
     @Override
     public List<Meteo> getAllMeteoByLocationId(UUID locationId) {
         return repository.getAllMeteoByLocationId(locationId, LIMIT_METEO);
