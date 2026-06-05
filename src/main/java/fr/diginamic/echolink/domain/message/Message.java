@@ -52,6 +52,13 @@ public class Message {
         this.text = text;
     }
 
+    public Message(String text, Profile profile, Thread thread) {
+        this.text = text;
+        this.profile = profile;
+        this.thread = thread;
+
+    }
+
     /** @return toString */
     @Override
     public String toString() {
