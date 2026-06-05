@@ -1,15 +1,11 @@
 package fr.diginamic.echolink.domain.message;
 
-import fr.diginamic.echolink.domain.profile.Profile;
-import fr.diginamic.echolink.domain.thread.Thread;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-
-import java.util.UUID;
-
-public record MessageUpdateRequest(
-        String text,
-        UUID profileId,
-        UUID threadId
-) {
-}
+/**
+ * Request object used to update an existing {@link Message}.
+ * <p>
+ * Only mutable fields of a message are included here. Fields that are null
+ * or blank are ignored during the update process.
+ *
+ * @param text new content of the message
+ */
+public record MessageUpdateRequest(String text) {}
