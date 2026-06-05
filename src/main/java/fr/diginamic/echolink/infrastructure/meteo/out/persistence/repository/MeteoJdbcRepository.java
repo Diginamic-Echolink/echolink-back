@@ -12,7 +12,7 @@ import java.util.UUID;
 public interface MeteoJdbcRepository extends JpaRepository<Meteo, UUID> {
 
     @Query("SELECT m FROM Meteo m WHERE m.location.id = :locationId ORDER BY m.recordedAt DESC LIMIT 1")
-    Optional<Meteo> findByLocationId(@Param("locationId") UUID locationId);
+    Optional<Meteo> findLastByLocationId(@Param("locationId") UUID locationId);
 
     @Query("SELECT m FROM Meteo m WHERE m.location.id = :locationId ORDER BY m.recordedAt DESC LIMIT :limit")
     List<Meteo> findAllByLocationId(@Param("locationId") UUID locationId, @Param("limit") int limit);

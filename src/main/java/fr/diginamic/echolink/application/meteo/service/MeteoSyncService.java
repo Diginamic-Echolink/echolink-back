@@ -40,10 +40,13 @@ public class MeteoSyncService implements MeteoSyncUseCase {
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
         LocalDateTime endOfDay = startOfDay.plusDays(1);
 
-        List<Location> locationsToSync = locationRepository.findLocationToSyncMeteoToday(startOfDay, endOfDay);
+        List<Location> locationsToSync = locationRepository.getAllLocationsToSyncMeteoToday(startOfDay, endOfDay);
 
         pendingLocations.addAll(locationsToSync);
-        syncRunning = true;
+
+        if (!locationsToSync.isEmpty()) {
+            syncRunning = true;
+        }
 
         log.info("Weather synchronization for today: {} Locations loaded", locationsToSync.size());
     }
