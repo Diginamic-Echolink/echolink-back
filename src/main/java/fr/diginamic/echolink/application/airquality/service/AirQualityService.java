@@ -28,24 +28,12 @@ public class AirQualityService implements AirQualityGetUseCase {
      */
     private final AirQualityRepository repository;
 
-    /**
-     * Retrieves the latest air quality data for a given location.
-     *
-     * @param locationId unique identifier of the location
-     * @return the air quality data associated with the location
-     */
     @Override
     public AirQuality getByLocationId(UUID locationId) throws LocationNotFoundException {
         return repository.getByLocationId(locationId)
                 .orElseThrow(() -> new LocationNotFoundException("Location with id " + locationId + " not found"));
     }
 
-    /**
-     * Retrieves a list of air quality records for a given location.
-     *
-     * @param locationId unique identifier of the location
-     * @return a list of air quality records associated with the location
-     */
     @Override
     public List<AirQuality> getAllByLocationId(UUID locationId) {
         return repository.getAllByLocationId(locationId, LIMIT_AIR_QUALITY);

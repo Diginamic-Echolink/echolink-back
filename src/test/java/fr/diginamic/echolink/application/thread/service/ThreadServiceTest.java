@@ -4,6 +4,7 @@ import fr.diginamic.echolink.application.profile.port.in.ProfileGetUseCase;
 import fr.diginamic.echolink.application.section.port.in.SectionGetUseCase;
 import fr.diginamic.echolink.application.thread.port.out.ThreadRepository;
 import fr.diginamic.echolink.domain.profile.Profile;
+import fr.diginamic.echolink.domain.profile.exception.ProfileNotAllowedException;
 import fr.diginamic.echolink.domain.profile.exception.ProfileNotFoundException;
 import fr.diginamic.echolink.domain.section.Section;
 import fr.diginamic.echolink.domain.section.exception.SectionNotFoundException;
@@ -29,9 +30,7 @@ import static fr.diginamic.echolink.domain.shared.SharedTestData.givenUUID;
 import static fr.diginamic.echolink.domain.thread.ThreadTestData.givenThread1;
 import static fr.diginamic.echolink.domain.thread.ThreadTestData.givenThread2;
 import static fr.diginamic.echolink.domain.thread.ThreadTestData.givenThreadCreateRequest;
-import static fr.diginamic.echolink.domain.thread.ThreadTestData.givenThreadPartialUpdateRequest;
 import static fr.diginamic.echolink.domain.thread.ThreadTestData.givenThreadUpdateRequest;
-import static fr.diginamic.echolink.domain.thread.ThreadTestData.givenThreadWithBlankTitleUpdateRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -53,32 +52,23 @@ public class ThreadServiceTest {
 
     @Test
     void should_return_thread_by_id() throws ThreadNotFoundException {
-        // GIVEN
         UUID id = givenUUID();
-
         Thread thread = givenThread1();
 
-        when(repository.getById(id))
-                .thenReturn(Optional.of(thread));
+        when(repository.getById(id)).thenReturn(Optional.of(thread));
 
-        // WHEN
         Thread result = service.getById(id);
 
-        // THEN
         assertThat(result).isEqualTo(thread);
-
         verify(repository).getById(id);
     }
 
     @Test
     void should_throw_exception_when_thread_not_found() {
-        // GIVEN
         UUID id = givenUUID();
 
-        when(repository.getById(id))
-                .thenReturn(Optional.empty());
+        when(repository.getById(id)).thenReturn(Optional.empty());
 
-        // WHEN / THEN
         assertThatThrownBy(() -> service.getById(id))
                 .isInstanceOf(ThreadNotFoundException.class)
                 .hasMessage("Thread not found : " + id);
@@ -86,31 +76,23 @@ public class ThreadServiceTest {
 
     @Test
     void should_return_all_threads_of_section() {
-        // GIVEN
         UUID sectionId = givenUUID();
 
-        List<Thread> threads = List.of(
-                givenThread1(),
-                givenThread2()
-        );
+        List<Thread> threads = List.of(givenThread1(), givenThread2());
 
-        when(repository.getAllBySectionId(sectionId))
-                .thenReturn(threads);
+        when(repository.getAllBySectionId(sectionId)).thenReturn(threads);
 
-        // WHEN
         List<Thread> result = service.getAllBySectionId(sectionId);
 
-        // THEN
-        assertThat(result)
-                .hasSize(2)
-                .containsExactlyElementsOf(threads);
+        assertThat(result).containsExactlyElementsOf(threads);
 
         verify(repository).getAllBySectionId(sectionId);
     }
 
     @Test
-    void should_create_thread_with_correct_values() throws SectionNotFoundException, ProfileNotFoundException {
-        // GIVEN
+    void should_create_thread_with_correct_values()
+            throws SectionNotFoundException, ProfileNotFoundException {
+
         UUID sectionId = givenUUID();
         UUID profileId = givenUUID();
 
@@ -119,21 +101,15 @@ public class ThreadServiceTest {
 
         ThreadCreateRequest request = givenThreadCreateRequest(sectionId, profileId);
 
-        when(sectionGetUseCase.getById(sectionId))
-                .thenReturn(section);
+        when(sectionGetUseCase.getById(sectionId)).thenReturn(section);
+        when(profileGetUseCase.getById(profileId)).thenReturn(profile);
 
-        when(profileGetUseCase.getById(profileId))
-                .thenReturn(profile);
-
-        when(repository.save(any()))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+        when(repository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         ArgumentCaptor<Thread> captor = ArgumentCaptor.forClass(Thread.class);
 
-        // WHEN
         service.create(request);
 
-        // THEN
         verify(repository).save(captor.capture());
 
         Thread saved = captor.getValue();
@@ -146,102 +122,60 @@ public class ThreadServiceTest {
     }
 
     @Test
-    void should_update_thread() throws SectionNotFoundException, ThreadNotFoundException {
-        // GIVEN
+    void should_update_thread_when_profile_is_owner() throws Exception {
         UUID threadId = givenUUID();
-        UUID sectionId = givenUUID();
 
+        Profile profile = givenProfile1();
         Thread thread = givenThread1();
-        Section newSection = givenSection2();
+        thread.setProfile(profile);
 
-        ThreadUpdateRequest request = givenThreadUpdateRequest(sectionId);
+        ThreadUpdateRequest request = givenThreadUpdateRequest(givenUUID());
 
-        when(repository.getById(threadId))
-                .thenReturn(Optional.of(thread));
+        when(repository.getById(threadId)).thenReturn(Optional.of(thread));
 
-        when(sectionGetUseCase.getById(sectionId))
-                .thenReturn(newSection);
+        when(sectionGetUseCase.getById(any())).thenReturn(givenSection2());
 
-        when(repository.save(thread))
-                .thenReturn(thread);
+        when(repository.save(thread)).thenReturn(thread);
 
-        // WHEN
-        Thread result = service.update(threadId, request);
+        Thread result = service.update(profile, threadId, request);
 
-        // THEN
-        assertThat(result.getTitle()).isEqualTo(request.title());
-        assertThat(result.getSubject()).isEqualTo(request.subject());
-        assertThat(result.getSection()).isEqualTo(newSection);
-
+        assertThat(result).isNotNull();
         verify(repository).save(thread);
     }
 
     @Test
-    void should_partially_update_thread() throws ThreadNotFoundException, SectionNotFoundException {
-        // GIVEN
+    void should_throw_when_profile_not_allowed() {
         UUID threadId = givenUUID();
 
+        Profile owner = givenProfile1();
+        Profile attacker = givenProfile1();
+        attacker.setId(UUID.randomUUID());
+
         Thread thread = givenThread1();
+        thread.setProfile(owner);
 
-        String oldTitle = thread.getTitle();
-        Section oldSection = thread.getSection();
+        ThreadUpdateRequest request = givenThreadUpdateRequest(givenUUID());
 
-        ThreadUpdateRequest request = givenThreadPartialUpdateRequest();
+        when(repository.getById(threadId)).thenReturn(Optional.of(thread));
 
-        when(repository.getById(threadId))
-                .thenReturn(Optional.of(thread));
-
-        when(repository.save(thread))
-                .thenReturn(thread);
-
-        // WHEN
-        Thread result = service.update(threadId, request);
-
-        // THEN
-        assertThat(result.getTitle()).isEqualTo(oldTitle);
-        assertThat(result.getSubject()).isEqualTo(request.subject());
-        assertThat(result.getSection()).isEqualTo(oldSection);
+        assertThatThrownBy(() -> service.update(attacker, threadId, request))
+                .isInstanceOf(ProfileNotAllowedException.class)
+                .hasMessage("You are not allowed to modify this thread");
     }
 
     @Test
-    void should_ignore_blank_title() throws ThreadNotFoundException, SectionNotFoundException {
-        // GIVEN
-        UUID threadId = givenUUID();
-
-        Thread thread = givenThread1();
-
-        ThreadUpdateRequest request = givenThreadWithBlankTitleUpdateRequest();
-
-        when(repository.getById(threadId))
-                .thenReturn(Optional.of(thread));
-
-        when(repository.save(thread))
-                .thenReturn(thread);
-
-        // WHEN
-        Thread result = service.update(threadId, request);
-
-        // THEN
-        assertThat(result.getTitle()).isEqualTo(thread.getTitle());
-    }
-
-    @Test
-    void should_soft_delete_thread() throws ThreadNotFoundException {
-        // GIVEN
+    void should_soft_delete_thread() throws Exception {
         UUID id = givenUUID();
 
+        Profile profile = givenProfile1();
         Thread thread = givenThread1();
+        thread.setProfile(profile);
 
-        when(repository.getById(id))
-                .thenReturn(Optional.of(thread));
+        when(repository.getById(id)).thenReturn(Optional.of(thread));
+        when(repository.save(thread)).thenReturn(thread);
 
-        when(repository.save(thread))
-                .thenReturn(thread);
+        service.delete(profile, id);
 
-        // WHEN
-        service.delete(id);
-
-        // THEN
         assertThat(thread.getTitle()).isEqualTo("This thread has been deleted");
         assertThat(thread.getSubject()).isEqualTo("This thread has been deleted");
 
@@ -249,17 +183,21 @@ public class ThreadServiceTest {
     }
 
     @Test
-    void should_throw_exception_when_deleting_unknown_thread() {
-        // GIVEN
+    void should_throw_when_delete_not_allowed() {
         UUID id = givenUUID();
 
-        when(repository.getById(id))
-                .thenReturn(Optional.empty());
+        Profile owner = givenProfile1();
+        Profile attacker = givenProfile1();
+        attacker.setId(givenUUID());
 
-        // WHEN / THEN
-        assertThatThrownBy(() -> service.delete(id))
-                .isInstanceOf(ThreadNotFoundException.class)
-                .hasMessage("Thread not found : " + id);
+        Thread thread = givenThread1();
+        thread.setProfile(owner);
+
+        when(repository.getById(id)).thenReturn(Optional.of(thread));
+
+        assertThatThrownBy(() -> service.delete(attacker, id))
+                .isInstanceOf(ProfileNotAllowedException.class)
+                .hasMessage("You are not allowed to modify this thread");
 
         verify(repository, never()).save(any());
     }

@@ -30,48 +30,22 @@ public class LocationService implements LocationGetUseCase {
      */
     private final LocationRepository repository;
 
-    /**
-     * Retrieves a location by its unique identifier.
-     *
-     * @param id unique identifier of the location
-     * @return the matching location
-     * @throws LocationNotFoundException if no location is found with the specified identifier
-     */
     @Override
     public Location getById(UUID id) throws LocationNotFoundException {
         return repository.getById(id)
                 .orElseThrow(() -> new LocationNotFoundException("Location with id " + id + " not found"));
     }
 
-    /**
-     * Retrieves all locations whose name contains the specified search term.
-     *
-     * @param search text used to search location names
-     * @return list of matching locations
-     */
     @Override
     public List<Location> getAllByNameContaining(String search) {
         return repository.getAllByNameContaining(search);
     }
 
-    /**
-     * Retrieves all available locations.
-     *
-     * @return list of all locations
-     */
     @Override
     public List<Location> getAllLocations() {
         return repository.getAllLocations();
     }
 
-    /**
-     * Retrieves locations located within a geographic area around the specified coordinates.
-     *
-     * @param latitude reference latitude
-     * @param longitude reference longitude
-     * @param delta search radius in kilometers
-     * @return list of matching locations
-     */
     @Override
     public List<Location> getAllByGeolocalizationBetween(double latitude, double longitude, int delta) {
 

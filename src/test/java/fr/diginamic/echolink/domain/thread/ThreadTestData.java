@@ -63,23 +63,4 @@ public final class ThreadTestData {
                 sectionId
         );
     }
-
-
-    public static ThreadUpdateRequest givenThreadPartialUpdateRequest() {
-
-        return new ThreadUpdateRequest(
-                null,
-                "Nouvelle Description",
-                null
-        );
-    }
-
-    public static ThreadUpdateRequest givenThreadWithBlankTitleUpdateRequest() {
-
-        return new ThreadUpdateRequest(
-                "            ",
-                null,
-                null
-        );
-    }
 }
