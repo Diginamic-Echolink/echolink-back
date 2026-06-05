@@ -18,20 +18,51 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+/**
+ * Service responsible for synchronizing weather data for locations.
+ * This service loads locations that require weather updates, retrieves
+ * current weather data from an external provider and persists the results
+ * in batches.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class MeteoSyncService implements MeteoSyncUseCase {
 
+    /**
+     * Maximum number of locations processed during a synchronization batch.
+     */
     private static final int BATCH_SIZE = 200;
+
+    /**
+     * Indicates whether a synchronization process is currently running.
+     */
     private volatile boolean syncRunning = false;
 
+    /**
+     * Repository used to retrieve locations requiring weather synchronization.
+     */
     private final LocationRepository locationRepository;
+
+    /**
+     * Repository used to persist weather data.
+     */
     private final MeteoRepository meteoRepository;
+
+    /**
+     * Provider used to retrieve weather data from an external source.
+     */
     private final MeteoProvider meteoProvider;
 
+    /**
+     * Queue containing locations waiting to be synchronized.
+     */
     private final Queue<Location> pendingLocations = new ConcurrentLinkedQueue<>();
 
+    /**
+     * Initializes the synchronization queue with locations that have not yet
+     * received weather data for the current day.
+     */
     @Override
     public synchronized void initializeQueue() {
 
@@ -51,6 +82,10 @@ public class MeteoSyncService implements MeteoSyncUseCase {
         log.info("Weather synchronization for today: {} Locations loaded", locationsToSync.size());
     }
 
+    /**
+     * Processes a batch of locations and synchronizes their current weather data.
+     * Retrieved weather records are persisted once the batch is completed.
+     */
     @Override
     public void syncTodayMeteo() {
 

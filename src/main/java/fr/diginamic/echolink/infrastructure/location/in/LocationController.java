@@ -18,14 +18,31 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * REST controller exposing location retrieval endpoints.
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/v1/location", produces = MediaType.APPLICATION_JSON_VALUE)
 public class LocationController {
 
+    /**
+     * Use case responsible for retrieving locations.
+     */
     private final LocationGetUseCase getUseCase;
+
+    /**
+     * Mapper used to convert location domain objects into query DTOs.
+     */
     private final LocationQueryMapper mapper;
 
+    /**
+     * Retrieves a location by its unique identifier.
+     *
+     * @param locationId unique identifier of the location
+     * @return location information
+     * @throws LocationNotFoundException if no location is found with the specified identifier
+     */
     @GetMapping("/{locationId}")
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<LocationQuery> getLocationById(
@@ -36,6 +53,12 @@ public class LocationController {
         return ResponseEntity.ok(query);
     }
 
+    /**
+     * Retrieves locations whose name contains the specified value.
+     *
+     * @param name text used to search location names
+     * @return list of matching locations
+     */
     @GetMapping("/search")
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<List<LocationQuery>> getAllLocationsByNameContaining(@RequestParam String name) {
@@ -44,6 +67,11 @@ public class LocationController {
         return ResponseEntity.ok(query);
     }
 
+    /**
+     * Retrieves all available locations.
+     *
+     * @return list of location information
+     */
     @GetMapping("/all")
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<List<LocationQuery>> getAllLocations() {
@@ -52,6 +80,14 @@ public class LocationController {
         return ResponseEntity.ok(query);
     }
 
+    /**
+     * Retrieves locations located within a geographic area around the specified coordinates.
+     *
+     * @param latitude reference latitude
+     * @param longitude reference longitude
+     * @param delta search radius in kilometers
+     * @return list of matching locations
+     */
     @GetMapping("/geo/{latitude}/{longitude}/{delta}")
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<List<LocationQuery>> getAllLocationsByGeo(
