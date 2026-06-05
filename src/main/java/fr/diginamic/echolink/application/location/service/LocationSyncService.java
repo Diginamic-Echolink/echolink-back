@@ -12,16 +12,32 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Service responsible for synchronizing location data from an external provider.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class LocationSyncService implements LocationSyncUseCase {
 
+    /**
+     * Minimum population required for a location to be synchronized.
+     */
     private static final long MIN_POPULATION = 10_000L;
 
+    /**
+     * Repository used to access and persist location data.
+     */
     private final LocationRepository repository;
+
+    /**
+     * Provider used to retrieve location data from an external source.
+     */
     private final LocationProvider provider;
 
+    /**
+     * Synchronizes locations from the external provider and persists new entries.
+     */
     public void syncLocations() {
 
         long currentTimeMillis = System.currentTimeMillis();

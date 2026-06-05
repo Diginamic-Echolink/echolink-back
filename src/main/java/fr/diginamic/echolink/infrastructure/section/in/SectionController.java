@@ -27,18 +27,44 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * REST controller exposing section management endpoints.
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/v1/section", produces = MediaType.APPLICATION_JSON_VALUE)
 public class SectionController {
 
+    /**
+     * Use case responsible for retrieving sections.
+     */
     private final SectionGetUseCase getUseCase;
+
+    /**
+     * Use case responsible for creating sections.
+     */
     private final SectionCreateUseCase postUseCase;
+
+    /**
+     * Use case responsible for updating sections.
+     */
     private final SectionUpdateUseCase updateUseCase;
+
+    /**
+     * Use case responsible for deleting sections.
+     */
     private final SectionDeleteUseCase deleteUseCase;
 
+    /**
+     * Mapper used to convert section domain objects into query DTOs.
+     */
     private final SectionQueryMapper mapper;
 
+    /**
+     * Retrieves all available sections.
+     *
+     * @return list of section information
+     */
     @GetMapping("/all")
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<List<SectionQuery>> getAllSections() {
@@ -47,6 +73,12 @@ public class SectionController {
         return ResponseEntity.ok(query);
     }
 
+    /**
+     * Creates a new section.
+     *
+     * @param request request containing section information
+     * @return created section information
+     */
     @PostMapping
     @Secured("ROLE_ADMIN")
     public ResponseEntity<SectionQuery> createSection(@Valid @RequestBody SectionUpsertRequest request) {
@@ -55,6 +87,14 @@ public class SectionController {
         return ResponseEntity.ok(query);
     }
 
+    /**
+     * Updates an existing section.
+     *
+     * @param sectionId unique identifier of the section to update
+     * @param request request containing updated section information
+     * @return updated section information
+     * @throws SectionNotFoundException if no section is found with the specified identifier
+     */
     @PutMapping("/{sectionId}")
     @Secured("ROLE_ADMIN")
     public ResponseEntity<SectionQuery> updateSection(
@@ -66,6 +106,13 @@ public class SectionController {
         return ResponseEntity.ok(query);
     }
 
+    /**
+     * Deletes a section.
+     *
+     * @param sectionId unique identifier of the section to delete
+     * @return success response
+     * @throws SectionNotFoundException if no section is found with the specified identifier
+     */
     @DeleteMapping("/{sectionId}")
     @Secured("ROLE_ADMIN")
     public ResponseEntity<MessageQuery> updateSection(@PathVariable UUID sectionId) throws SectionNotFoundException {

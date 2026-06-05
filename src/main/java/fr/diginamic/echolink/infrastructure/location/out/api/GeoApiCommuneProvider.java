@@ -13,13 +13,30 @@ import org.springframework.web.client.RestClientException;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Implementation of {@link LocationProvider} that retrieves location data
+ * from the French Geo API.
+ */
 @Component
 @RequiredArgsConstructor
 public class GeoApiCommuneProvider implements LocationProvider {
 
+    /**
+     * REST client used to communicate with the Geo API.
+     */
     private final RestClient geoApiRestClient;
+
+    /**
+     * Mapper used to convert Geo API responses into domain objects.
+     */
     private final GeoApiCommuneMapper mapper;
 
+    /**
+     * Retrieves all available locations from the Geo API.
+     *
+     * @return list of available locations
+     * @throws LocationApiSyncException if the location data cannot be retrieved
+     */
     @Override
     public List<Location> getAllLocations() {
 

@@ -6,16 +6,27 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
+/**
+ * Configuration class responsible for creating and configuring
+ * {@link RestClient} instances used to communicate with external APIs.
+ */
 @Configuration
 public class RestClientConfig {
 
     @Value("${spring.geo-api.base-url}")
     private String baseUrlGeoApi;
+
     @Value("${spring.open-meteo.weather.base-url}")
     private String baseUrlOpenMeteoWeather;
+
     @Value("${spring.open-meteo.air-quality.base-url}")
     private String baseUrlOpenMeteoAirQuality;
 
+    /**
+     * Creates a generic {@link RestClient}.
+     *
+     * @return configured REST client
+     */
     @Bean
     public RestClient restClient() {
         return RestClient.builder()
@@ -23,6 +34,12 @@ public class RestClientConfig {
                 .build();
     }
 
+    /**
+     * Creates the HTTP request factory used by all REST clients.
+     * Configures connection and read timeouts.
+     *
+     * @return configured request factory
+     */
     private SimpleClientHttpRequestFactory clientHttpRequestFactory() {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         factory.setConnectTimeout(8000);
@@ -30,6 +47,11 @@ public class RestClientConfig {
         return factory;
     }
 
+    /**
+     * Creates a REST client configured for the Geo API.
+     *
+     * @return Geo API REST client
+     */
     @Bean(name = "geoApiRestClient")
     public RestClient geoApiRestClient() {
         return RestClient.builder()
@@ -38,6 +60,12 @@ public class RestClientConfig {
                 .build();
     }
 
+    /**
+     * Creates a REST client configured for the Open-Meteo
+     * weather API.
+     *
+     * @return Open-Meteo weather REST client
+     */
     @Bean(name = "openMeteoWeatherRestClient")
     public RestClient openMeteoRestClient() {
         return RestClient.builder()
@@ -46,6 +74,12 @@ public class RestClientConfig {
                 .build();
     }
 
+    /**
+     * Creates a REST client configured for the Open-Meteo
+     * air quality API.
+     *
+     * @return Open-Meteo air quality REST client
+     */
     @Bean(name = "openMeteoAirQualityRestClient")
     public RestClient openMeteoAirQualityRestClient() {
         return RestClient.builder()
