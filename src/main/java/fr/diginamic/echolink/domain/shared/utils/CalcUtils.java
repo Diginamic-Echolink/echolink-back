@@ -6,6 +6,9 @@ import java.util.List;
 
 public class CalcUtils {
 
+    /** Constant for the conversion of 1° to km */
+    private static final double DEGRE_TO_KM_CONVERSION = 111.11;
+
     public static float averageFloat(List<Float> values) {
         if (values == null || values.isEmpty()) return 0f;
 
@@ -37,6 +40,20 @@ public class CalcUtils {
                 .orElse(0d);
 
         return (byte) Math.round(max);
+    }
+
+    public static double deltaLatitudeToKm(double delta) {
+        return delta / DEGRE_TO_KM_CONVERSION;
+    }
+
+    public static double deltaLongitudeToKm(double latitude, int delta) {
+
+        // 1° ~= 111km * cos(latitude°)
+        double latitudeRad = Math.toRadians(latitude);
+
+        // Calculating the distance in km
+        double latitudeCoefficient = Math.cos(latitudeRad);
+        return delta / (DEGRE_TO_KM_CONVERSION * latitudeCoefficient);
     }
 
     private static float roundToFloatWithOneDecimal(double value) {

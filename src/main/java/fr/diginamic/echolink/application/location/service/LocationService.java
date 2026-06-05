@@ -10,14 +10,14 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 
+import static fr.diginamic.echolink.domain.shared.utils.CalcUtils.deltaLatitudeToKm;
+import static fr.diginamic.echolink.domain.shared.utils.CalcUtils.deltaLongitudeToKm;
+
 @Service
 @RequiredArgsConstructor
 public class LocationService implements LocationGetUseCase {
 
     private static final int LIMIT_LOCATION = 10;
-
-    /** Constant for the conversion of 1° to km */
-    private static final double DEGRE_TO_KM_CONVERSION = 111.11;
 
     private final LocationRepository repository;
 
@@ -40,7 +40,7 @@ public class LocationService implements LocationGetUseCase {
     @Override
     public List<Location> getAllByGeolocalizationBetween(double latitude, double longitude, int delta) {
 
-        double deltaDegreLatitude = delta / DEGRE_TO_KM_CONVERSION;
+        double deltaDegreLatitude = deltaLatitudeToKm(delta);
         double deltaDegreLongitude = deltaLongitudeToKm(latitude, delta);
 
         double latitudeMin = latitude - deltaDegreLatitude;
@@ -50,15 +50,5 @@ public class LocationService implements LocationGetUseCase {
         double longitudeMax = longitude + deltaDegreLongitude;
 
         return repository.getByGeolocalizationBetween(latitudeMin, latitudeMax , longitudeMin, longitudeMax, LIMIT_LOCATION);
-    }
-
-    private double deltaLongitudeToKm(double latitude, int delta) {
-
-        // 1° ~= 111km * cos(latitude°)
-        double latitudeRad = Math.toRadians(latitude);
-
-        // Calculating the distance in km
-        double latitudeCoefficient = Math.cos(latitudeRad);
-        return delta / (DEGRE_TO_KM_CONVERSION * latitudeCoefficient);
     }
 }
