@@ -11,6 +11,7 @@ spring:
     password: ${DB_PASSWORD:echolink}
 
   jpa:
+    open-in-view: false
     properties:
       hibernate:
         jdbc:
