@@ -22,21 +22,43 @@ public class SectionRepositoryAdapter implements SectionRepository {
      */
     private final SectionJdbcRepository repository;
 
+    /**
+     * Retrieves a section by its unique identifier.
+     *
+     * @param id unique identifier of the section
+     * @return an {@link Optional} containing the section if found
+     */
     @Override
     public Optional<Section> getById(UUID id) {
         return repository.findById(id);
     }
 
+    /**
+     * Retrieves all available sections.
+     *
+     * @return list of all sections
+     */
     @Override
     public List<Section> getAllSections() {
         return repository.findAll();
     }
 
+    /**
+     * Persists a section.
+     *
+     * @param section section to save
+     * @return the saved section
+     */
     @Override
     public Section save(Section section) {
         return repository.save(section);
     }
 
+    /**
+     * Deletes a section by its unique identifier.
+     *
+     * @param id unique identifier of the section to delete
+     */
     @Override
     public void delete(UUID id) {
         repository.deleteById(id);

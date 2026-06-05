@@ -30,6 +30,14 @@ public class OpenMeteoAirQualityProvider implements AirQualityProvider {
      */
     private final OpenMeteoAirQualityResponseMapper mapper;
 
+    /**
+     * Retrieves the current air quality data for the specified coordinates.
+     *
+     * @param latitude latitude of the location
+     * @param longitude longitude of the location
+     * @return the current air quality data
+     * @throws AirQualityApiSyncException if the API request fails or returns an invalid response
+     */
     @Override
     public AirQuality getCurrentAirQuality(double latitude, double longitude) {
 
