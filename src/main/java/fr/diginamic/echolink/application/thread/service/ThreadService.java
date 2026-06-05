@@ -101,7 +101,7 @@ public class ThreadService implements ThreadGetUseCase, ThreadCreateUseCase, Thr
      * @throws ThreadNotFoundException if no thread is found with the specified identifier
      */
     @Override
-    public Thread update(UUID id, ThreadUpdateRequest request) throws ThreadNotFoundException, SectionNotFoundException {
+    public Thread update(UUID id, ThreadUpdateRequest request) throws ThreadNotFoundException, SectionNotFoundException, ProfileNotFoundException{
         Thread thread = getById(id);
 
         if (request.title() != null && !request.title().isBlank()) {
@@ -113,6 +113,11 @@ public class ThreadService implements ThreadGetUseCase, ThreadCreateUseCase, Thr
         if (request.sectionId() != null) {
             Section section = sectionGetUseCase.getById(request.sectionId());
             thread.setSection(section);
+        }
+
+        if (request.profileId() != null) {
+            Profile profile = profileGetUseCase.getById(request.profileId());
+            thread.setProfile(profile);
         }
 
         return repository.save(thread);

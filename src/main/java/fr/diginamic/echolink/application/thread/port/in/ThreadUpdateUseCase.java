@@ -1,5 +1,6 @@
 package fr.diginamic.echolink.application.thread.port.in;
 
+import fr.diginamic.echolink.domain.profile.exception.ProfileNotFoundException;
 import fr.diginamic.echolink.domain.section.exception.SectionNotFoundException;
 import fr.diginamic.echolink.domain.thread.Thread;
 import fr.diginamic.echolink.domain.thread.ThreadUpdateRequest;
@@ -20,6 +21,7 @@ public interface ThreadUpdateUseCase {
      * @return the updated thread
      * @throws ThreadNotFoundException if no thread is found with the specified identifier
      * @throws SectionNotFoundException if no section is found with the specified identifier
+     * @throws ProfileNotFoundException if no profile is found with the specidied identifier
      */
-    Thread update(UUID id, ThreadUpdateRequest request) throws ThreadNotFoundException, SectionNotFoundException;
+    Thread update(UUID id, ThreadUpdateRequest request) throws ThreadNotFoundException, SectionNotFoundException, ProfileNotFoundException;
 }

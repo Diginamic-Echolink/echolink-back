@@ -18,21 +18,6 @@ public class LocationRepositoryAdapter implements LocationRepository {
 
     private final LocationJdbcRepository repository;
 
-    public Optional<Location> getById(UUID id) {
-        return repository.findById(id);
-    }
-
-    @Override
-    public List<Location> getByGeo(
-            double latitudeMin,
-            double latitudeMax,
-            double longitudeMin,
-            double longitudeMax,
-            int limit
-    ) {
-        return repository.findLocationsByCordonneeBetween(latitudeMin, latitudeMax, longitudeMin, longitudeMax, limit);
-    }
-
     @Override
     public Optional<Location> getById(UUID id) {
         return repository.findById(id);

@@ -109,7 +109,7 @@ public class ThreadController {
     public ResponseEntity<ThreadQuery> updateThread(
             @PathVariable UUID threadId,
             @RequestBody ThreadUpdateRequest request
-    ) throws ThreadNotFoundException, SectionNotFoundException {
+    ) throws ThreadNotFoundException, SectionNotFoundException, ProfileNotFoundException {
         Thread thread = updateUseCase.update(threadId, request);
         ThreadQuery query = mapper.toQuery(thread);
         return ResponseEntity.ok(query);
