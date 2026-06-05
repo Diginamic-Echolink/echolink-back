@@ -10,13 +10,32 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
+/**
+ * Implementation of {@link MeteoProvider} that retrieves weather data
+ * from the Open-Meteo API.
+ */
 @Component
 @RequiredArgsConstructor
 public class OpenMeteoWeatherProvider implements MeteoProvider {
 
+    /**
+     * REST client used to communicate with the Open-Meteo API.
+     */
     private final RestClient openMeteoWeatherRestClient;
+
+    /**
+     * Mapper used to convert Open-Meteo responses into domain objects.
+     */
     private final OpenMeteoWeatherResponseMapper mapper;
 
+    /**
+     * Retrieves the current weather data for the specified coordinates.
+     *
+     * @param latitude latitude of the requested location
+     * @param longitude longitude of the requested location
+     * @return weather data corresponding to the specified coordinates
+     * @throws MeteoApiSyncException if the weather data cannot be retrieved
+     */
     public Meteo getCurrentWeather(double latitude, double longitude) throws MeteoApiSyncException {
 
         try {

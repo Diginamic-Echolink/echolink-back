@@ -7,7 +7,19 @@ import fr.diginamic.echolink.domain.thread.exception.ThreadNotFoundException;
 
 import java.util.UUID;
 
+/**
+ * Defines the use case for updating a thread.
+ */
 public interface ThreadUpdateUseCase {
 
+    /**
+     * Updates the thread identified by the specified identifier.
+     *
+     * @param id unique identifier of the thread to update
+     * @param request request containing updated thread information
+     * @return the updated thread
+     * @throws ThreadNotFoundException if no thread is found with the specified identifier
+     * @throws SectionNotFoundException if no section is found with the specified identifier
+     */
     Thread update(UUID id, ThreadUpdateRequest request) throws ThreadNotFoundException, SectionNotFoundException;
 }

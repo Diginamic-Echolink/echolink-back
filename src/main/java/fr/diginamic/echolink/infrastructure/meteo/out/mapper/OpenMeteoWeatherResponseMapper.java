@@ -12,9 +12,18 @@ import java.util.List;
 import static fr.diginamic.echolink.domain.shared.utils.CalcUtils.averageFloat;
 import static fr.diginamic.echolink.domain.shared.utils.CalcUtils.averageInteger;
 
+/**
+ * Maps Open-Meteo API responses to weather domain objects.
+ */
 @Component
 public class OpenMeteoWeatherResponseMapper {
 
+    /**
+     * Converts an Open-Meteo response into a weather domain object.
+     *
+     * @param dto Open-Meteo response to convert
+     * @return corresponding weather domain object
+     */
     public Meteo toMeteo(OpenMeteoWeatherResponse dto) {
 
         OpenMeteoWeatherResponse.Daily daily = dto.daily();
