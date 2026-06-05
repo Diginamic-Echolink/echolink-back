@@ -30,14 +30,6 @@ public class Message {
     @Column(name="text", length = 10000)
     private String text;
 
-    /** Message's like count */
-    @Column(name="like_count")
-    private int likeCount;
-
-    /** Message's dislike count */
-    @Column(name="dislike_count")
-    private int dislikeCount;
-
     /** Thread to which this message belongs */
     @ManyToOne
     @JoinColumn(name="thread_id")
@@ -55,13 +47,9 @@ public class Message {
      * Constructor for: Message
      *
      * @param text
-     * @param likeCount
-     * @param dislikeCount
      */
-    public Message(String text, int likeCount, int dislikeCount) {
+    public Message(String text) {
         this.text = text;
-        this.likeCount = likeCount;
-        this.dislikeCount = dislikeCount;
     }
 
     /** @return toString */
@@ -70,8 +58,6 @@ public class Message {
         return "Message{" +
                 "id=" + id +
                 ", text='" + text + '\'' +
-                ", likeCount=" + likeCount +
-                ", dislikeCount=" + dislikeCount +
                 ", thread=" + thread +
                 ", profile=" + profile +
                 '}';
