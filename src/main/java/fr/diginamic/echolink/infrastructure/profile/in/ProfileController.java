@@ -9,6 +9,7 @@ import fr.diginamic.echolink.domain.profile.exception.ProfileNotFoundException;
 import fr.diginamic.echolink.infrastructure.common.in.dto.MessageQuery;
 import fr.diginamic.echolink.infrastructure.profile.in.dto.ProfileQuery;
 import fr.diginamic.echolink.infrastructure.profile.in.mapper.ProfileQueryMapper;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +35,7 @@ public class ProfileController {
     private final ProfileGetUseCase getUseCase;
     private final ProfileUpdateUseCase updateUseCase;
     private final ProfileDeleteUseCase deleteUseCase;
+
     private final ProfileQueryMapper mapper;
 
     @GetMapping("/me")
@@ -68,7 +70,7 @@ public class ProfileController {
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<ProfileQuery> updateProfile(
             @PathVariable UUID profileId,
-            @RequestBody ProfileUpdateRequest request
+            @Valid @RequestBody ProfileUpdateRequest request
     ) throws ProfileNotFoundException {
         Profile profile = updateUseCase.update(profileId, request);
         ProfileQuery query = mapper.toQuery(profile);

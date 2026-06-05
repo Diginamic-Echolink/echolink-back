@@ -7,8 +7,8 @@ import fr.diginamic.echolink.application.thread.port.in.ThreadUpdateUseCase;
 import fr.diginamic.echolink.domain.profile.exception.ProfileNotFoundException;
 import fr.diginamic.echolink.domain.section.exception.SectionNotFoundException;
 import fr.diginamic.echolink.domain.thread.Thread;
-import fr.diginamic.echolink.domain.thread.ThreadUpsertRequest;
-import fr.diginamic.echolink.domain.thread.exception.ThreadCreationNotValidException;
+import fr.diginamic.echolink.domain.thread.ThreadCreateRequest;
+import fr.diginamic.echolink.domain.thread.ThreadUpdateRequest;
 import fr.diginamic.echolink.domain.thread.exception.ThreadNotFoundException;
 import fr.diginamic.echolink.infrastructure.common.in.dto.MessageQuery;
 import fr.diginamic.echolink.infrastructure.thread.in.dto.ThreadQuery;
@@ -53,8 +53,8 @@ public class ThreadController {
     @PostMapping
     @Secured("ROLE_ADMIN")
     public ResponseEntity<ThreadQuery> createThread(
-            @Valid @RequestBody ThreadUpsertRequest request
-    ) throws ThreadCreationNotValidException, SectionNotFoundException, ProfileNotFoundException {
+            @Valid @RequestBody ThreadCreateRequest request
+    ) throws SectionNotFoundException, ProfileNotFoundException {
         Thread thread = postUseCase.create(request);
         ThreadQuery query = mapper.toQuery(thread);
         return ResponseEntity.ok(query);
@@ -64,8 +64,8 @@ public class ThreadController {
     @Secured({"ROLE_ADMIN"})
     public ResponseEntity<ThreadQuery> updateThread(
             @PathVariable UUID threadId,
-            @Valid @RequestBody ThreadUpsertRequest request
-    ) throws ThreadNotFoundException {
+            @RequestBody ThreadUpdateRequest request
+    ) throws ThreadNotFoundException, SectionNotFoundException {
         Thread thread = updateUseCase.update(threadId, request);
         ThreadQuery query = mapper.toQuery(thread);
         return ResponseEntity.ok(query);

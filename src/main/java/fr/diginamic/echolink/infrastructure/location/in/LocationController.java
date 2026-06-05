@@ -1,6 +1,6 @@
 package fr.diginamic.echolink.infrastructure.location.in;
 
-import fr.diginamic.echolink.application.location.service.LocationService;
+import fr.diginamic.echolink.application.location.port.in.LocationGetUseCase;
 import fr.diginamic.echolink.domain.location.Location;
 import fr.diginamic.echolink.domain.location.exception.LocationNotFoundException;
 import fr.diginamic.echolink.infrastructure.location.in.dto.LocationQuery;
@@ -23,32 +23,32 @@ import java.util.UUID;
 @RequestMapping(value = "/api/v1/location", produces = MediaType.APPLICATION_JSON_VALUE)
 public class LocationController {
 
-    private final LocationService locationService;
-    private final LocationQueryMapper locationQueryMapper;
+    private final LocationGetUseCase getUseCase;
+    private final LocationQueryMapper mapper;
 
     @GetMapping("/{locationId}")
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<LocationQuery> getLocationById(
             @PathVariable UUID locationId
     ) throws LocationNotFoundException {
-        Location location = locationService.getById(locationId);
-        LocationQuery query = locationQueryMapper.toQuery(location);
+        Location location = getUseCase.getById(locationId);
+        LocationQuery query = mapper.toQuery(location);
         return ResponseEntity.ok(query);
     }
 
     @GetMapping("/search")
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<List<LocationQuery>> getAllLocationsByNameContaining(@RequestParam String name) {
-        List<Location> locations = locationService.getAllByNameContaining(name);
-        List<LocationQuery> query = locations.stream().map(locationQueryMapper::toQuery).toList();
+        List<Location> locations = getUseCase.getAllByNameContaining(name);
+        List<LocationQuery> query = locations.stream().map(mapper::toQuery).toList();
         return ResponseEntity.ok(query);
     }
 
     @GetMapping("/all")
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<List<LocationQuery>> getAllLocations() {
-        List<Location> locations = locationService.getAllLocations();
-        List<LocationQuery> query = locations.stream().map(locationQueryMapper::toQuery).toList();
+        List<Location> locations = getUseCase.getAllLocations();
+        List<LocationQuery> query = locations.stream().map(mapper::toQuery).toList();
         return ResponseEntity.ok(query);
     }
 
@@ -59,8 +59,8 @@ public class LocationController {
             @PathVariable double longitude,
             @PathVariable int delta
     ) {
-        List<Location> locations = locationService.getAllByGeolocalizationBetween(latitude, longitude, delta);
-        List<LocationQuery> query = locations.stream().map(locationQueryMapper::toQuery).toList();
+        List<Location> locations = getUseCase.getAllByGeolocalizationBetween(latitude, longitude, delta);
+        List<LocationQuery> query = locations.stream().map(mapper::toQuery).toList();
         return ResponseEntity.ok(query);
     }
 }
