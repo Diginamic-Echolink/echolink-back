@@ -6,6 +6,8 @@ import java.util.List;
 
 public class CalcUtils {
 
+    private CalcUtils() {}
+
     /** Constant for the conversion of 1° to km */
     private static final double DEGRE_TO_KM_CONVERSION = 111.11;
 

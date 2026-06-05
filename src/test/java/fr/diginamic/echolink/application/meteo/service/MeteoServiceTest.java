@@ -20,7 +20,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class MeteoServiceTest {
+class MeteoServiceTest {
 
     @Mock
     private MeteoRepository repository;
@@ -41,7 +41,6 @@ public class MeteoServiceTest {
         Meteo result = service.getLastMeteoByLocationId(locationId);
 
         // THEN
-        assertThat(result).isNotNull();
         assertThat(result).isEqualTo(meteo);
 
         verify(repository).getLastMeteoByLocationId(locationId);
