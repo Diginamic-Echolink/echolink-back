@@ -27,7 +27,7 @@ public class LocationSyncService implements LocationSyncUseCase {
         long currentTimeMillis = System.currentTimeMillis();
         log.info("Location sync started");
 
-        Set<String> existingInseeCodes = repository.findAllInseeCodes();
+        Set<String> existingInseeCodes = repository.getAllInseeCodes();
         List<Location> locations;
 
         try {

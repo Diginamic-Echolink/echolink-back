@@ -28,12 +28,17 @@ public class LocationService implements LocationGetUseCase {
     }
 
     @Override
+    public List<Location> getAllByNameContaining(String search) {
+        return repository.getAllByNameContaining(search);
+    }
+
+    @Override
     public List<Location> getAllLocations() {
         return repository.getAllLocations();
     }
 
     @Override
-    public List<Location> getByGeo(double latitude, double longitude, int delta) {
+    public List<Location> getAllByGeolocalizationBetween(double latitude, double longitude, int delta) {
 
         double deltaDegreLatitude = delta / DEGRE_TO_KM_CONVERSION;
         double deltaDegreLongitude = deltaLongitudeToKm(latitude, delta);
@@ -44,7 +49,7 @@ public class LocationService implements LocationGetUseCase {
         double longitudeMin = longitude - deltaDegreLongitude;
         double longitudeMax = longitude + deltaDegreLongitude;
 
-        return repository.getByGeo(latitudeMin, latitudeMax , longitudeMin, longitudeMax, LIMIT_LOCATION);
+        return repository.getByGeolocalizationBetween(latitudeMin, latitudeMax , longitudeMin, longitudeMax, LIMIT_LOCATION);
     }
 
     private double deltaLongitudeToKm(double latitude, int delta) {

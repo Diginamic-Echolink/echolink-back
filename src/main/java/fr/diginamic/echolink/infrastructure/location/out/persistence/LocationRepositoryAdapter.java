@@ -18,19 +18,25 @@ public class LocationRepositoryAdapter implements LocationRepository {
 
     private final LocationJdbcRepository repository;
 
+    @Override
     public Optional<Location> getById(UUID id) {
         return repository.findById(id);
     }
 
     @Override
-    public List<Location> getByGeo(
+    public List<Location> getAllByNameContaining(String name) {
+        return repository.findAllByNameContaining(name);
+    }
+
+    @Override
+    public List<Location> getByGeolocalizationBetween(
             double latitudeMin,
             double latitudeMax,
             double longitudeMin,
             double longitudeMax,
             int limit
     ) {
-        return repository.findLocationsByCordonneeBetween(latitudeMin, latitudeMax, longitudeMin, longitudeMax, limit);
+        return repository.findAllByCordonneeBetween(latitudeMin, latitudeMax, longitudeMin, longitudeMax, limit);
     }
 
     @Override
@@ -39,18 +45,18 @@ public class LocationRepositoryAdapter implements LocationRepository {
     }
 
     @Override
-    public Set<String> findAllInseeCodes() {
+    public Set<String> getAllInseeCodes() {
         return repository.findAllInseeCodes();
     }
 
     @Override
-    public List<Location> findLocationToSyncMeteoToday(LocalDateTime startOfDay, LocalDateTime endOfDay) {
-        return repository.findLocationToSyncMeteoToday(startOfDay, endOfDay);
+    public List<Location> getAllLocationsToSyncMeteoToday(LocalDateTime startOfDay, LocalDateTime endOfDay) {
+        return repository.findAllLocationsToSyncMeteoToday(startOfDay, endOfDay);
     }
 
     @Override
-    public List<Location> findLocationToSyncAirQualityToday(LocalDateTime startOfDay, LocalDateTime endOfDay) {
-        return repository.findLocationToSyncAirQualityToday(startOfDay, endOfDay);
+    public List<Location> getAllLocationsToSyncAirQualityToday(LocalDateTime startOfDay, LocalDateTime endOfDay) {
+        return repository.findAllLocationsToSyncAirQualityToday(startOfDay, endOfDay);
     }
 
     @Override

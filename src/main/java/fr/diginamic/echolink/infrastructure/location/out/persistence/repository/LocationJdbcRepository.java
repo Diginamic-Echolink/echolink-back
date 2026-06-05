@@ -15,12 +15,20 @@ public interface LocationJdbcRepository extends JpaRepository<Location, UUID> {
     @Query("""
         SELECT l
         FROM Location l
+        WHERE LOWER(l.name) LIKE LOWER(CONCAT('%', :name, '%'))
+        ORDER BY l.population DESC
+    """)
+    List<Location> findAllByNameContaining(@Param("name") String name);
+
+    @Query("""
+        SELECT l
+        FROM Location l
         WHERE l.latitude BETWEEN :latitudeMin AND :latitudeMax
         AND l.longitude BETWEEN :longitudeMin AND :longitudeMax
         ORDER BY l.population DESC
         LIMIT :limit
         """)
-    List<Location> findLocationsByCordonneeBetween(
+    List<Location> findAllByCordonneeBetween(
             @Param("latitudeMin") double latitudeMin,
             @Param("latitudeMax") double latitudeMax,
             @Param("longitudeMin") double longitudeMin,
@@ -41,7 +49,7 @@ public interface LocationJdbcRepository extends JpaRepository<Location, UUID> {
             AND m.recordedAt < :endOfDay
         )
     """)
-    List<Location> findLocationToSyncMeteoToday(
+    List<Location> findAllLocationsToSyncMeteoToday(
             LocalDateTime startOfDay,
             LocalDateTime endOfDay
     );
@@ -56,7 +64,7 @@ public interface LocationJdbcRepository extends JpaRepository<Location, UUID> {
             AND a.recordedAt < :endOfDay
         )
     """)
-    List<Location> findLocationToSyncAirQualityToday(
+    List<Location> findAllLocationsToSyncAirQualityToday(
             LocalDateTime startOfDay,
             LocalDateTime endOfDay
     );

@@ -12,7 +12,9 @@ public interface LocationRepository {
 
     Optional<Location> getById(UUID id);
 
-    List<Location> getByGeo(
+    List<Location> getAllByNameContaining(String name);
+
+    List<Location> getByGeolocalizationBetween(
             double latitudeMin,
             double latitudeMax,
             double longitudeMin,
@@ -22,11 +24,11 @@ public interface LocationRepository {
 
     List<Location> getAllLocations();
 
-    Set<String> findAllInseeCodes();
+    Set<String> getAllInseeCodes();
 
-    List<Location> findLocationToSyncMeteoToday(LocalDateTime startOfDay, LocalDateTime endOfDay);
+    List<Location> getAllLocationsToSyncMeteoToday(LocalDateTime startOfDay, LocalDateTime endOfDay);
 
-    List<Location> findLocationToSyncAirQualityToday(LocalDateTime startOfDay, LocalDateTime endOfDay);
+    List<Location> getAllLocationsToSyncAirQualityToday(LocalDateTime startOfDay, LocalDateTime endOfDay);
 
     void saveAll(List<Location> locations);
 }
