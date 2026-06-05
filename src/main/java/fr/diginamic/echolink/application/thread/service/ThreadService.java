@@ -12,8 +12,8 @@ import fr.diginamic.echolink.domain.profile.exception.ProfileNotFoundException;
 import fr.diginamic.echolink.domain.section.Section;
 import fr.diginamic.echolink.domain.section.exception.SectionNotFoundException;
 import fr.diginamic.echolink.domain.thread.Thread;
-import fr.diginamic.echolink.domain.thread.ThreadUpsertRequest;
-import fr.diginamic.echolink.domain.thread.exception.ThreadCreationNotValidException;
+import fr.diginamic.echolink.domain.thread.ThreadCreateRequest;
+import fr.diginamic.echolink.domain.thread.ThreadUpdateRequest;
 import fr.diginamic.echolink.domain.thread.exception.ThreadNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -43,17 +43,7 @@ public class ThreadService implements ThreadGetUseCase, ThreadCreateUseCase, Thr
     }
 
     @Override
-    public Thread create(
-            ThreadUpsertRequest request
-    ) throws ThreadCreationNotValidException, SectionNotFoundException, ProfileNotFoundException {
-
-        if (request.title().isBlank()) {
-            throw new ThreadCreationNotValidException("Title is required");
-        }
-        if (request.subject().isBlank()) {
-            throw new ThreadCreationNotValidException("Subject is required");
-        }
-
+    public Thread create(ThreadCreateRequest request) throws SectionNotFoundException, ProfileNotFoundException {
         Section section = sectionGetUseCase.getById(request.sectionId());
         Profile profile = profileGetUseCase.getById(request.profileId());
 
@@ -68,14 +58,18 @@ public class ThreadService implements ThreadGetUseCase, ThreadCreateUseCase, Thr
     }
 
     @Override
-    public Thread update(UUID id, ThreadUpsertRequest request) throws ThreadNotFoundException {
+    public Thread update(UUID id, ThreadUpdateRequest request) throws ThreadNotFoundException, SectionNotFoundException {
         Thread thread = getById(id);
 
-        if (!request.title().isBlank()) {
+        if (request.title() != null && !request.title().isBlank()) {
             thread.setTitle(request.title());
         }
-        if (!request.subject().isBlank()) {
+        if (request.subject() != null && !request.subject().isBlank()) {
             thread.setSubject(request.subject());
+        }
+        if (request.sectionId() != null) {
+            Section section = sectionGetUseCase.getById(request.sectionId());
+            thread.setSection(section);
         }
 
         return repository.save(thread);

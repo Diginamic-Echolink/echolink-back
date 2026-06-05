@@ -1,4 +1,4 @@
-package fr.diginamic.echolink.infrastructure.thread.out;
+package fr.diginamic.echolink.infrastructure.thread.out.persistence;
 
 import fr.diginamic.echolink.application.thread.port.out.ThreadRepository;
 import fr.diginamic.echolink.domain.thread.Thread;
