@@ -30,18 +30,45 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * REST controller exposing thread management endpoints.
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/v1/thread", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ThreadController {
 
+    /**
+     * Use case responsible for retrieving threads.
+     */
     private final ThreadGetUseCase getUseCase;
+
+    /**
+     * Use case responsible for creating threads.
+     */
     private final ThreadCreateUseCase postUseCase;
+
+    /**
+     * Use case responsible for updating threads.
+     */
     private final ThreadUpdateUseCase updateUseCase;
+
+    /**
+     * Use case responsible for deleting threads.
+     */
     private final ThreadDeleteUseCase deleteUseCase;
 
+    /**
+     * Mapper used to convert thread domain objects into query DTOs.
+     */
     private final ThreadQueryMapper mapper;
 
+    /**
+     * Retrieves all threads associated with a section.
+     *
+     * @param sectionId unique identifier of the section
+     * @return list of thread information
+     */
     @GetMapping("/all/{sectionId}")
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public ResponseEntity<List<ThreadQuery>> getAllBySectionId(@PathVariable UUID sectionId) {
@@ -50,6 +77,14 @@ public class ThreadController {
         return ResponseEntity.ok(query);
     }
 
+    /**
+     * Creates a new thread.
+     *
+     * @param request request containing thread information
+     * @return created thread information
+     * @throws SectionNotFoundException if the associated section cannot be found
+     * @throws ProfileNotFoundException if the associated profile cannot be found
+     */
     @PostMapping
     @Secured("ROLE_ADMIN")
     public ResponseEntity<ThreadQuery> createThread(
@@ -60,6 +95,15 @@ public class ThreadController {
         return ResponseEntity.ok(query);
     }
 
+    /**
+     * Updates an existing thread.
+     *
+     * @param threadId unique identifier of the thread to update
+     * @param request request containing updated thread information
+     * @return updated thread information
+     * @throws ThreadNotFoundException if no thread is found with the specified identifier
+     * @throws SectionNotFoundException if the associated section cannot be found
+     */
     @PutMapping("/{threadId}")
     @Secured({"ROLE_ADMIN"})
     public ResponseEntity<ThreadQuery> updateThread(
@@ -71,6 +115,13 @@ public class ThreadController {
         return ResponseEntity.ok(query);
     }
 
+    /**
+     * Deletes a thread.
+     *
+     * @param threadId unique identifier of the thread to delete
+     * @return confirmation message
+     * @throws ThreadNotFoundException if no thread is found with the specified identifier
+     */
     @DeleteMapping("/{threadId}")
     @Secured({"ROLE_ADMIN"})
     public ResponseEntity<MessageQuery> updateThread(@PathVariable UUID threadId) throws ThreadNotFoundException {

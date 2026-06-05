@@ -10,8 +10,18 @@ import java.util.Set;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Repository providing persistence operations for {@link Location} entities.
+ */
 public interface LocationJdbcRepository extends JpaRepository<Location, UUID> {
 
+    /**
+     * Searches for locations whose name contains the specified value.
+     * Results are ordered by population in descending order.
+     *
+     * @param name location name or partial name to search for
+     * @return matching locations ordered by population
+     */
     @Query("""
         SELECT l
         FROM Location l
@@ -20,6 +30,18 @@ public interface LocationJdbcRepository extends JpaRepository<Location, UUID> {
     """)
     List<Location> findAllByNameContaining(@Param("name") String name);
 
+    /**
+     * Retrieves locations located within the specified geographical boundaries.
+     * Results are ordered by population in descending order and limited
+     * to the specified number of records.
+     *
+     * @param latitudeMin minimum latitude
+     * @param latitudeMax maximum latitude
+     * @param longitudeMin minimum longitude
+     * @param longitudeMax maximum longitude
+     * @param limit maximum number of locations to return
+     * @return locations matching the provided coordinates range
+     */
     @Query("""
         SELECT l
         FROM Location l
@@ -36,9 +58,22 @@ public interface LocationJdbcRepository extends JpaRepository<Location, UUID> {
             @Param("limit") int limit
     );
 
+    /**
+     * Retrieves all INSEE codes stored in the database.
+     *
+     * @return set of INSEE codes
+     */
     @Query("SELECT l.inseeCode FROM Location l")
     Set<String> findAllInseeCodes();
 
+    /**
+     * Retrieves locations for which no weather data has been synchronized
+     * during the specified day.
+     *
+     * @param startOfDay start of the day
+     * @param endOfDay end of the day
+     * @return locations requiring weather synchronization
+     */
     @Query("""
         SELECT l
         FROM Location l
@@ -54,6 +89,14 @@ public interface LocationJdbcRepository extends JpaRepository<Location, UUID> {
             LocalDateTime endOfDay
     );
 
+    /**
+     * Retrieves locations for which no air quality data has been synchronized
+     * during the specified day.
+     *
+     * @param startOfDay start of the day
+     * @param endOfDay end of the day
+     * @return locations requiring air quality synchronization
+     */
     @Query("""
         SELECT l
         FROM Location l

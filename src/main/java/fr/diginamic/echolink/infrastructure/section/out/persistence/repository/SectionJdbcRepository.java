@@ -5,4 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;
 
+/**
+ * JPA repository for accessing section data.
+ */
 public interface SectionJdbcRepository extends JpaRepository<Section, UUID> {}

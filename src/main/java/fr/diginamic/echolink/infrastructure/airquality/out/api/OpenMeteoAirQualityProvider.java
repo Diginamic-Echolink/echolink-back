@@ -11,14 +11,33 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
+/**
+ * Implementation of {@link AirQualityProvider} using the Open-Meteo Air Quality API.
+ * Retrieves current air quality data and maps the API response into domain objects.
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class OpenMeteoAirQualityProvider implements AirQualityProvider {
 
+    /**
+     * REST client used to communicate with the Open-Meteo Air Quality API.
+     */
     private final RestClient openMeteoAirQualityRestClient;
+
+    /**
+     * Mapper used to convert API responses into domain objects.
+     */
     private final OpenMeteoAirQualityResponseMapper mapper;
 
+    /**
+     * Retrieves the current air quality data for the specified coordinates.
+     *
+     * @param latitude latitude of the location
+     * @param longitude longitude of the location
+     * @return the current air quality data
+     * @throws AirQualityApiSyncException if the API request fails or returns an invalid response
+     */
     @Override
     public AirQuality getCurrentAirQuality(double latitude, double longitude) {
 

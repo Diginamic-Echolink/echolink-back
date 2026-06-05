@@ -1,5 +1,8 @@
 package fr.diginamic.echolink.domain.meteo;
 
+/**
+ * Represents weather conditions based on WMO weather codes.
+ */
 public enum WeatherCondition {
     CLEAR_SKY,
     MAINLY_CLEAR,
@@ -16,6 +19,12 @@ public enum WeatherCondition {
     THUNDERSTORM_WITH_HAIL,
     UNKNOWN;
 
+    /**
+     * Converts a WMO weather code into the corresponding weather condition.
+     *
+     * @param code WMO weather code
+     * @return corresponding weather condition
+     */
     public static WeatherCondition fromWmoCode(int code) {
         return switch (code) {
 

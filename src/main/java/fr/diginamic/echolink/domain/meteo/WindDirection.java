@@ -1,5 +1,8 @@
 package fr.diginamic.echolink.domain.meteo;
 
+/**
+ * Represents the cardinal and intercardinal wind directions.
+ */
 public enum WindDirection {
     NORTH,
     SOUTH,
@@ -10,6 +13,13 @@ public enum WindDirection {
     NORTH_WEST,
     SOUTH_WEST;
 
+    /**
+     * Converts a wind direction expressed in degrees into the corresponding
+     * cardinal or intercardinal direction.
+     *
+     * @param deg wind direction in degrees
+     * @return corresponding wind direction
+     */
     public static WindDirection fromDegrees(int deg) {
 
         if (deg >= 337 || deg < 23) return WindDirection.NORTH;
