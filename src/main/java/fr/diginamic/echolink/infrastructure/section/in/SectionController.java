@@ -7,6 +7,7 @@ import fr.diginamic.echolink.application.section.port.in.SectionUpdateUseCase;
 import fr.diginamic.echolink.domain.section.Section;
 import fr.diginamic.echolink.domain.section.SectionUpsertRequest;
 import fr.diginamic.echolink.domain.section.exception.SectionNotFoundException;
+import fr.diginamic.echolink.infrastructure.common.in.dto.MessageQuery;
 import fr.diginamic.echolink.infrastructure.section.in.dto.SectionQuery;
 import fr.diginamic.echolink.infrastructure.section.in.mapper.SectionQueryMapper;
 import jakarta.validation.Valid;
@@ -67,8 +68,8 @@ public class SectionController {
 
     @DeleteMapping("/{sectionId}")
     @Secured("ROLE_ADMIN")
-    public ResponseEntity<?> updateSection(@PathVariable UUID sectionId) throws SectionNotFoundException {
+    public ResponseEntity<MessageQuery> updateSection(@PathVariable UUID sectionId) throws SectionNotFoundException {
         deleteUseCase.delete(sectionId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(new MessageQuery("Section with id: " + sectionId + " is correctly deleted"));
     }
 }
