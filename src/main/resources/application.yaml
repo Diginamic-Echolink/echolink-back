@@ -28,3 +28,6 @@ spring:
       base-url: https://api.open-meteo.com/v1
     air-quality:
       base-url: https://air-quality-api.open-meteo.com/v1/
+
+  startup-initializer:
+    enabled: true
