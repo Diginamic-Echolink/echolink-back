@@ -19,7 +19,7 @@ public interface AirQualityRepository {
      * @param locationId unique identifier of the location
      * @return an optional containing the air quality data if found
      */
-    Optional<AirQuality> getByLocationId(UUID locationId);
+    Optional<AirQuality> getLastByLocationId(UUID locationId);
 
     /**
      * Retrieves a limited number of air quality records for a location.

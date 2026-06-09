@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 
 import static fr.diginamic.echolink.domain.location.LocationTestData.givenLocation1;
 import static fr.diginamic.echolink.domain.location.LocationTestData.givenLocation2;
-import static fr.diginamic.echolink.domain.location.LocationTestData.givenLocation3;
 
 public final class MeteoTestData {
 
@@ -52,7 +51,7 @@ public final class MeteoTestData {
                 WindDirection.EAST,
                 6.8f
         );
-        meteo.setLocation(givenLocation3());
+        meteo.setLocation(givenLocation1());
         return meteo;
     }
 }

@@ -3,7 +3,7 @@ package fr.diginamic.echolink.application.airquality.service;
 import fr.diginamic.echolink.application.airquality.port.in.AirQualitySyncUseCase;
 import fr.diginamic.echolink.application.airquality.port.out.AirQualityProvider;
 import fr.diginamic.echolink.application.airquality.port.out.AirQualityRepository;
-import fr.diginamic.echolink.application.location.port.out.LocationRepository;
+import fr.diginamic.echolink.application.location.port.in.LocationGetUseCase;
 import fr.diginamic.echolink.domain.airquality.AirQuality;
 import fr.diginamic.echolink.domain.airquality.exception.AirQualityApiSyncException;
 import fr.diginamic.echolink.domain.location.Location;
@@ -39,9 +39,9 @@ public class AirQualitySyncService implements AirQualitySyncUseCase {
     private volatile boolean syncRunning = false;
 
     /**
-     * Repository used to retrieve locations requiring synchronization.
+     * Use case used to retrieve locations.
      */
-    private final LocationRepository locationRepository;
+    private final LocationGetUseCase locationGetUseCase;
 
     /**
      * Repository used to persist air quality records.
@@ -70,7 +70,7 @@ public class AirQualitySyncService implements AirQualitySyncUseCase {
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
         LocalDateTime endOfDay = startOfDay.plusDays(1);
 
-        List<Location> locationsToSync = locationRepository.getAllLocationsToSyncAirQualityToday(startOfDay, endOfDay);
+        List<Location> locationsToSync = locationGetUseCase.getAllLocationsToSyncAirQualityToday(startOfDay, endOfDay);
 
         pendingLocations.addAll(locationsToSync);
 
@@ -119,10 +119,10 @@ public class AirQualitySyncService implements AirQualitySyncUseCase {
 
             } catch (AirQualityApiSyncException ex) {
                 log.warn(
-                        "Skipping location due to API failure. Unable to retrieve air quality datas for {} ({})",
+                        "Skipping location {} ({}) because air quality provider returned an error: {}",
                         location.getName(),
                         location.getInseeCode(),
-                        ex
+                        ex.getMessage()
                 );
             }
         }

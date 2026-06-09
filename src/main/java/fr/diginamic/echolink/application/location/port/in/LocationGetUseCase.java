@@ -3,6 +3,7 @@ package fr.diginamic.echolink.application.location.port.in;
 import fr.diginamic.echolink.domain.location.Location;
 import fr.diginamic.echolink.domain.location.exception.LocationNotFoundException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -10,6 +11,8 @@ import java.util.UUID;
  * Defines the use cases for retrieving locations.
  */
 public interface LocationGetUseCase {
+
+    boolean existsById(UUID id);
 
     /**
      * Retrieves a location by its unique identifier.
@@ -44,4 +47,22 @@ public interface LocationGetUseCase {
      * @return list of matching locations
      */
     List<Location> getAllByGeolocalizationBetween(double latitude, double longitude, int delta);
+
+    /**
+     * Retrieves locations that require weather synchronization for the current day.
+     *
+     * @param startOfDay start of the synchronization period
+     * @param endOfDay end of the synchronization period
+     * @return list of locations to synchronize
+     */
+    List<Location> getAllLocationsToSyncMeteoToday(LocalDateTime startOfDay, LocalDateTime endOfDay);
+
+    /**
+     * Retrieves locations that require air quality synchronization for the current day.
+     *
+     * @param startOfDay start of the synchronization period
+     * @param endOfDay end of the synchronization period
+     * @return list of locations to synchronize
+     */
+    List<Location> getAllLocationsToSyncAirQualityToday(LocalDateTime startOfDay, LocalDateTime endOfDay);
 }

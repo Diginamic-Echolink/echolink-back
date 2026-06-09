@@ -49,7 +49,7 @@ public class LocationSyncService implements LocationSyncUseCase {
             locations = provider.getAllLocations();
 
         } catch (LocationApiSyncException ex) {
-            log.warn("Unable to retrieve weather datas due to API failure.", ex);
+            log.warn("Unable to retrieve because location provider returned an error: {}.", ex.getMessage());
             return;
         }
 

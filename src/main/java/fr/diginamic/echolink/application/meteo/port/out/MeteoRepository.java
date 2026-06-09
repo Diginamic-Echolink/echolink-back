@@ -17,7 +17,7 @@ public interface MeteoRepository {
      * @param locationId unique identifier of the location
      * @return an {@link Optional} containing the latest weather record if found
      */
-    Optional<Meteo> getLastMeteoByLocationId(UUID locationId);
+    Optional<Meteo> getLastByLocationId(UUID locationId);
 
     /**
      * Retrieves a limited list of weather records for the specified location.
@@ -26,7 +26,7 @@ public interface MeteoRepository {
      * @param LIMIT_METEO maximum number of weather records to retrieve
      * @return a list of weather records associated with the location
      */
-    List<Meteo> getAllMeteoByLocationId(UUID locationId, int LIMIT_METEO);
+    List<Meteo> getAllByLocationId(UUID locationId, int LIMIT_METEO);
 
     /**
      * Persists a collection of weather records.
