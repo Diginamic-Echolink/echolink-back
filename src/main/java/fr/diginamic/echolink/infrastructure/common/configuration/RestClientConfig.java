@@ -13,13 +13,13 @@ import org.springframework.web.client.RestClient;
 @Configuration
 public class RestClientConfig {
 
-    @Value("${spring.geo-api.base-url}")
+    @Value("${app.integrations.geo-api.base-url}")
     private String baseUrlGeoApi;
 
-    @Value("${spring.open-meteo.weather.base-url}")
+    @Value("${app.integrations.open-meteo.weather.base-url}")
     private String baseUrlOpenMeteoWeather;
 
-    @Value("${spring.open-meteo.air-quality.base-url}")
+    @Value("${app.integrations.open-meteo.air-quality.base-url}")
     private String baseUrlOpenMeteoAirQuality;
 
     /**
