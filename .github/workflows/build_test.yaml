@@ -1,0 +1,41 @@
+#
+# GitHub Actions workflow that builds the project
+# and executes all tests on each push to the dev branch.
+#
+
+name: Build Test
+
+on:
+  #
+  # Triggers the workflow whenever code is pushed
+  # to the dev / main branch.
+  #
+  push:
+    branches: [ dev, main ]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      #
+      # Checks out the repository source code.
+      #
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      #
+      # Installs Java 25 and enables Maven dependency caching.
+      #
+      - name: Set up Java 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      #
+      # Builds the application and executes all tests.
+      #
+      - name: Build and test with Maven
+        run: mvn -B clean verify -Dspring.profiles.active=test

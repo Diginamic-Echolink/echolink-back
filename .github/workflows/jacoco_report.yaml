@@ -1,0 +1,47 @@
+#
+# GitHub Actions workflow that generates a JaCoCo code coverage report
+# and publishes it as a downloadable artifact.
+#
+
+name: JaCoCo Report
+
+on:
+  workflow_dispatch:
+
+jobs:
+  jacoco:
+    runs-on: ubuntu-latest
+
+    steps:
+      #
+      # Checks out the repository content.
+      #
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      #
+      # Installs Java 25 and configures Maven dependency caching.
+      #
+      - name: Set up Java 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      #
+      # Builds the project, executes tests,
+      # and generates the JaCoCo coverage report.
+      #
+      - name: Build project with Maven
+        run: mvn -B clean verify -Dspring.profiles.active=test
+
+      #
+      # Uploads the generated JaCoCo report
+      # as a GitHub Actions artifact.
+      #
+      - name: Upload JaCoCo report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: target/site/jacoco/
