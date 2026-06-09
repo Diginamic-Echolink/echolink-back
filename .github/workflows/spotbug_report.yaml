@@ -1,6 +1,7 @@
 #
-# GitHub Actions workflow that runs SpotBugs static code analysis
-# and publishes the generated report as a downloadable artifact.
+# GitHub Actions workflow that generates the Maven site
+# including the SpotBugs report and publishes it as a
+# downloadable artifact.
 #
 
 name: SpotBugs Report
@@ -31,22 +32,25 @@ jobs:
 
       #
       # Builds the project and executes tests.
-      # Test failures are ignored to allow SpotBugs analysis to continue.
+      # Test failures are ignored to allow report generation
+      # to continue.
       #
       - name: Build project with Maven
         run: mvn -B clean verify -Dspring.profiles.active=test -Dmaven.test.failure.ignore=true
 
       #
-      # Runs SpotBugs static analysis and generates the XML report.
+      # Generates the Maven site and all configured reports,
+      # including the SpotBugs report.
       #
-      - name: Run SpotBugs analysis
-        run: mvn spotbugs:spotbugs
+      - name: Generate Maven site
+        run: mvn site
 
       #
-      # Uploads the SpotBugs XML report as a GitHub Actions artifact.
+      # Uploads the generated SpotBugs report directory
+      # as a GitHub Actions artifact.
       #
       - name: Upload SpotBugs report
         uses: actions/upload-artifact@v4
         with:
           name: spotbugs-report
-          path: target/spotbugsXml.xml
+          path: target/spotbugs/
