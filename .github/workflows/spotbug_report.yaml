@@ -1,0 +1,52 @@
+#
+# GitHub Actions workflow that runs SpotBugs static code analysis
+# and publishes the generated report as a downloadable artifact.
+#
+
+name: SpotBugs Report
+
+on:
+  workflow_dispatch:
+
+jobs:
+  spotbugs:
+    runs-on: ubuntu-latest
+
+    steps:
+      #
+      # Checks out the repository source code.
+      #
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      #
+      # Installs Java 25 and enables Maven dependency caching.
+      #
+      - name: Set up Java 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      #
+      # Builds the project and executes tests.
+      # Test failures are ignored to allow SpotBugs analysis to continue.
+      #
+      - name: Build project with Maven
+        run: mvn -B clean verify -Dspring.profiles.active=test -Dmaven.test.failure.ignore=true
+
+      #
+      # Runs SpotBugs static analysis and generates the XML report.
+      #
+      - name: Run SpotBugs analysis
+        run: mvn spotbugs:spotbugs
+
+      #
+      # Uploads the SpotBugs XML report as a GitHub Actions artifact.
+      #
+      - name: Upload SpotBugs report
+        uses: actions/upload-artifact@v4
+        with:
+          name: spotbugs-report
+          path: target/spotbugsXml.xml
