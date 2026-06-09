@@ -1,15 +1,8 @@
 spring:
   application:
     name: echolink
-    jwt:
-      secret: ${JWT_SECRET:5mKbY6qNfK7dYjz9WvTn3GpLr4XsQe8BcDfGhJkLmNpQrStUvWxYz123456789AB}
-      expiration: 3600000
-
-  datasource:
-    url: ${DB_JDBC_URL:jdbc:mariadb://localhost:13306/echolink}
-    username: ${DB_USERNAME:echolink}
-    password: ${DB_PASSWORD:echolink}
-
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
   jpa:
     open-in-view: false
     properties:
@@ -17,17 +10,21 @@ spring:
         jdbc:
           batch_size: 500
         order_inserts: true
-
   flyway:
     enabled: true
-
-  geo-api:
-    base-url: https://geo.api.gouv.fr
-  open-meteo:
-    weather:
-      base-url: https://api.open-meteo.com/v1
-    air-quality:
-      base-url: https://air-quality-api.open-meteo.com/v1/
-
   startup-initializer:
     enabled: true
+
+app:
+  security:
+    jwt:
+      secret: ${JWT_SECRET:dumb_5mKbY6qNfK7dYjz9WvTn3GpLr4XsQe8BcDfGhJkLmNpQrStUvWxYz123456789AB}
+      expiration: 360000
+  integrations:
+    geo-api:
+      base-url: https://geo.api.gouv.fr
+    open-meteo:
+      weather:
+        base-url: https://api.open-meteo.com/v1
+      air-quality:
+        base-url: https://air-quality-api.open-meteo.com/v1/

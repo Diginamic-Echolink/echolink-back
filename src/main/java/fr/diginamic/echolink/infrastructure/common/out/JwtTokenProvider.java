@@ -25,7 +25,7 @@ public class JwtTokenProvider implements TokenProvider {
 
     private final JwtEncoder jwtEncoder;
 
-    @Value("${spring.application.jwt.expiration}")
+    @Value("${app.security.jwt.expiration}")
     private long expiration;
 
     /**

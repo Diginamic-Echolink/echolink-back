@@ -25,7 +25,7 @@ import java.nio.charset.StandardCharsets;
 @EnableConfigurationProperties
 public class JwtConfig {
 
-    @Value("${spring.application.jwt.secret}")
+    @Value("${app.security.jwt.secret}")
     private String secret;
 
     /**
