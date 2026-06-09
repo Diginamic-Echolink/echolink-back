@@ -13,6 +13,8 @@ import java.util.UUID;
  */
 public interface LocationRepository {
 
+    boolean existsById(UUID id);
+
     /**
      * Retrieves a location by its unique identifier.
      *

@@ -1,6 +1,6 @@
 package fr.diginamic.echolink.application.meteo.service;
 
-import fr.diginamic.echolink.application.location.port.out.LocationRepository;
+import fr.diginamic.echolink.application.location.port.in.LocationGetUseCase;
 import fr.diginamic.echolink.application.meteo.port.in.MeteoSyncUseCase;
 import fr.diginamic.echolink.application.meteo.port.out.MeteoProvider;
 import fr.diginamic.echolink.application.meteo.port.out.MeteoRepository;
@@ -40,9 +40,9 @@ public class MeteoSyncService implements MeteoSyncUseCase {
     private volatile boolean syncRunning = false;
 
     /**
-     * Repository used to retrieve locations requiring weather synchronization.
+     * Use case used to retrieve locations.
      */
-    private final LocationRepository locationRepository;
+    private final LocationGetUseCase locationGetUseCase;
 
     /**
      * Repository used to persist weather data.
@@ -71,7 +71,7 @@ public class MeteoSyncService implements MeteoSyncUseCase {
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
         LocalDateTime endOfDay = startOfDay.plusDays(1);
 
-        List<Location> locationsToSync = locationRepository.getAllLocationsToSyncMeteoToday(startOfDay, endOfDay);
+        List<Location> locationsToSync = locationGetUseCase.getAllLocationsToSyncMeteoToday(startOfDay, endOfDay);
 
         pendingLocations.addAll(locationsToSync);
 
@@ -115,10 +115,10 @@ public class MeteoSyncService implements MeteoSyncUseCase {
 
             } catch (MeteoApiSyncException ex) {
                 log.warn(
-                        "Skipping location due to API failure. Unable to retrieve weather datas for {} ({})",
+                        "Skipping location {} ({}) because weather provider returned an error: {}",
                         location.getName(),
                         location.getInseeCode(),
-                        ex
+                        ex.getMessage()
                 );
             }
         }
