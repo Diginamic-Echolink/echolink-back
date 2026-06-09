@@ -30,7 +30,7 @@ public class MeteoRepositoryAdapter implements MeteoRepository {
      * @return an {@link Optional} containing the latest weather record if found
      */
     @Override
-    public Optional<Meteo> getLastMeteoByLocationId(UUID locationId) {
+    public Optional<Meteo> getLastByLocationId(UUID locationId) {
         return repository.findLastByLocationId(locationId);
     }
 
@@ -42,7 +42,7 @@ public class MeteoRepositoryAdapter implements MeteoRepository {
      * @return list of weather records associated with the location
      */
     @Override
-    public List<Meteo> getAllMeteoByLocationId(UUID locationId, int limit) {
+    public List<Meteo> getAllByLocationId(UUID locationId, int limit) {
         return repository.findAllByLocationId(locationId, limit);
     }
 

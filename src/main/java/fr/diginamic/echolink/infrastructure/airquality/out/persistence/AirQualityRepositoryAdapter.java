@@ -30,7 +30,7 @@ public class AirQualityRepositoryAdapter implements AirQualityRepository {
      * @return an optional containing the air quality record if found
      */
     @Override
-    public Optional<AirQuality> getByLocationId(UUID locationId) {
+    public Optional<AirQuality> getLastByLocationId(UUID locationId) {
         return repository.findByLocationId(locationId);
     }
 

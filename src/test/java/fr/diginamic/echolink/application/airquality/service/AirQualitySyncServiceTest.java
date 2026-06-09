@@ -2,7 +2,7 @@ package fr.diginamic.echolink.application.airquality.service;
 
 import fr.diginamic.echolink.application.airquality.port.out.AirQualityProvider;
 import fr.diginamic.echolink.application.airquality.port.out.AirQualityRepository;
-import fr.diginamic.echolink.application.location.port.out.LocationRepository;
+import fr.diginamic.echolink.application.location.port.in.LocationGetUseCase;
 import fr.diginamic.echolink.domain.airquality.AirQuality;
 import fr.diginamic.echolink.domain.airquality.exception.AirQualityApiSyncException;
 import fr.diginamic.echolink.domain.location.Location;
@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
 class AirQualitySyncServiceTest {
 
     @Mock
-    private LocationRepository locationRepository;
+    private LocationGetUseCase locationGetUseCase;
     @Mock
     private AirQualityRepository airQualityRepository;
     @Mock
@@ -43,14 +43,14 @@ class AirQualitySyncServiceTest {
         // GIVEN
         Location location = givenLocation1();
 
-        when(locationRepository.getAllLocationsToSyncAirQualityToday(any(), any()))
+        when(locationGetUseCase.getAllLocationsToSyncAirQualityToday(any(), any()))
                 .thenReturn(List.of(location));
 
         // WHEN
         service.initializeQueue();
 
         // THEN
-        verify(locationRepository).getAllLocationsToSyncAirQualityToday(any(), any());
+        verify(locationGetUseCase).getAllLocationsToSyncAirQualityToday(any(), any());
     }
 
     @Test
@@ -58,14 +58,14 @@ class AirQualitySyncServiceTest {
         // GIVEN
         Location location = givenLocation1();
 
-        when(locationRepository.getAllLocationsToSyncAirQualityToday(any(), any()))
+        when(locationGetUseCase.getAllLocationsToSyncAirQualityToday(any(), any()))
                 .thenReturn(List.of(location));
 
         service.initializeQueue();
         service.initializeQueue();
 
         // THEN
-        verify(locationRepository, times(1))
+        verify(locationGetUseCase, times(1))
                 .getAllLocationsToSyncAirQualityToday(any(), any());
     }
 
@@ -75,7 +75,7 @@ class AirQualitySyncServiceTest {
         Location location = givenLocation1();
         AirQuality airQuality = givenAirQuality1();
 
-        when(locationRepository.getAllLocationsToSyncAirQualityToday(any(), any()))
+        when(locationGetUseCase.getAllLocationsToSyncAirQualityToday(any(), any()))
                 .thenReturn(List.of(location));
 
         when(airQualityProvider.getCurrentAirQuality(location.getLatitude(), location.getLongitude()))
@@ -96,7 +96,7 @@ class AirQualitySyncServiceTest {
         // GIVEN
         Location location = givenLocation1();
 
-        when(locationRepository.getAllLocationsToSyncAirQualityToday(any(), any()))
+        when(locationGetUseCase.getAllLocationsToSyncAirQualityToday(any(), any()))
                 .thenReturn(List.of(location));
 
         when(airQualityProvider.getCurrentAirQuality(anyDouble(), anyDouble()))
@@ -120,7 +120,7 @@ class AirQualitySyncServiceTest {
             locations.add(givenLocation1());
         }
 
-        when(locationRepository.getAllLocationsToSyncAirQualityToday(any(), any()))
+        when(locationGetUseCase.getAllLocationsToSyncAirQualityToday(any(), any()))
                 .thenReturn(locations);
 
         when(airQualityProvider.getCurrentAirQuality(anyDouble(), anyDouble()))
@@ -140,7 +140,7 @@ class AirQualitySyncServiceTest {
         // GIVEN
         Location location = givenLocation1();
 
-        when(locationRepository.getAllLocationsToSyncAirQualityToday(any(), any()))
+        when(locationGetUseCase.getAllLocationsToSyncAirQualityToday(any(), any()))
                 .thenReturn(List.of(location));
 
         when(airQualityProvider.getCurrentAirQuality(anyDouble(), anyDouble()))

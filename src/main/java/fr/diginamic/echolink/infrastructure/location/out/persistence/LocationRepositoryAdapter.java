@@ -24,6 +24,11 @@ public class LocationRepositoryAdapter implements LocationRepository {
 
     private final LocationJdbcRepository repository;
 
+    @Override
+    public boolean existsById(UUID id) {
+        return repository.existsById(id);
+    }
+
     public Optional<Location> getById(UUID id) {
         return repository.findById(id);
     }

@@ -1,6 +1,6 @@
 package fr.diginamic.echolink.application.meteo.service;
 
-import fr.diginamic.echolink.application.location.port.out.LocationRepository;
+import fr.diginamic.echolink.application.location.port.in.LocationGetUseCase;
 import fr.diginamic.echolink.application.meteo.port.out.MeteoProvider;
 import fr.diginamic.echolink.application.meteo.port.out.MeteoRepository;
 import fr.diginamic.echolink.domain.location.Location;
@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
 class MeteoSyncServiceTest {
 
     @Mock
-    private LocationRepository locationRepository;
+    private LocationGetUseCase locationGetUseCase;
     @Mock
     private MeteoRepository meteoRepository;
     @Mock
@@ -43,14 +43,14 @@ class MeteoSyncServiceTest {
         // GIVEN
         Location location = givenLocation1();
 
-        when(locationRepository.getAllLocationsToSyncMeteoToday(any(), any()))
+        when(locationGetUseCase.getAllLocationsToSyncMeteoToday(any(), any()))
                 .thenReturn(List.of(location));
 
         // WHEN
         service.initializeQueue();
 
         // THEN
-        verify(locationRepository).getAllLocationsToSyncMeteoToday(any(), any());
+        verify(locationGetUseCase).getAllLocationsToSyncMeteoToday(any(), any());
     }
 
     @Test
@@ -58,14 +58,14 @@ class MeteoSyncServiceTest {
         // GIVEN
         Location location = givenLocation1();
 
-        when(locationRepository.getAllLocationsToSyncMeteoToday(any(), any()))
+        when(locationGetUseCase.getAllLocationsToSyncMeteoToday(any(), any()))
                 .thenReturn(List.of(location));
 
         service.initializeQueue();
         service.initializeQueue();
 
         // THEN
-        verify(locationRepository, times(1))
+        verify(locationGetUseCase, times(1))
                 .getAllLocationsToSyncMeteoToday(any(), any());
     }
 
@@ -75,7 +75,7 @@ class MeteoSyncServiceTest {
         Location location = givenLocation1();
         Meteo meteo = givenMeteo1();
 
-        when(locationRepository.getAllLocationsToSyncMeteoToday(any(), any()))
+        when(locationGetUseCase.getAllLocationsToSyncMeteoToday(any(), any()))
                 .thenReturn(List.of(location));
 
         when(meteoProvider.getCurrentWeather(location.getLatitude(), location.getLongitude()))
@@ -96,7 +96,7 @@ class MeteoSyncServiceTest {
         // GIVEN
         Location location = givenLocation1();
 
-        when(locationRepository.getAllLocationsToSyncMeteoToday(any(), any()))
+        when(locationGetUseCase.getAllLocationsToSyncMeteoToday(any(), any()))
                 .thenReturn(List.of(location));
 
         when(meteoProvider.getCurrentWeather(anyDouble(), anyDouble()))
@@ -120,7 +120,7 @@ class MeteoSyncServiceTest {
             locations.add(givenLocation1());
         }
 
-        when(locationRepository.getAllLocationsToSyncMeteoToday(any(), any()))
+        when(locationGetUseCase.getAllLocationsToSyncMeteoToday(any(), any()))
                 .thenReturn(locations);
 
         when(meteoProvider.getCurrentWeather(anyDouble(), anyDouble()))
@@ -141,7 +141,7 @@ class MeteoSyncServiceTest {
         // GIVEN
         Location location = givenLocation1();
 
-        when(locationRepository.getAllLocationsToSyncMeteoToday(any(), any()))
+        when(locationGetUseCase.getAllLocationsToSyncMeteoToday(any(), any()))
                 .thenReturn(List.of(location));
 
         when(meteoProvider.getCurrentWeather(anyDouble(), anyDouble()))
