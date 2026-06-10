@@ -50,4 +50,3 @@ public record ThreadCreateRequest(
         String subject
 ) {
 }
-
