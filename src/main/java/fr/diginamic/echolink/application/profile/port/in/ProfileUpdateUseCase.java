@@ -2,6 +2,7 @@ package fr.diginamic.echolink.application.profile.port.in;
 
 import fr.diginamic.echolink.domain.profile.Profile;
 import fr.diginamic.echolink.domain.profile.ProfileUpdateRequest;
+import fr.diginamic.echolink.domain.profile.exception.ProfileNotAllowedException;
 import fr.diginamic.echolink.domain.profile.exception.ProfileNotFoundException;
 
 import java.util.UUID;
@@ -19,5 +20,6 @@ public interface ProfileUpdateUseCase {
      * @return the updated profile
      * @throws ProfileNotFoundException if no profile is found with the specified identifier
      */
-    Profile update(UUID id, ProfileUpdateRequest profile) throws ProfileNotFoundException;
+    Profile update(Profile user, UUID id, ProfileUpdateRequest profile)
+            throws ProfileNotFoundException, ProfileNotAllowedException;
 }

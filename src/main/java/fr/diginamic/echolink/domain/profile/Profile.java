@@ -143,7 +143,8 @@ public class Profile implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return isAdmin()
                 ? List.of(new SimpleGrantedAuthority("ADMIN"), new SimpleGrantedAuthority("USER"))
-                : List.of(new SimpleGrantedAuthority("USER"));
+                : List.of(new SimpleGrantedAuthority("USER")
+        );
     }
 
     /**
