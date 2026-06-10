@@ -36,7 +36,7 @@ public class RestResponseExceptionHandler {
     public ResponseEntity<ErrorMessageQuery> handleBadRequestException(AbstractBadRequestException exception) {
         return ResponseEntity
                 .status(BAD_REQUEST)
-                .body(new ErrorMessageQuery(exception.getMessage(), null));
+                .body(new ErrorMessageQuery(exception.getMessage(), List.of()));
     }
 
     /**
@@ -50,7 +50,7 @@ public class RestResponseExceptionHandler {
     public ResponseEntity<ErrorMessageQuery> handleForbiddenException(AbstractForbiddenException exception) {
         return ResponseEntity
                 .status(FORBIDDEN)
-                .body(new ErrorMessageQuery(exception.getMessage(), null));
+                .body(new ErrorMessageQuery(exception.getMessage(), List.of()));
     }
 
     /**
@@ -63,7 +63,7 @@ public class RestResponseExceptionHandler {
     public ResponseEntity<ErrorMessageQuery> handleNotFoundException(AbstractNotFoundException exception) {
         return ResponseEntity
                 .status(NOT_FOUND)
-                .body(new ErrorMessageQuery(exception.getMessage(), null));
+                .body(new ErrorMessageQuery(exception.getMessage(), List.of()));
     }
 
     /**
@@ -76,7 +76,7 @@ public class RestResponseExceptionHandler {
     public ResponseEntity<ErrorMessageQuery> handleInvalidJson(HttpMessageNotReadableException ex) {
         return ResponseEntity
                 .status(BAD_REQUEST)
-                .body(new ErrorMessageQuery("Invalid request format", null));
+                .body(new ErrorMessageQuery("Invalid request format", List.of()));
     }
 
     /**

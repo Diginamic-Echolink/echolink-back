@@ -7,14 +7,22 @@ import fr.diginamic.echolink.application.section.port.in.SectionUpdateUseCase;
 import fr.diginamic.echolink.domain.section.Section;
 import fr.diginamic.echolink.domain.section.SectionUpsertRequest;
 import fr.diginamic.echolink.domain.section.exception.SectionNotFoundException;
+import fr.diginamic.echolink.infrastructure.common.in.dto.ErrorMessageQuery;
 import fr.diginamic.echolink.infrastructure.common.in.dto.MessageResponse;
 import fr.diginamic.echolink.infrastructure.section.in.dto.SectionQuery;
 import fr.diginamic.echolink.infrastructure.section.in.mapper.SectionQueryMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,12 +35,15 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.UUID;
 
+import static org.springframework.http.HttpStatus.CREATED;
+
 /**
  * REST controller exposing section management endpoints.
  */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/v1/section", produces = MediaType.APPLICATION_JSON_VALUE)
+@Tag(name = "Section", description = "Section management")
 public class SectionController {
 
     /**
@@ -66,10 +77,32 @@ public class SectionController {
      * @return list of section information
      */
     @GetMapping("/all")
-    @Secured({"ROLE_ADMIN", "ROLE_USER"})
+    @RolesAllowed({"ADMIN", "USER"})
+    @Operation(
+            operationId = "getAllSections",
+            summary = "Get all sections",
+            description = "Returns all available sections",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Sections retrieved successfully",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = SectionQuery.class))
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized",
+                            content = @Content(schema = @Schema(hidden = true))
+                    )
+            }
+    )
     public ResponseEntity<List<SectionQuery>> getAllSections() {
+
         List<Section> sections = getUseCase.getAllSections();
         List<SectionQuery> query = sections.stream().map(mapper::toQuery).toList();
+
         return ResponseEntity.ok(query);
     }
 
@@ -80,11 +113,40 @@ public class SectionController {
      * @return created section information
      */
     @PostMapping
-    @Secured("ROLE_ADMIN")
+    @RolesAllowed("ADMIN")
+    @Operation(
+            operationId = "createSection",
+            summary = "Create a section",
+            description = "Creates a new section",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "201",
+                            description = "Section created successfully",
+                            content = @Content(schema = @Schema(implementation = SectionQuery.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Invalid request",
+                            content = @Content(schema = @Schema(implementation = ErrorMessageQuery.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized",
+                            content = @Content(schema = @Schema(hidden = true))
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Forbidden",
+                            content = @Content(schema = @Schema(hidden = true))
+                    )
+            }
+    )
     public ResponseEntity<SectionQuery> createSection(@Valid @RequestBody SectionUpsertRequest request) {
+
         Section section = postUseCase.create(request);
         SectionQuery query = mapper.toQuery(section);
-        return ResponseEntity.ok(query);
+
+        return ResponseEntity.status(CREATED).body(query);
     }
 
     /**
@@ -96,13 +158,42 @@ public class SectionController {
      * @throws SectionNotFoundException if no section is found with the specified identifier
      */
     @PutMapping("/{sectionId}")
-    @Secured("ROLE_ADMIN")
+    @RolesAllowed("ADMIN")
+    @Operation(
+            operationId = "updateSection",
+            summary = "Update a section",
+            description = "Updates an existing section",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Section updated successfully",
+                            content = @Content(schema = @Schema(implementation = SectionQuery.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized",
+                            content = @Content(schema = @Schema(hidden = true))
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Forbidden",
+                            content = @Content(schema = @Schema(hidden = true))
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Section not found",
+                            content = @Content(schema = @Schema(implementation = ErrorMessageQuery.class))
+                    )
+            }
+    )
     public ResponseEntity<SectionQuery> updateSection(
-            @PathVariable UUID sectionId,
+            @Parameter(description = "Section UUID", required = true) @PathVariable UUID sectionId,
             @Valid @RequestBody SectionUpsertRequest request
     ) throws SectionNotFoundException {
+
         Section section = updateUseCase.update(sectionId, request);
         SectionQuery query = mapper.toQuery(section);
+
         return ResponseEntity.ok(query);
     }
 
@@ -114,9 +205,40 @@ public class SectionController {
      * @throws SectionNotFoundException if no section is found with the specified identifier
      */
     @DeleteMapping("/{sectionId}")
-    @Secured("ROLE_ADMIN")
-    public ResponseEntity<MessageResponse> updateSection(@PathVariable UUID sectionId) throws SectionNotFoundException {
+    @RolesAllowed("ADMIN")
+    @Operation(
+            operationId = "deleteSection",
+            summary = "Delete a section",
+            description = "Deletes a section by its ID",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Section deleted successfully",
+                            content = @Content(schema = @Schema(implementation = MessageResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized",
+                            content = @Content(schema = @Schema(hidden = true))
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Forbidden",
+                            content = @Content(schema = @Schema(hidden = true))
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Section not found",
+                            content = @Content(schema = @Schema(implementation = ErrorMessageQuery.class))
+                    )
+            }
+    )
+    public ResponseEntity<MessageResponse> deleteSection(
+            @Parameter(description = "Section UUID", required = true) @PathVariable UUID sectionId
+    ) throws SectionNotFoundException {
+
         deleteUseCase.delete(sectionId);
+
         return ResponseEntity.ok(new MessageResponse("Section with id: " + sectionId + " is correctly deleted"));
     }
 }

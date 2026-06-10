@@ -5,15 +5,24 @@ import fr.diginamic.echolink.application.profile.port.in.ProfileGetUseCase;
 import fr.diginamic.echolink.application.profile.port.in.ProfileUpdateUseCase;
 import fr.diginamic.echolink.domain.profile.Profile;
 import fr.diginamic.echolink.domain.profile.ProfileUpdateRequest;
+import fr.diginamic.echolink.domain.profile.exception.ProfileNotAllowedException;
 import fr.diginamic.echolink.domain.profile.exception.ProfileNotFoundException;
+import fr.diginamic.echolink.infrastructure.common.in.dto.ErrorMessageQuery;
 import fr.diginamic.echolink.infrastructure.common.in.dto.MessageResponse;
 import fr.diginamic.echolink.infrastructure.profile.in.dto.ProfileQuery;
 import fr.diginamic.echolink.infrastructure.profile.in.mapper.ProfileQueryMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -33,6 +43,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/v1/profile", produces = MediaType.APPLICATION_JSON_VALUE)
+@Tag(name = "Profile", description = "Profile management")
 public class ProfileController {
 
     /**
@@ -63,15 +74,40 @@ public class ProfileController {
      * @throws ProfileNotFoundException if the authenticated profile cannot be found
      */
     @GetMapping("/me")
-    @Secured({"ROLE_ADMIN", "ROLE_USER"})
+    @RolesAllowed({"ADMIN", "USER"})
+    @Operation(
+            operationId = "getMyProfile",
+            summary = "Get authenticated profile",
+            description = "Returns the profile linked to the current JWT",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Profile retrieved successfully",
+                            content = @Content(schema = @Schema(implementation = ProfileQuery.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized",
+                            content = @Content(schema = @Schema(hidden = true))
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Profile not found",
+                            content = @Content(schema = @Schema(implementation = ErrorMessageQuery.class))
+                    )
+            }
+    )
     public ResponseEntity<ProfileQuery> me(Authentication authentication) throws ProfileNotFoundException {
-        Jwt jwt = (Jwt) authentication.getPrincipal();
-        if (jwt != null) {
-            Profile profile = getUseCase.getById(UUID.fromString(jwt.getSubject()));
-            ProfileQuery query = mapper.toQuery(profile);
-            return ResponseEntity.ok(query);
+
+        if (authentication == null || authentication.getPrincipal() == null) {
+            return ResponseEntity.status(401).build();
         }
-        return ResponseEntity.notFound().build();
+
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        Profile profile = getUseCase.getById(UUID.fromString(jwt.getSubject()));
+        ProfileQuery query = mapper.toQuery(profile);
+
+        return ResponseEntity.ok(query);
     }
 
     /**
@@ -82,10 +118,35 @@ public class ProfileController {
      * @throws ProfileNotFoundException if no profile is found with the specified identifier
      */
     @GetMapping("/{profileId}")
-    @Secured({"ROLE_ADMIN", "ROLE_USER"})
-    public ResponseEntity<ProfileQuery> getProfileById(@PathVariable UUID profileId) throws ProfileNotFoundException {
+    @RolesAllowed({"ADMIN", "USER"})
+    @Operation(
+            operationId = "getProfileById",
+            summary = "Get profile by id",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Profile found",
+                            content = @Content(schema = @Schema(implementation = ProfileQuery.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized",
+                            content = @Content(schema = @Schema(hidden = true))
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Profile not found",
+                            content = @Content(schema = @Schema(implementation = ErrorMessageQuery.class))
+                    )
+            }
+    )
+    public ResponseEntity<ProfileQuery> getProfileById(
+            @Parameter(description = "Profile UUID", required = true) @PathVariable UUID profileId
+    ) throws ProfileNotFoundException {
+
         Profile profile = getUseCase.getById(profileId);
         ProfileQuery query = mapper.toQuery(profile);
+
         return ResponseEntity.ok(query);
     }
 
@@ -95,10 +156,35 @@ public class ProfileController {
      * @return list of profile information
      */
     @GetMapping("/all")
-    @Secured({"ROLE_ADMIN", "ROLE_USER"})
+    @RolesAllowed("ADMIN")
+    @Operation(
+            operationId = "getAllProfiles",
+            summary = "Get all profiles",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Profiles retrieved",
+                            content = @Content(
+                                    array = @ArraySchema(schema = @Schema(implementation = ProfileQuery.class))
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized",
+                            content = @Content(schema = @Schema(hidden = true))
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Forbidden",
+                            content = @Content(schema = @Schema(hidden = true))
+                    )
+            }
+    )
     public ResponseEntity<List<ProfileQuery>> getAllProfiles() {
+
         List<Profile> profiles = getUseCase.getAllProfiles();
         List<ProfileQuery> query = profiles.stream().map(mapper::toQuery).toList();
+
         return ResponseEntity.ok(query);
     }
 
@@ -111,13 +197,51 @@ public class ProfileController {
      * @throws ProfileNotFoundException if no profile is found with the specified identifier
      */
     @PutMapping("/{profileId}")
-    @Secured({"ROLE_ADMIN", "ROLE_USER"})
+    @RolesAllowed({"ADMIN", "USER"})
+    @Operation(
+            operationId = "updateProfile",
+            summary = "Update profile",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Profile updated",
+                            content = @Content(schema = @Schema(implementation = ProfileQuery.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Invalid request",
+                            content = @Content(schema = @Schema(implementation = ErrorMessageQuery.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized",
+                            content = @Content(schema = @Schema(hidden = true))
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Forbidden",
+                            content = @Content(schema = @Schema(implementation = ErrorMessageQuery.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Profile not found",
+                            content = @Content(schema = @Schema(implementation = ErrorMessageQuery.class))
+                    )
+            }
+    )
     public ResponseEntity<ProfileQuery> updateProfile(
-            @PathVariable UUID profileId,
-            @Valid @RequestBody ProfileUpdateRequest request
-    ) throws ProfileNotFoundException {
-        Profile profile = updateUseCase.update(profileId, request);
+            @Parameter(description = "Profile UUID", required = true) @PathVariable UUID profileId,
+            @Valid @RequestBody ProfileUpdateRequest request,
+            Authentication authentication
+    ) throws ProfileNotFoundException, ProfileNotAllowedException {
+
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        UUID id = UUID.fromString(Objects.requireNonNull(jwt).getSubject());
+        Profile user = getUseCase.getById(id);
+
+        Profile profile = updateUseCase.update(user, profileId, request);
         ProfileQuery query = mapper.toQuery(profile);
+
         return ResponseEntity.ok(query);
     }
 
@@ -129,9 +253,39 @@ public class ProfileController {
      * @throws ProfileNotFoundException if no profile is found with the specified identifier
      */
     @DeleteMapping("/{profileId}")
-    @Secured("ROLE_ADMIN")
-    public ResponseEntity<MessageResponse> deleteProfile(@PathVariable UUID profileId) throws ProfileNotFoundException {
+    @RolesAllowed("ADMIN")
+    @Operation(
+            operationId = "deleteProfile",
+            summary = "Delete profile",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Profile deleted",
+                            content = @Content(schema = @Schema(implementation = MessageResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized",
+                            content = @Content(schema = @Schema(hidden = true))
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Forbidden",
+                            content = @Content(schema = @Schema(hidden = true))
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Profile not found",
+                            content = @Content(schema = @Schema(implementation = ErrorMessageQuery.class))
+                    )
+            }
+    )
+    public ResponseEntity<MessageResponse> deleteProfile(
+            @Parameter(description = "Profile UUID", required = true) @PathVariable UUID profileId
+    ) throws ProfileNotFoundException {
+
         deleteUseCase.delete(profileId);
+
         return ResponseEntity.ok(new MessageResponse("Profile with id: " + profileId + " is correctly deleted"));
     }
 }

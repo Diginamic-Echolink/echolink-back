@@ -1,5 +1,7 @@
 package fr.diginamic.echolink.domain.message;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 /**
  * Request object used to update an existing {@link Message}.
  * <p>
@@ -8,4 +10,13 @@ package fr.diginamic.echolink.domain.message;
  *
  * @param text new content of the message
  */
-public record MessageUpdateRequest(String text) {}
+@Schema(description = "Payload used to update an existing message")
+public record MessageUpdateRequest(
+
+        @Schema(
+                description = "New message content",
+                example = "Updated message content"
+        )
+        String text
+) {
+}
