@@ -55,11 +55,12 @@ public final class ThreadTestData {
         );
     }
 
-    public static ThreadUpdateRequest givenThreadUpdateRequest(UUID sectionId) {
+    public static ThreadUpdateRequest givenThreadUpdateRequest(UUID sectionId, UUID profileId) {
 
         return new ThreadUpdateRequest(
                 "Nouveau sujet",
                 "Nouvelle Description",
+                profileId,
                 sectionId
         );
     }

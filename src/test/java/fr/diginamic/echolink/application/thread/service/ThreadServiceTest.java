@@ -144,7 +144,7 @@ class ThreadServiceTest {
         Thread thread = givenThread1();
         thread.setProfile(profile);
 
-        ThreadUpdateRequest request = givenThreadUpdateRequest(givenUUID());
+        ThreadUpdateRequest request = givenThreadUpdateRequest(givenUUID(), profile.getId());
 
         when(repository.getById(threadId)).thenReturn(Optional.of(thread));
 
@@ -172,7 +172,7 @@ class ThreadServiceTest {
         Thread thread = givenThread1();
         thread.setProfile(owner);
 
-        ThreadUpdateRequest request = givenThreadUpdateRequest(givenUUID());
+        ThreadUpdateRequest request = givenThreadUpdateRequest(givenUUID(), owner.getId());
 
         when(repository.getById(threadId)).thenReturn(Optional.of(thread));
 
