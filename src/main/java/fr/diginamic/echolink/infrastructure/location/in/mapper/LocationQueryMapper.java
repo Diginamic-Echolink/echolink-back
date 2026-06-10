@@ -17,6 +17,7 @@ public class LocationQueryMapper {
      * @return corresponding location query DTO
      */
     public LocationQuery toQuery(Location location) {
+
         return new LocationQuery(
                 location.getName(),
                 location.getPostalCode(),
