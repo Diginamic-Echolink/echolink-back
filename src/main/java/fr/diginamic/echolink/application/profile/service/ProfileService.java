@@ -6,6 +6,7 @@ import fr.diginamic.echolink.application.profile.port.in.ProfileUpdateUseCase;
 import fr.diginamic.echolink.application.profile.port.out.ProfileRepository;
 import fr.diginamic.echolink.domain.profile.Profile;
 import fr.diginamic.echolink.domain.profile.ProfileUpdateRequest;
+import fr.diginamic.echolink.domain.profile.exception.ProfileNotAllowedException;
 import fr.diginamic.echolink.domain.profile.exception.ProfileNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -63,13 +64,23 @@ public class ProfileService implements ProfileGetUseCase, ProfileUpdateUseCase, 
      * @throws ProfileNotFoundException if no profile is found with the specified identifier
      */
     @Override
-    public Profile update(UUID id, ProfileUpdateRequest request) throws ProfileNotFoundException {
+    public Profile update(Profile user, UUID id, ProfileUpdateRequest request)
+            throws ProfileNotFoundException, ProfileNotAllowedException {
+
+        if (!user.isAdmin() && !user.getId().equals(id)) {
+            throw new ProfileNotAllowedException("You are not allowed to modify this profile");
+        }
+
         Profile profile = getById(id);
         profile.setFirstName(request.firstName());
         profile.setLastName(request.lastName());
         profile.setPseudo(request.pseudo());
-        profile.setEmail(request.email());
-        profile.setPassword(passwordEncoder.encode(request.password()));
+        if (request.email() != null) {
+            profile.setEmail(request.email());
+        }
+        if (request.password() != null && !request.password().isEmpty()) {
+            profile.setPassword(passwordEncoder.encode(request.password()));
+        }
         profile.setCity(request.city());
         profile.setPostalCode(request.postalCode());
         profile.setAddress(request.address());
