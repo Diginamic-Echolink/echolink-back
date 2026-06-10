@@ -1,5 +1,7 @@
 package fr.diginamic.echolink.infrastructure.profile.in.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 /**
  * Represents profile information returned to clients.
  *
@@ -9,20 +11,72 @@ package fr.diginamic.echolink.infrastructure.profile.in.dto;
  * @param pseudo profile pseudonym
  * @param email profile email address
  * @param city city of residence
- * @param codePostal postal code
+ * @param postalCode postal code
  * @param address postal address
  * @param phoneNumber phone number
  * @param linkImgProfile link to the profile image
  */
+@Schema(description = "Profile information returned to the user")
 public record ProfileQuery(
+
+        @Schema(
+                description = "Unique identifier of the profile",
+                example = "550e8400-e29b-41d4-a716-446655440000"
+        )
         String id,
+
+        @Schema(
+                description = "First name of the profile",
+                example = "John"
+        )
         String firstName,
+
+        @Schema(
+                description = "Last name of the profile",
+                example = "Doe"
+        )
         String lastName,
+
+        @Schema(
+                description = "User pseudonym",
+                example = "john_doe"
+        )
         String pseudo,
+
+        @Schema(
+                description = "Email address",
+                example = "john.doe@email.com"
+        )
         String email,
+
+        @Schema(
+                description = "City of residence",
+                example = "Lyon"
+        )
         String city,
-        String codePostal,
+
+        @Schema(
+                description = "Postal code",
+                example = "69000"
+        )
+        String postalCode,
+
+        @Schema(
+                description = "Full postal address",
+                example = "12 rue de la Paix"
+        )
         String address,
+
+        @Schema(
+                description = "Phone number",
+                example = "+33612345678"
+        )
         String phoneNumber,
-        String linkImgProfile) {
+
+        @Schema(
+                description = "URL of the profile image",
+                example = "https://cdn.app.com/profiles/123.png"
+        )
+        String linkImgProfile
+) {
 }

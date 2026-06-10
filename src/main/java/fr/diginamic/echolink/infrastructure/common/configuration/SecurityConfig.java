@@ -21,7 +21,7 @@ import org.springframework.security.web.SecurityFilterChain;
  */
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(securedEnabled = true)
+@EnableMethodSecurity(jsr250Enabled = true)
 public class SecurityConfig {
 
     /**

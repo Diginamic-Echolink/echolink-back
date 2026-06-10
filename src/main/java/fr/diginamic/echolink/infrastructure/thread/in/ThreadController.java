@@ -13,14 +13,22 @@ import fr.diginamic.echolink.domain.thread.Thread;
 import fr.diginamic.echolink.domain.thread.ThreadCreateRequest;
 import fr.diginamic.echolink.domain.thread.ThreadUpdateRequest;
 import fr.diginamic.echolink.domain.thread.exception.ThreadNotFoundException;
+import fr.diginamic.echolink.infrastructure.common.in.dto.ErrorMessageQuery;
 import fr.diginamic.echolink.infrastructure.common.in.dto.MessageResponse;
 import fr.diginamic.echolink.infrastructure.thread.in.dto.ThreadQuery;
 import fr.diginamic.echolink.infrastructure.thread.in.mapper.ThreadQueryMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -36,12 +44,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import static org.springframework.http.HttpStatus.CREATED;
+
 /**
  * REST controller exposing thread management endpoints.
  */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/v1/thread", produces = MediaType.APPLICATION_JSON_VALUE)
+@Tag(name = "Thread", description = "Thread management")
 public class ThreadController {
 
     /**
@@ -81,12 +92,40 @@ public class ThreadController {
      * @return list of thread information
      */
     @GetMapping("/all/{sectionId}")
-    @Secured({"ROLE_ADMIN", "ROLE_USER"})
+    @RolesAllowed({"ADMIN", "USER"})
+    @Operation(
+            operationId = "getThreadsBySectionId",
+            summary = "Get all threads by section",
+            description = "Returns all threads belonging to a specific section",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Threads retrieved successfully",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = ThreadQuery.class))
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized",
+                            content = @Content(schema = @Schema(hidden = true))
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Section not found",
+                            content = @Content(schema = @Schema(implementation = ErrorMessageQuery.class))
+                    )
+            }
+    )
     public ResponseEntity<List<ThreadQuery>> getAllBySectionId(
+            @Parameter(description = "Section UUID", required = true)
             @PathVariable UUID sectionId
     ) throws SectionNotFoundException {
+
         List<Thread> threads = getUseCase.getAllBySectionId(sectionId);
         List<ThreadQuery> query = threads.stream().map(mapper::toQuery).toList();
+
         return ResponseEntity.ok(query);
     }
 
@@ -99,13 +138,42 @@ public class ThreadController {
      * @throws ProfileNotFoundException if the associated profile cannot be found
      */
     @PostMapping
-    @Secured({"ROLE_ADMIN", "ROLE_USER"})
+    @RolesAllowed({"ADMIN", "USER"})
+    @Operation(
+            operationId = "createThread",
+            summary = "Create a thread",
+            description = "Creates a new thread inside a section",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "201",
+                            description = "Thread created successfully",
+                            content = @Content(schema = @Schema(implementation = ThreadQuery.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Invalid request",
+                            content = @Content(schema = @Schema(implementation = ErrorMessageQuery.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized",
+                            content = @Content(schema = @Schema(hidden = true))
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Section or Profile not found",
+                            content = @Content(schema = @Schema(implementation = ErrorMessageQuery.class))
+                    )
+            }
+    )
     public ResponseEntity<ThreadQuery> createThread(
             @Valid @RequestBody ThreadCreateRequest request
     ) throws SectionNotFoundException, ProfileNotFoundException {
+
         Thread thread = postUseCase.create(request);
         ThreadQuery query = mapper.toQuery(thread);
-        return ResponseEntity.ok(query);
+
+        return ResponseEntity.status(CREATED).body(query);
     }
 
     /**
@@ -118,18 +186,47 @@ public class ThreadController {
      * @throws SectionNotFoundException if the associated section cannot be found
      */
     @PutMapping("/{threadId}")
-    @Secured({"ROLE_ADMIN", "ROLE_USER"})
+    @RolesAllowed({"ADMIN", "USER"})
+    @Operation(
+            operationId = "updateThread",
+            summary = "Update a thread",
+            description = "Updates an existing thread (requires ownership check)",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Thread updated successfully",
+                            content = @Content(schema = @Schema(implementation = ThreadQuery.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized",
+                            content = @Content(schema = @Schema(hidden = true))
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "User is not allowed to update this thread",
+                            content = @Content(schema = @Schema(implementation = ErrorMessageQuery.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Thread or Section not found",
+                            content = @Content(schema = @Schema(implementation = ErrorMessageQuery.class))
+                    )
+            }
+    )
     public ResponseEntity<ThreadQuery> updateThread(
-            @PathVariable UUID threadId,
+            @Parameter(description = "Thread UUID", required = true) @PathVariable UUID threadId,
             @RequestBody ThreadUpdateRequest request,
             Authentication authentication
     ) throws ThreadNotFoundException, SectionNotFoundException, ProfileNotAllowedException, ProfileNotFoundException {
-        Jwt jwt = (Jwt) authentication.getPrincipal();
-        UUID profileId = UUID.fromString(Objects.requireNonNull(jwt).getSubject());
-        Profile profile = profileGetUseCase.getById(profileId);
 
-        Thread thread = updateUseCase.update(profile, threadId, request);
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        UUID userId = UUID.fromString(Objects.requireNonNull(jwt).getSubject());
+        Profile user = profileGetUseCase.getById(userId);
+
+        Thread thread = updateUseCase.update(user, threadId, request);
         ThreadQuery query = mapper.toQuery(thread);
+
         return ResponseEntity.ok(query);
     }
 
@@ -141,16 +238,45 @@ public class ThreadController {
      * @throws ThreadNotFoundException if no thread is found with the specified identifier
      */
     @DeleteMapping("/{threadId}")
-    @Secured({"ROLE_ADMIN", "ROLE_USER"})
-    public ResponseEntity<MessageResponse> updateThread(
-            @PathVariable UUID threadId,
+    @RolesAllowed({"ADMIN", "USER"})
+    @Operation(
+            operationId = "deleteThread",
+            summary = "Delete a thread",
+            description = "Deletes a thread (soft or hard depending on implementation)",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Thread deleted successfully",
+                            content = @Content(schema = @Schema(implementation = MessageResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized",
+                            content = @Content(schema = @Schema(hidden = true))
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "User is not allowed to delete this thread",
+                            content = @Content(schema = @Schema(implementation = ErrorMessageQuery.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Thread not found",
+                            content = @Content(schema = @Schema(implementation = ErrorMessageQuery.class))
+                    )
+            }
+    )
+    public ResponseEntity<MessageResponse> deleteThread(
+            @Parameter(description = "Thread UUID", required = true) @PathVariable UUID threadId,
             Authentication authentication
     ) throws ThreadNotFoundException, ProfileNotAllowedException, ProfileNotFoundException {
-        Jwt jwt = (Jwt) authentication.getPrincipal();
-        UUID profileId = UUID.fromString(Objects.requireNonNull(jwt).getSubject());
-        Profile profile = profileGetUseCase.getById(profileId);
 
-        deleteUseCase.delete(profile, threadId);
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        UUID userId = UUID.fromString(Objects.requireNonNull(jwt).getSubject());
+        Profile user = profileGetUseCase.getById(userId);
+
+        deleteUseCase.delete(user, threadId);
+
         return ResponseEntity.ok(new MessageResponse("Thread with id: " + threadId + " is correctly deleted"));
     }
 }

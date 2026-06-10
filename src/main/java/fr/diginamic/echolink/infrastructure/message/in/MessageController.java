@@ -13,14 +13,22 @@ import fr.diginamic.echolink.domain.profile.Profile;
 import fr.diginamic.echolink.domain.profile.exception.ProfileNotAllowedException;
 import fr.diginamic.echolink.domain.profile.exception.ProfileNotFoundException;
 import fr.diginamic.echolink.domain.thread.exception.ThreadNotFoundException;
+import fr.diginamic.echolink.infrastructure.common.in.dto.ErrorMessageQuery;
 import fr.diginamic.echolink.infrastructure.common.in.dto.MessageResponse;
 import fr.diginamic.echolink.infrastructure.message.in.dto.MessageQuery;
 import fr.diginamic.echolink.infrastructure.message.in.mapper.MessageQueryMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -36,6 +44,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import static org.springframework.http.HttpStatus.CREATED;
+
 /**
  * REST controller responsible for handling message-related operations.
  * <p>
@@ -48,6 +58,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/v1/message", produces = MediaType.APPLICATION_JSON_VALUE)
+@Tag(name = "Message", description = "Message management")
 public class MessageController {
 
     /**
@@ -88,12 +99,42 @@ public class MessageController {
      * @throws ThreadNotFoundException if the thread does not exist
      */
     @GetMapping("/all/{threadId}")
-    @Secured({"ROLE_ADMIN", "ROLE_USER"})
+    @RolesAllowed({"ADMIN", "USER"})
+    @Operation(
+            operationId = "getMessagesByThreadId",
+            summary = "Get all messages from a thread",
+            description = "Returns all messages belonging to the specified thread",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Messages retrieved successfully",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = MessageQuery.class))
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized",
+                            content = @Content(schema = @Schema(hidden = true))
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Thread not found",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorMessageQuery.class)
+                            )
+                    )
+            }
+    )
     public ResponseEntity<List<MessageQuery>> getMessageByThreadId(
-            @PathVariable UUID threadId
+            @Parameter(description = "Thread UUID", required = true) @PathVariable UUID threadId
     ) throws ThreadNotFoundException {
+
         List<Message> messages = getUseCase.getAllByThreadId(threadId);
         List<MessageQuery> query = messages.stream().map(mapper::toQuery).toList();
+
         return ResponseEntity.ok(query);
     }
 
@@ -106,13 +147,51 @@ public class MessageController {
      * @throws ProfileNotFoundException if the author profile does not exist
      */
     @PostMapping
-    @Secured({"ROLE_ADMIN", "ROLE_USER"})
+    @RolesAllowed({"ADMIN", "USER"})
+    @Operation(
+            operationId = "createMessage",
+            summary = "Create a message",
+            description = "Creates a new message inside a thread",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "201",
+                            description = "Message created successfully",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = MessageQuery.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Invalid request",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorMessageQuery.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized",
+                            content = @Content(schema = @Schema(hidden = true))
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Thread or Profile not found",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorMessageQuery.class)
+                            )
+                    )
+            }
+    )
     public ResponseEntity<MessageQuery> createMessage(
             @Valid @RequestBody MessageCreateRequest request
     ) throws ThreadNotFoundException, ProfileNotFoundException {
+
         Message message = createUseCase.create(request);
         MessageQuery query = mapper.toQuery(message);
-        return ResponseEntity.ok(query);
+
+        return ResponseEntity.status(CREATED).body(query);
     }
 
     /**
@@ -127,18 +206,56 @@ public class MessageController {
      * @throws ProfileNotAllowedException if the user is not allowed to update the message
      */
     @PutMapping("/{messageId}")
-    @Secured({"ROLE_ADMIN", "ROLE_USER"})
+    @RolesAllowed({"ADMIN", "USER"})
+    @Operation(
+            operationId = "updateMessage",
+            summary = "Update a message",
+            description = "Updates an existing message owned by the authenticated user",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Message updated successfully",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = MessageQuery.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized",
+                            content = @Content(schema = @Schema(hidden = true))
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "User is not allowed to update this message",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorMessageQuery.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Message or Profile not found",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorMessageQuery.class)
+                            )
+                    )
+            }
+    )
     public ResponseEntity<MessageQuery> updateMessage(
-            @PathVariable UUID messageId,
+            @Parameter(description = "Message UUID", required = true) @PathVariable UUID messageId,
             @RequestBody MessageUpdateRequest request,
             Authentication authentication
     ) throws ProfileNotFoundException, MessageNotFoundException, ProfileNotAllowedException {
-        Jwt jwt = (Jwt) authentication.getPrincipal();
-        UUID profileId = UUID.fromString(Objects.requireNonNull(jwt).getSubject());
-        Profile profile = profileGetUseCase.getById(profileId);
 
-        Message message = updateUseCase.update(profile, messageId, request);
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        UUID userId = UUID.fromString(Objects.requireNonNull(jwt).getSubject());
+        Profile user = profileGetUseCase.getById(userId);
+
+        Message message = updateUseCase.update(user, messageId, request);
         MessageQuery query = mapper.toQuery(message);
+
         return ResponseEntity.ok(query);
     }
 
@@ -153,16 +270,54 @@ public class MessageController {
      * @throws ProfileNotAllowedException if the user is not allowed to delete the message
      */
     @DeleteMapping("/{messageId}")
-    @Secured({"ROLE_ADMIN", "ROLE_USER"})
+    @RolesAllowed({"ADMIN", "USER"})
+    @Operation(
+            operationId = "deleteMessage",
+            summary = "Delete a message",
+            description = "Soft deletes a message by replacing its content",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Message deleted successfully",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = MessageResponse.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized",
+                            content = @Content(schema = @Schema(hidden = true))
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "User is not allowed to delete this message",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorMessageQuery.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Message or Profile not found",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorMessageQuery.class)
+                            )
+                    )
+            }
+    )
     public ResponseEntity<MessageResponse> deleteMessage(
-            @PathVariable UUID messageId,
+            @Parameter(description = "Message UUID", required = true) @PathVariable UUID messageId,
             Authentication authentication
     ) throws MessageNotFoundException, ProfileNotFoundException, ProfileNotAllowedException {
-        Jwt jwt = (Jwt) authentication.getPrincipal();
-        UUID profileId = UUID.fromString(Objects.requireNonNull(jwt).getSubject());
-        Profile profile = profileGetUseCase.getById(profileId);
 
-        deleteUseCase.delete(profile, messageId);
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        UUID userId = UUID.fromString(Objects.requireNonNull(jwt).getSubject());
+        Profile user = profileGetUseCase.getById(userId);
+
+        deleteUseCase.delete(user, messageId);
+
         return ResponseEntity.ok(new MessageResponse("Message with id: " + messageId + " is correctly deleted"));
     }
 }
