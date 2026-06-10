@@ -19,4 +19,3 @@ public record ThreadCreateRequest(
         @NotBlank(message = "title is required") String title,
         @NotBlank(message = "subject is required") String subject) {
 }
-
