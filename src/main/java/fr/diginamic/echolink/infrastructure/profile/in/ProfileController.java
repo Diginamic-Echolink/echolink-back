@@ -156,7 +156,7 @@ public class ProfileController {
      * @return list of profile information
      */
     @GetMapping("/all")
-    @RolesAllowed("ADMIN")
+    @RolesAllowed({"ADMIN"})
     @Operation(
             operationId = "getAllProfiles",
             summary = "Get all profiles",
@@ -253,7 +253,7 @@ public class ProfileController {
      * @throws ProfileNotFoundException if no profile is found with the specified identifier
      */
     @DeleteMapping("/{profileId}")
-    @RolesAllowed("ADMIN")
+    @RolesAllowed({"ADMIN"})
     @Operation(
             operationId = "deleteProfile",
             summary = "Delete profile",
