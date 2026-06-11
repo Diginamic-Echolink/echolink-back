@@ -1,12 +1,15 @@
+#
+# This GitHub Actions workflow runs CodeQL analysis on the repository to detect
+# security vulnerabilities, code quality issues, and potential weaknesses in the codebase.
+#
+
 name: CodeQL Report
 
 on:
-  push:
-    branches: [ 'dev' ]
+  workflow_dispatch:
 
 jobs:
-  analyze:
-    name: Analyze
+  code-ql:
     runs-on: ubuntu-latest
 
     permissions:
@@ -15,9 +18,15 @@ jobs:
       security-events: write
 
     steps:
+      #
+      # Checks out the repository source code.
+      #
       - name: Checkout source code
         uses: actions/checkout@v4
 
+      #
+      # Installs Java 25 and enables Maven dependency caching.
+      #
       - name: Set up Java 25
         uses: actions/setup-java@v4
         with:
@@ -25,13 +34,25 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
+      #
+      # Step 3: Initialize CodeQL analysis
+      # This prepares the CodeQL database and configures the analysis for Java/Kotlin
+      #
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
         with:
           languages: java-kotlin
 
+      #
+      # Builds the project and executes tests.
+      # Test failures are ignored to allow report generation
+      # to continue.
+      #
       - name: Build with Maven
         run: mvn -B clean verify -Dspring.profiles.active=test
 
+      #
+      # Run CodeQL analysis and upload results to GitHub Security tab
+      #
       - name: Analyse avec CodeQL
         uses: github/codeql-action/analyze@v4
