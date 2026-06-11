@@ -113,7 +113,7 @@ public class SectionController {
      * @return created section information
      */
     @PostMapping
-    @RolesAllowed("ADMIN")
+    @RolesAllowed({"ADMIN"})
     @Operation(
             operationId = "createSection",
             summary = "Create a section",
@@ -158,7 +158,7 @@ public class SectionController {
      * @throws SectionNotFoundException if no section is found with the specified identifier
      */
     @PutMapping("/{sectionId}")
-    @RolesAllowed("ADMIN")
+    @RolesAllowed({"ADMIN"})
     @Operation(
             operationId = "updateSection",
             summary = "Update a section",
@@ -205,7 +205,7 @@ public class SectionController {
      * @throws SectionNotFoundException if no section is found with the specified identifier
      */
     @DeleteMapping("/{sectionId}")
-    @RolesAllowed("ADMIN")
+    @RolesAllowed({"ADMIN"})
     @Operation(
             operationId = "deleteSection",
             summary = "Delete a section",
