@@ -23,11 +23,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static fr.diginamic.echolink.domain.message.MessageTestData.givenBlankMessageUpdateRequest;
 import static fr.diginamic.echolink.domain.message.MessageTestData.givenMessage1;
 import static fr.diginamic.echolink.domain.message.MessageTestData.givenMessage2;
 import static fr.diginamic.echolink.domain.message.MessageTestData.givenMessageCreateRequest;
 import static fr.diginamic.echolink.domain.message.MessageTestData.givenMessageUpdateRequest;
+import static fr.diginamic.echolink.domain.message.MessageTestData.givenNullMessageUpdateRequest;
 import static fr.diginamic.echolink.domain.profile.ProfileTestData.givenProfile1;
+import static fr.diginamic.echolink.domain.profile.ProfileTestData.givenProfile3;
 import static fr.diginamic.echolink.domain.shared.SharedTestData.givenUUID;
 import static fr.diginamic.echolink.domain.thread.ThreadTestData.givenThread1;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,7 +64,14 @@ public class MessageServiceTest {
         Message result = service.getById(id);
 
         // THEN
-        assertThat(result).isEqualTo(message);
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(message.getId());
+        assertThat(result.getText()).isEqualTo(message.getText());
+        assertThat(result.getProfile()).isNotNull();
+        assertThat(result.getProfile().getId()).isEqualTo(message.getProfile().getId());
+        assertThat(result.getThread()).isNotNull();
+        assertThat(result.getThread().getId()).isEqualTo(message.getThread().getId());
+
         verify(repository).getById(id);
     }
 
@@ -94,7 +104,17 @@ public class MessageServiceTest {
         List<Message> result = service.getAllByThreadId(threadId);
 
         // THEN
-        assertThat(result).containsExactlyElementsOf(messages);
+        assertThat(result).hasSize(2);
+
+        for (int i = 0; i < result.size(); i++) {
+            Message actual = result.get(i);
+            Message expected = messages.get(i);
+
+            assertThat(actual.getId()).isEqualTo(expected.getId());
+            assertThat(actual.getText()).isEqualTo(expected.getText());
+            assertThat(actual.getProfile().getId()).isEqualTo(expected.getProfile().getId());
+            assertThat(actual.getThread().getId()).isEqualTo(expected.getThread().getId());
+        }
 
         verify(threadGetUseCase).getById(threadId);
         verify(repository).getAllByThreadId(thread.getId());
@@ -127,8 +147,12 @@ public class MessageServiceTest {
         Message saved = captor.getValue();
 
         assertThat(saved.getText()).isEqualTo(request.text());
-        assertThat(saved.getProfile()).isEqualTo(profile);
-        assertThat(saved.getThread()).isEqualTo(thread);
+        assertThat(saved.getProfile()).isNotNull();
+        assertThat(saved.getProfile().getId()).isEqualTo(profile.getId());
+        assertThat(saved.getProfile().getEmail()).isEqualTo(profile.getEmail());
+        assertThat(saved.getThread()).isNotNull();
+        assertThat(saved.getThread().getId()).isEqualTo(thread.getId());
+        assertThat(saved.getThread().getTitle()).isEqualTo(thread.getTitle());
     }
 
     @Test
@@ -149,7 +173,12 @@ public class MessageServiceTest {
         Message result = service.update(profile, messageId, request);
 
         // THEN
+        assertThat(result).isNotNull();
         assertThat(result.getText()).isEqualTo(request.text());
+        assertThat(result.getProfile()).isNotNull();
+        assertThat(result.getProfile().getId()).isEqualTo(profile.getId());
+        assertThat(result.getThread()).isNotNull();
+        assertThat(result.getThread().getId()).isEqualTo(message.getThread().getId());
         verify(repository).save(message);
     }
 
@@ -175,6 +204,115 @@ public class MessageServiceTest {
     }
 
     @Test
+    void should_allow_admin_to_update_other_user_message()
+            throws MessageNotFoundException, ProfileNotAllowedException {
+
+        // GIVEN
+        UUID messageId = givenUUID();
+
+        Profile owner = givenProfile1();
+
+        Profile admin = givenProfile3();
+
+        Message message = givenMessage1();
+        message.setProfile(owner);
+
+        MessageUpdateRequest request = givenMessageUpdateRequest();
+
+        when(repository.getById(messageId))
+                .thenReturn(Optional.of(message));
+
+        when(repository.save(message))
+                .thenReturn(message);
+
+        // WHEN
+        Message result = service.update(admin, messageId, request);
+
+        // THEN
+        assertThat(result.getText())
+                .isEqualTo(request.text());
+
+        verify(repository).save(message);
+    }
+
+    @Test
+    void should_throw_when_updating_unknown_message() {
+        // GIVEN
+        UUID messageId = givenUUID();
+
+        when(repository.getById(messageId))
+                .thenReturn(Optional.empty());
+
+        // WHEN / THEN
+        assertThatThrownBy(() ->
+                service.update(givenProfile1(), messageId, givenMessageUpdateRequest()))
+                .isInstanceOf(MessageNotFoundException.class)
+                .hasMessage("Message with id " + messageId + " not found");
+
+        verify(repository, never()).save(any());
+    }
+
+    @Test
+    void should_keep_existing_text_when_update_text_is_null()
+            throws MessageNotFoundException, ProfileNotAllowedException {
+        // GIVEN
+        UUID messageId = givenUUID();
+
+        Profile profile = givenProfile1();
+
+        Message message = givenMessage1();
+        message.setProfile(profile);
+
+        String originalText = message.getText();
+
+        MessageUpdateRequest request = givenNullMessageUpdateRequest();
+
+        when(repository.getById(messageId))
+                .thenReturn(Optional.of(message));
+
+        when(repository.save(message))
+                .thenReturn(message);
+
+        // WHEN
+        Message result = service.update(profile, messageId, request);
+
+        // THEN
+        assertThat(result.getText()).isEqualTo(originalText);
+
+        verify(repository).save(message);
+    }
+
+    @Test
+    void should_keep_existing_text_when_update_text_is_blank()
+            throws MessageNotFoundException, ProfileNotAllowedException {
+        // GIVEN
+        UUID messageId = givenUUID();
+
+        Profile profile = givenProfile1();
+
+        Message message = givenMessage1();
+        message.setProfile(profile);
+
+        String originalText = message.getText();
+
+        MessageUpdateRequest request = givenBlankMessageUpdateRequest();
+
+        when(repository.getById(messageId))
+                .thenReturn(Optional.of(message));
+
+        when(repository.save(message))
+                .thenReturn(message);
+
+        // WHEN
+        Message result = service.update(profile, messageId, request);
+
+        // THEN
+        assertThat(result.getText()).isEqualTo(originalText);
+
+        verify(repository).save(message);
+    }
+
+    @Test
     void should_soft_delete_message() throws MessageNotFoundException, ProfileNotAllowedException {
         // GIVEN
         UUID messageId = givenUUID();
@@ -191,6 +329,8 @@ public class MessageServiceTest {
 
         // THEN
         assertThat(message.getText()).isEqualTo("This message was deleted by the moderator or the user");
+        assertThat(message.getProfile()).isNotNull();
+        assertThat(message.getThread()).isNotNull();
 
         verify(repository).save(message);
     }
@@ -213,6 +353,53 @@ public class MessageServiceTest {
         assertThatThrownBy(() -> service.delete(attacker, messageId))
                 .isInstanceOf(ProfileNotAllowedException.class)
                 .hasMessage("You are not allowed to delete this message");
+
+        verify(repository, never()).save(any());
+    }
+
+    @Test
+    void should_allow_admin_to_delete_other_user_message()
+            throws MessageNotFoundException, ProfileNotAllowedException {
+
+        // GIVEN
+        UUID messageId = givenUUID();
+
+        Profile owner = givenProfile1();
+
+        Profile admin = givenProfile3();
+
+        Message message = givenMessage1();
+        message.setProfile(owner);
+
+        when(repository.getById(messageId))
+                .thenReturn(Optional.of(message));
+
+        when(repository.save(message))
+                .thenReturn(message);
+
+        // WHEN
+        service.delete(admin, messageId);
+
+        // THEN
+        assertThat(message.getText())
+                .isEqualTo("This message was deleted by the moderator or the user");
+
+        verify(repository).save(message);
+    }
+
+    @Test
+    void should_throw_when_deleting_unknown_message() {
+        // GIVEN
+        UUID messageId = givenUUID();
+
+        when(repository.getById(messageId))
+                .thenReturn(Optional.empty());
+
+        // WHEN / THEN
+        assertThatThrownBy(() ->
+                service.delete(givenProfile1(), messageId))
+                .isInstanceOf(MessageNotFoundException.class)
+                .hasMessage("Message with id " + messageId + " not found");
 
         verify(repository, never()).save(any());
     }
