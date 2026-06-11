@@ -49,7 +49,7 @@ public class LocationSyncService implements LocationSyncUseCase {
             locations = provider.getAllLocations();
 
         } catch (LocationApiSyncException ex) {
-            log.warn("Unable to retrieve because location provider returned an error: {}.", ex.getMessage());
+            log.warn("Unable to retrieve because location provider returned an error.", ex);
             return;
         }
 
