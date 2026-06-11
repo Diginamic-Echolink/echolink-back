@@ -80,6 +80,54 @@ public final class ProfileTestData {
         );
     }
 
+    public static ProfileUpdateRequest givenProfileUpdateRequestWithoutEmail() {
+
+        return new ProfileUpdateRequest(
+                "John",
+                "Doe",
+                "jdoe",
+                null,
+                "newPassword",
+                "Lyon",
+                "69000",
+                "10 rue de Lyon",
+                "0600000000",
+                "image.jpg"
+        );
+    }
+
+    public static ProfileUpdateRequest givenProfileUpdateRequestWithoutPassword() {
+
+        return new ProfileUpdateRequest(
+                "John",
+                "Doe",
+                "jdoe",
+                "mail@test.fr",
+                "",
+                "city",
+                "69000",
+                "10 rue de Lyon",
+                "0600000000",
+                "image.jpg"
+        );
+    }
+
+    public static ProfileUpdateRequest givenProfileUpdateRequestWithNullPassword() {
+
+        return new ProfileUpdateRequest(
+                "John",
+                "Doe",
+                "jdoe",
+                "mail@test.fr",
+                null,
+                "city",
+                "69000",
+                "10 rue de Lyon",
+                "0600000000",
+                "image.jpg"
+        );
+    }
+
     public static AuthRequest givenAuthRequest() {
 
         return new AuthRequest(

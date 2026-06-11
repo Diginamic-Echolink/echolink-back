@@ -48,7 +48,10 @@ class SectionServiceTest {
         Section result = service.getById(id);
 
         // THEN
-        assertThat(result).isEqualTo(section);
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(section.getId());
+        assertThat(result.getName()).isEqualTo(section.getName());
+        assertThat(result.getTopic()).isEqualTo(section.getTopic());
 
         verify(repository).getById(id);
     }
@@ -65,6 +68,8 @@ class SectionServiceTest {
         assertThatThrownBy(() -> service.getById(id))
                 .isInstanceOf(SectionNotFoundException.class)
                 .hasMessage("Section not found : " + id);
+
+        verify(repository).getById(id);
     }
 
     @Test
@@ -83,9 +88,19 @@ class SectionServiceTest {
         List<Section> result = service.getAllSections();
 
         // THEN
-        assertThat(result)
-                .hasSize(3)
-                .containsExactlyElementsOf(sections);
+        assertThat(result).hasSize(3);
+
+        assertThat(result.getFirst().getId()).isEqualTo(sections.getFirst().getId());
+        assertThat(result.getFirst().getName()).isEqualTo(sections.getFirst().getName());
+        assertThat(result.getFirst().getTopic()).isEqualTo(sections.getFirst().getTopic());
+
+        assertThat(result.get(1).getId()).isEqualTo(sections.get(1).getId());
+        assertThat(result.get(1).getName()).isEqualTo(sections.get(1).getName());
+        assertThat(result.get(1).getTopic()).isEqualTo(sections.get(1).getTopic());
+
+        assertThat(result.get(2).getId()).isEqualTo(sections.get(2).getId());
+        assertThat(result.get(2).getName()).isEqualTo(sections.get(2).getName());
+        assertThat(result.get(2).getTopic()).isEqualTo(sections.get(2).getTopic());
 
         verify(repository).getAllSections();
     }
@@ -131,8 +146,11 @@ class SectionServiceTest {
         Section result = service.update(id, request);
 
         // THEN
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(section.getId());
         assertThat(result.getName()).isEqualTo(request.name());
         assertThat(result.getTopic()).isEqualTo(request.topic());
+        assertThat(result.getThreads()).isSameAs(section.getThreads());
 
         verify(repository).save(section);
     }
@@ -152,6 +170,7 @@ class SectionServiceTest {
                 .isInstanceOf(SectionNotFoundException.class)
                 .hasMessage("Section not found : " + id);
 
+        verify(repository).getById(id);
         verify(repository, never()).save(any());
     }
 
@@ -167,6 +186,7 @@ class SectionServiceTest {
         service.delete(id);
 
         // THEN
+        verify(repository).getById(id);
         verify(repository).delete(id);
     }
 
@@ -183,6 +203,7 @@ class SectionServiceTest {
                 .isInstanceOf(SectionNotFoundException.class)
                 .hasMessage("Section not found : " + id);
 
+        verify(repository).getById(id);
         verify(repository, never()).delete(any());
     }
 }
