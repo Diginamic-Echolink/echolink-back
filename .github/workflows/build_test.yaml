@@ -8,10 +8,8 @@ name: Build Test
 on:
   #
   # Triggers the workflow whenever code is pushed
-  # to the dev / main branch.
   #
   push:
-    branches: [ dev, main ]
 
 jobs:
   build-test:
