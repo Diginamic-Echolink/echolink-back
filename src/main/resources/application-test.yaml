@@ -1,3 +1,10 @@
 spring:
   startup-initializer:
     enabled: false
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+  flyway:
+    enabled: false
