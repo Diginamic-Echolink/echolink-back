@@ -115,10 +115,10 @@ public class MeteoSyncService implements MeteoSyncUseCase {
 
             } catch (MeteoApiSyncException ex) {
                 log.warn(
-                        "Skipping location {} ({}) because weather provider returned an error: {}",
+                        "Skipping location {} ({}) because weather provider returned an error.",
                         location.getName(),
                         location.getInseeCode(),
-                        ex.getMessage()
+                        ex
                 );
             }
         }

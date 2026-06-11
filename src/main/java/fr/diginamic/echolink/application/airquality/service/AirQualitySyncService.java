@@ -119,10 +119,10 @@ public class AirQualitySyncService implements AirQualitySyncUseCase {
 
             } catch (AirQualityApiSyncException ex) {
                 log.warn(
-                        "Skipping location {} ({}) because air quality provider returned an error: {}",
+                        "Skipping location {} ({}) because air quality provider returned an error.",
                         location.getName(),
                         location.getInseeCode(),
-                        ex.getMessage()
+                        ex
                 );
             }
         }
