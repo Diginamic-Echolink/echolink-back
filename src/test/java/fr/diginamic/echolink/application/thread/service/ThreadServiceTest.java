@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static fr.diginamic.echolink.domain.profile.ProfileTestData.givenProfile1;
+import static fr.diginamic.echolink.domain.profile.ProfileTestData.givenProfile3;
 import static fr.diginamic.echolink.domain.section.SectionTestData.givenSection1;
 import static fr.diginamic.echolink.domain.section.SectionTestData.givenSection2;
 import static fr.diginamic.echolink.domain.shared.SharedTestData.givenUUID;
@@ -62,7 +63,14 @@ class ThreadServiceTest {
         Thread result = service.getById(id);
 
         // THEN
-        assertThat(result).isEqualTo(thread);
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(thread.getId());
+        assertThat(result.getTitle()).isEqualTo(thread.getTitle());
+        assertThat(result.getSubject()).isEqualTo(thread.getSubject());
+        assertThat(result.getCreatedAt()).isEqualTo(thread.getCreatedAt());
+        assertThat(result.getSection().getId()).isEqualTo(thread.getSection().getId());
+        assertThat(result.getProfile().getId()).isEqualTo(thread.getProfile().getId());
+
         verify(repository).getById(id);
     }
 
@@ -77,6 +85,8 @@ class ThreadServiceTest {
         assertThatThrownBy(() -> service.getById(id))
                 .isInstanceOf(ThreadNotFoundException.class)
                 .hasMessage("Thread not found : " + id);
+
+        verify(repository).getById(id);
     }
 
     @Test
@@ -94,7 +104,15 @@ class ThreadServiceTest {
         List<Thread> result = service.getAllBySectionId(sectionId);
 
         // THEN
-        assertThat(result).containsExactlyElementsOf(threads);
+        assertThat(result).hasSize(2);
+
+        assertThat(result.getFirst().getId()).isEqualTo(threads.getFirst().getId());
+        assertThat(result.getFirst().getTitle()).isEqualTo(threads.getFirst().getTitle());
+        assertThat(result.getFirst().getSubject()).isEqualTo(threads.getFirst().getSubject());
+
+        assertThat(result.get(1).getId()).isEqualTo(threads.get(1).getId());
+        assertThat(result.get(1).getTitle()).isEqualTo(threads.get(1).getTitle());
+        assertThat(result.get(1).getSubject()).isEqualTo(threads.get(1).getSubject());
 
         verify(sectionGetUseCase).getById(sectionId);
         verify(repository).getAllBySectionId(section.getId());
@@ -130,9 +148,11 @@ class ThreadServiceTest {
 
         assertThat(saved.getTitle()).isEqualTo(request.title());
         assertThat(saved.getSubject()).isEqualTo(request.subject());
-        assertThat(saved.getSection()).isEqualTo(section);
-        assertThat(saved.getProfile()).isEqualTo(profile);
+        assertThat(saved.getSection().getId()).isEqualTo(section.getId());
+        assertThat(saved.getProfile().getId()).isEqualTo(profile.getId());
         assertThat(saved.getCreatedAt()).isNotNull();
+        assertThat(saved.getMessages()).isNotNull();
+        assertThat(saved.getMessages()).isEmpty();
     }
 
     @Test
@@ -157,6 +177,12 @@ class ThreadServiceTest {
 
         // THEN
         assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(thread.getId());
+        assertThat(result.getTitle()).isEqualTo(request.title());
+        assertThat(result.getSubject()).isEqualTo(request.subject());
+        assertThat(result.getSection().getId()).isEqualTo(givenSection2().getId());
+        assertThat(result.getProfile().getId()).isEqualTo(profile.getId());
+
         verify(repository).save(thread);
     }
 
@@ -180,6 +206,32 @@ class ThreadServiceTest {
         assertThatThrownBy(() -> service.update(attacker, threadId, request))
                 .isInstanceOf(ProfileNotAllowedException.class)
                 .hasMessage("You are not allowed to modify this thread");
+    }
+
+    @Test
+    void should_allow_admin_to_update_any_thread() throws Exception {
+        // GIVEN
+        UUID threadId = givenUUID();
+
+        Profile admin = givenProfile3();
+
+        Profile owner = givenProfile1();
+
+        Thread thread = givenThread1();
+        thread.setProfile(owner);
+
+        ThreadUpdateRequest request = givenThreadUpdateRequest(givenUUID());
+
+        when(repository.getById(threadId)).thenReturn(Optional.of(thread));
+        when(sectionGetUseCase.getById(any())).thenReturn(givenSection2());
+        when(repository.save(thread)).thenReturn(thread);
+
+        // WHEN
+        Thread result = service.update(admin, threadId, request);
+
+        // THEN
+        assertThat(result).isNotNull();
+        verify(repository).save(thread);
     }
 
     @Test
@@ -223,6 +275,28 @@ class ThreadServiceTest {
                 .isInstanceOf(ProfileNotAllowedException.class)
                 .hasMessage("You are not allowed to modify this thread");
 
+        verify(repository).getById(id);
         verify(repository, never()).save(any());
+    }
+
+    @Test
+    void should_allow_admin_to_delete_any_thread() throws Exception {
+        // GIVEN
+        UUID id = givenUUID();
+
+        Profile admin = givenProfile3();
+
+        Thread thread = givenThread1();
+        thread.setProfile(givenProfile1());
+
+        when(repository.getById(id)).thenReturn(Optional.of(thread));
+        when(repository.save(thread)).thenReturn(thread);
+
+        // WHEN
+        service.delete(admin, id);
+
+        // THEN
+        assertThat(thread.getTitle()).isEqualTo("This thread has been deleted");
+        verify(repository).save(thread);
     }
 }

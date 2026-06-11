@@ -177,7 +177,7 @@ class ProfileAuthServiceTest {
 
         Profile saved = captor.getValue();
 
-        assertThat(saved.getEmail()).isEqualTo("newuser@mail.com");
+        assertThat(saved.getEmail()).isEqualTo(request.email());
         assertThat(saved.getPassword()).isEqualTo("encodedPassword");
     }
 }

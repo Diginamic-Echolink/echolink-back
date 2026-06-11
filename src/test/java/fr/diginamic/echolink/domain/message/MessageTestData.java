@@ -50,4 +50,14 @@ public final class MessageTestData {
 
         return new MessageUpdateRequest("YES");
     }
+
+    public static MessageUpdateRequest givenNullMessageUpdateRequest() {
+
+        return new MessageUpdateRequest(null);
+    }
+
+    public static MessageUpdateRequest givenBlankMessageUpdateRequest() {
+
+        return new MessageUpdateRequest("      ");
+    }
 }
