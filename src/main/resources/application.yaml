@@ -23,7 +23,7 @@ app:
   security:
     jwt:
       secret: ${JWT_SECRET:dumb_5mKbY6qNfK7dYjz9WvTn3GpLr4XsQe8BcDfGhJkLmNpQrStUvWxYz123456789AB}
-      expiration: 360000
+      expiration: 3600000
   integrations:
     geo-api:
       base-url: https://geo.api.gouv.fr

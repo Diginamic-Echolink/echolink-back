@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 /**
  * Represents location information returned to clients.
  *
+ * @param id location UUID
  * @param name location name
  * @param postalCode postal code of the location
  * @param latitude geographic latitude
@@ -13,6 +14,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
  */
 @Schema(description = "Location information returned by the API")
 public record LocationQuery (
+
+        @Schema(description = "Unique identifier of the location", example = "550e8400-e29b-41d4-a716-446655440000")
+        String id,
 
         @Schema(description = "Location name", example = "Saint-Étienne")
         String name,

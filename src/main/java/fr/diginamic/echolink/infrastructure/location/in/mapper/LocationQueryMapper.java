@@ -19,6 +19,7 @@ public class LocationQueryMapper {
     public LocationQuery toQuery(Location location) {
 
         return new LocationQuery(
+                location.getId().toString(),
                 location.getName(),
                 location.getPostalCode(),
                 location.getLatitude(),
