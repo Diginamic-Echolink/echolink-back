@@ -36,7 +36,7 @@ jobs:
       # to continue.
       #
       - name: Build project with Maven
-        run: mvn -B clean verify -Dspring.profiles.active=test -Dmaven.test.failure.ignore=true
+        run: mvn -B clean verify -Dspring.profiles.active=test
 
       #
       # Generates the Maven site and all configured reports,
