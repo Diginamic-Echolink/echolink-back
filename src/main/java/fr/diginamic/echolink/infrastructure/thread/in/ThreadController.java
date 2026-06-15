@@ -15,11 +15,11 @@ import fr.diginamic.echolink.domain.thread.ThreadUpdateRequest;
 import fr.diginamic.echolink.domain.thread.exception.ThreadNotFoundException;
 import fr.diginamic.echolink.infrastructure.common.in.dto.ErrorMessageQuery;
 import fr.diginamic.echolink.infrastructure.common.in.dto.MessageResponse;
+import fr.diginamic.echolink.infrastructure.common.in.dto.PageResponse;
 import fr.diginamic.echolink.infrastructure.thread.in.dto.ThreadQuery;
 import fr.diginamic.echolink.infrastructure.thread.in.mapper.ThreadQueryMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -27,6 +27,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -40,10 +42,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import static fr.diginamic.echolink.infrastructure.common.in.mapper.PageResponseMapper.toPageResponse;
 import static org.springframework.http.HttpStatus.CREATED;
 
 /**
@@ -86,24 +88,75 @@ public class ThreadController {
     private final ThreadQueryMapper mapper;
 
     /**
-     * Retrieves all threads associated with a section.
+     * Retrieves a thread by its identifier.
+     *
+     * @param threadId unique identifier of the thread
+     * @return thread information
+     * @throws ThreadNotFoundException if no thread is found with the specified identifier
+     */
+    @GetMapping("/{threadId}")
+    @RolesAllowed({"ADMIN", "USER"})
+    @Operation(
+            operationId = "getThreadById",
+            summary = "Get a thread by id",
+            description = "Returns the thread associated with the provided identifier",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Thread retrieved successfully",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ThreadQuery.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized",
+                            content = @Content(schema = @Schema(hidden = true))
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Thread not found",
+                            content = @Content(schema = @Schema(implementation = ErrorMessageQuery.class))
+                    )
+            }
+    )
+    public ResponseEntity<ThreadQuery> getById(
+            @Parameter(
+                    description = "Thread UUID",
+                    required = true,
+                    example = "550e8400-e29b-41d4-a716-446655440000"
+            )
+            @PathVariable UUID threadId
+    ) throws ThreadNotFoundException {
+
+        Thread thread = getUseCase.getById(threadId);
+        ThreadQuery query = mapper.toQuery(thread);
+
+        return ResponseEntity.ok(query);
+    }
+
+    /**
+     * Retrieves paginated threads associated with a section.
      *
      * @param sectionId unique identifier of the section
-     * @return list of thread information
+     * @param pageable pagination and sorting information
+     * @return paginated list of threads
+     * @throws SectionNotFoundException if the section does not exist
      */
     @GetMapping("/all/{sectionId}")
     @RolesAllowed({"ADMIN", "USER"})
     @Operation(
             operationId = "getThreadsBySectionId",
-            summary = "Get all threads by section",
-            description = "Returns all threads belonging to a specific section",
+            summary = "Get paginated threads by section",
+            description = "Returns threads of a section with pagination and sorting support",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
                             description = "Threads retrieved successfully",
                             content = @Content(
                                     mediaType = "application/json",
-                                    array = @ArraySchema(schema = @Schema(implementation = ThreadQuery.class))
+                                    schema = @Schema(implementation = PageResponse.class)
                             )
                     ),
                     @ApiResponse(
@@ -118,15 +171,20 @@ public class ThreadController {
                     )
             }
     )
-    public ResponseEntity<List<ThreadQuery>> getAllBySectionId(
+    public ResponseEntity<PageResponse<ThreadQuery>> getAllBySectionId(
             @Parameter(description = "Section UUID", required = true)
-            @PathVariable UUID sectionId
+            @PathVariable UUID sectionId,
+            @Parameter(
+                    description = "Pagination and sorting (page, size, sort)",
+                    example = "page=0&size=10&sort=createdAt,desc"
+            )
+            Pageable pageable
     ) throws SectionNotFoundException {
 
-        List<Thread> threads = getUseCase.getAllBySectionId(sectionId);
-        List<ThreadQuery> query = threads.stream().map(mapper::toQuery).toList();
+        Page<Thread> threads = getUseCase.getAllBySectionId(sectionId, pageable);
+        PageResponse<ThreadQuery> response = toPageResponse(threads, mapper::toQuery);
 
-        return ResponseEntity.ok(query);
+        return ResponseEntity.ok(response);
     }
 
     /**

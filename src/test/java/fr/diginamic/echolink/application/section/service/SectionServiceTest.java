@@ -179,8 +179,11 @@ class SectionServiceTest {
         // GIVEN
         UUID id = givenUUID();
 
+        Section section = givenSection1();
+        section.setId(id);
+
         when(repository.getById(id))
-                .thenReturn(Optional.of(givenSection1()));
+                .thenReturn(Optional.of(section));
 
         // WHEN
         service.delete(id);

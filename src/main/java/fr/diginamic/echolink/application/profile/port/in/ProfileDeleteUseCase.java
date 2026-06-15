@@ -1,5 +1,7 @@
 package fr.diginamic.echolink.application.profile.port.in;
 
+import fr.diginamic.echolink.domain.profile.Profile;
+import fr.diginamic.echolink.domain.profile.exception.ProfileNotAllowedException;
 import fr.diginamic.echolink.domain.profile.exception.ProfileNotFoundException;
 
 import java.util.UUID;
@@ -12,8 +14,9 @@ public interface ProfileDeleteUseCase {
     /**
      * Deletes the profile identified by the specified identifier.
      *
+     * @param user profile that made the request
      * @param id unique identifier of the profile to delete
      * @throws ProfileNotFoundException if no profile is found with the specified identifier
      */
-    void delete(UUID id) throws ProfileNotFoundException;
+    void delete(Profile user, UUID id) throws ProfileNotFoundException, ProfileNotAllowedException;
 }

@@ -110,7 +110,8 @@ public class OpenApiConfig {
                         .name("EchoLink Team")
                         .email("contact@echolink.local"))
                 .license(new License()
-                        .name("Academic Use Only"));
+                        .name("Academic Use Only")
+                        .identifier("Diginamic"));
     }
 
     private SecurityScheme bearerScheme() {

@@ -1,6 +1,8 @@
 package fr.diginamic.echolink.application.message.port.out;
 
 import fr.diginamic.echolink.domain.message.Message;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,12 +25,29 @@ public interface MessageRepository {
     Optional<Message> getById(UUID id);
 
     /**
+     * Retrieves all messages associated with a profile.
+     *
+     * @param profileId unique identifier of the profile
+     * @return list of messages belonging to the profile
+     */
+    List<Message> getAllByProfileId(UUID profileId);
+
+    /**
      * Retrieves all messages associated with a specific thread.
      *
-     * @param id unique identifier of the thread
+     * @param threadId unique identifier of the thread
      * @return list of messages belonging to the given thread
      */
-    List<Message> getAllByThreadId(UUID id);
+    List<Message> getAllByThreadId(UUID threadId);
+
+    /**
+     * Retrieves paginated messages belonging to a given thread.
+     *
+     * @param threadId unique identifier of the thread
+     * @param pageable pagination and sorting information
+     * @return paginated list of messages belonging to the given thread
+     */
+    Page<Message> getAllByThreadId(UUID threadId, Pageable pageable);
 
     /**
      * Persists a message entity.
@@ -37,4 +56,11 @@ public interface MessageRepository {
      * @return the persisted message
      */
     Message save(Message message);
+
+    /**
+     * Removes the profile association from all messages authored by the specified profile.
+     *
+     * @param profileId unique identifier of the profile
+     */
+    void removeProfileReferences(UUID profileId);
 }

@@ -17,8 +17,11 @@ import fr.diginamic.echolink.domain.profile.exception.ProfileNotFoundException;
 import fr.diginamic.echolink.domain.thread.Thread;
 import fr.diginamic.echolink.domain.thread.exception.ThreadNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -56,9 +59,15 @@ public class MessageService
     }
 
     @Override
-    public List<Message> getAllByThreadId(UUID id) throws ThreadNotFoundException {
-        Thread thread = threadGetUseCase.getById(id);
+    public List<Message> getAllByThreadId(UUID threadId) throws ThreadNotFoundException {
+        Thread thread = threadGetUseCase.getById(threadId);
         return repository.getAllByThreadId(thread.getId());
+    }
+
+    @Override
+    public Page<Message> getAllByThreadId(UUID threadId, Pageable pageable) throws ThreadNotFoundException {
+        Thread thread = threadGetUseCase.getById(threadId);
+        return repository.getAllByThreadId(thread.getId(), pageable);
     }
 
     @Override
@@ -68,6 +77,7 @@ public class MessageService
 
         Message message = new Message(
                 request.text(),
+                LocalDateTime.now(),
                 profile,
                 thread
         );

@@ -18,6 +18,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -119,6 +121,28 @@ class ThreadServiceTest {
     }
 
     @Test
+    void should_return_paginated_threads_by_section() throws SectionNotFoundException {
+        // GIVEN
+        UUID sectionId = givenUUID();
+        Pageable pageable = Pageable.ofSize(10);
+
+        Section section = givenSection1();
+        Page<Thread> page = Page.empty();
+
+        when(sectionGetUseCase.getById(sectionId)).thenReturn(section);
+        when(repository.getAllBySectionId(section.getId(), pageable)).thenReturn(page);
+
+        // WHEN
+        Page<Thread> result = service.getAllBySectionId(sectionId, pageable);
+
+        // THEN
+        assertThat(result).isNotNull();
+
+        verify(sectionGetUseCase).getById(sectionId);
+        verify(repository).getAllBySectionId(section.getId(), pageable);
+    }
+
+    @Test
     void should_create_thread_with_correct_values()
             throws SectionNotFoundException, ProfileNotFoundException {
 
@@ -153,6 +177,36 @@ class ThreadServiceTest {
         assertThat(saved.getCreatedAt()).isNotNull();
         assertThat(saved.getMessages()).isNotNull();
         assertThat(saved.getMessages()).isEmpty();
+    }
+
+    @Test
+    void should_throw_when_section_not_found_on_create() throws SectionNotFoundException {
+        UUID sectionId = givenUUID();
+        UUID profileId = givenUUID();
+
+        ThreadCreateRequest request = givenThreadCreateRequest(sectionId, profileId);
+
+        when(sectionGetUseCase.getById(sectionId))
+                .thenThrow(new SectionNotFoundException("Section not found"));
+
+        assertThatThrownBy(() -> service.create(request))
+                .isInstanceOf(SectionNotFoundException.class);
+    }
+
+    @Test
+    void should_throw_when_profile_not_found_on_create() throws SectionNotFoundException, ProfileNotFoundException {
+        UUID sectionId = givenUUID();
+        UUID profileId = givenUUID();
+
+        Section section = givenSection1();
+        ThreadCreateRequest request = givenThreadCreateRequest(sectionId, profileId);
+
+        when(sectionGetUseCase.getById(sectionId)).thenReturn(section);
+        when(profileGetUseCase.getById(profileId))
+                .thenThrow(new ProfileNotFoundException("Profile not found"));
+
+        assertThatThrownBy(() -> service.create(request))
+                .isInstanceOf(ProfileNotFoundException.class);
     }
 
     @Test
@@ -273,7 +327,7 @@ class ThreadServiceTest {
         // WHEN / THEN
         assertThatThrownBy(() -> service.delete(attacker, id))
                 .isInstanceOf(ProfileNotAllowedException.class)
-                .hasMessage("You are not allowed to modify this thread");
+                .hasMessage("You are not allowed to delete this thread");
 
         verify(repository).getById(id);
         verify(repository, never()).save(any());

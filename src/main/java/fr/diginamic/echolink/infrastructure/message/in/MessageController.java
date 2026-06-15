@@ -15,11 +15,11 @@ import fr.diginamic.echolink.domain.profile.exception.ProfileNotFoundException;
 import fr.diginamic.echolink.domain.thread.exception.ThreadNotFoundException;
 import fr.diginamic.echolink.infrastructure.common.in.dto.ErrorMessageQuery;
 import fr.diginamic.echolink.infrastructure.common.in.dto.MessageResponse;
+import fr.diginamic.echolink.infrastructure.common.in.dto.PageResponse;
 import fr.diginamic.echolink.infrastructure.message.in.dto.MessageQuery;
 import fr.diginamic.echolink.infrastructure.message.in.mapper.MessageQueryMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -27,6 +27,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -40,10 +44,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import static fr.diginamic.echolink.infrastructure.common.in.mapper.PageResponseMapper.toPageResponse;
 import static org.springframework.http.HttpStatus.CREATED;
 
 /**
@@ -92,25 +96,26 @@ public class MessageController {
     private final MessageQueryMapper mapper;
 
     /**
-     * Retrieves all messages belonging to a thread.
+     * Retrieves paginated messages belonging to a thread.
      *
      * @param threadId unique identifier of the thread
-     * @return list of messages for the specified thread
+     * @param pageable pagination and sorting information
+     * @return paginated messages
      * @throws ThreadNotFoundException if the thread does not exist
      */
     @GetMapping("/all/{threadId}")
     @RolesAllowed({"ADMIN", "USER"})
     @Operation(
             operationId = "getMessagesByThreadId",
-            summary = "Get all messages from a thread",
-            description = "Returns all messages belonging to the specified thread",
+            summary = "Get paginated messages from a thread",
+            description = "Returns messages of a thread with pagination and sorting support",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
                             description = "Messages retrieved successfully",
                             content = @Content(
                                     mediaType = "application/json",
-                                    array = @ArraySchema(schema = @Schema(implementation = MessageQuery.class))
+                                    schema = @Schema(implementation = PageResponse.class)
                             )
                     ),
                     @ApiResponse(
@@ -121,19 +126,28 @@ public class MessageController {
                     @ApiResponse(
                             responseCode = "404",
                             description = "Thread not found",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ErrorMessageQuery.class)
-                            )
+                            content = @Content(schema = @Schema(implementation = ErrorMessageQuery.class))
                     )
             }
     )
-    public ResponseEntity<List<MessageQuery>> getMessageByThreadId(
-            @Parameter(description = "Thread UUID", required = true) @PathVariable UUID threadId
+    public ResponseEntity<PageResponse<MessageQuery>> getMessageByThreadId(
+            @Parameter(description = "Thread UUID", required = true)
+            @PathVariable UUID threadId,
+
+            @Parameter(
+                    description = "Pagination and sorting (page, size, sort)",
+                    example = "page=0&size=20&sort=createdAt,asc"
+            )
+            @PageableDefault(
+                    size = 20,
+                    sort = "createdAt",
+                    direction = Sort.Direction.ASC
+            )
+            Pageable pageable
     ) throws ThreadNotFoundException {
 
-        List<Message> messages = getUseCase.getAllByThreadId(threadId);
-        List<MessageQuery> query = messages.stream().map(mapper::toQuery).toList();
+        Page<Message> messages = getUseCase.getAllByThreadId(threadId, pageable);
+        PageResponse<MessageQuery> query = toPageResponse(messages, mapper::toQuery);
 
         return ResponseEntity.ok(query);
     }

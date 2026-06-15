@@ -17,6 +17,8 @@ import fr.diginamic.echolink.domain.thread.ThreadCreateRequest;
 import fr.diginamic.echolink.domain.thread.ThreadUpdateRequest;
 import fr.diginamic.echolink.domain.thread.exception.ThreadNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -45,39 +47,24 @@ public class ThreadService implements ThreadGetUseCase, ThreadCreateUseCase, Thr
      */
     private final ThreadRepository repository;
 
-    /**
-     * Retrieves a thread by its unique identifier.
-     *
-     * @param id unique identifier of the thread
-     * @return the matching thread
-     * @throws ThreadNotFoundException if no thread is found with the specified identifier
-     */
     @Override
     public Thread getById(UUID id) throws ThreadNotFoundException {
         return repository.getById(id)
                 .orElseThrow(() -> new ThreadNotFoundException("Thread not found : " + id));
     }
 
-    /**
-     * Retrieves all threads associated with a section.
-     *
-     * @param sectionId unique identifier of the section
-     * @return list of threads belonging to the section
-     */
     @Override
     public List<Thread> getAllBySectionId(UUID sectionId) throws SectionNotFoundException {
         Section section = sectionGetUseCase.getById(sectionId);
         return repository.getAllBySectionId(section.getId());
     }
 
-    /**
-     * Creates a new thread.
-     *
-     * @param request request containing thread information
-     * @return the created thread
-     * @throws SectionNotFoundException if the associated section cannot be found
-     * @throws ProfileNotFoundException if the associated profile cannot be found
-     */
+    @Override
+    public Page<Thread> getAllBySectionId(UUID sectionId, Pageable pageable) throws SectionNotFoundException {
+        Section section = sectionGetUseCase.getById(sectionId);
+        return repository.getAllBySectionId(section.getId(), pageable);
+    }
+
     @Override
     public Thread create(ThreadCreateRequest request) throws SectionNotFoundException, ProfileNotFoundException {
         Section section = sectionGetUseCase.getById(request.sectionId());
@@ -93,14 +80,6 @@ public class ThreadService implements ThreadGetUseCase, ThreadCreateUseCase, Thr
         return repository.save(thread);
     }
 
-    /**
-     * Updates an existing thread.
-     *
-     * @param id unique identifier of the thread to update
-     * @param request request containing updated thread information
-     * @return the updated thread
-     * @throws ThreadNotFoundException if no thread is found with the specified identifier
-     */
     @Override
     public Thread update(
             Profile profile,
@@ -128,12 +107,6 @@ public class ThreadService implements ThreadGetUseCase, ThreadCreateUseCase, Thr
         return repository.save(thread);
     }
 
-    /**
-     * Marks a thread as deleted.
-     *
-     * @param id unique identifier of the thread to delete
-     * @throws ThreadNotFoundException if no thread is found with the specified identifier
-     */
     @Override
     public void delete(
             Profile profile,
@@ -143,7 +116,7 @@ public class ThreadService implements ThreadGetUseCase, ThreadCreateUseCase, Thr
         Thread thread = getById(id);
 
         if (!profile.isAdmin() && !profile.getId().equals(thread.getProfile().getId())) {
-            throw new ProfileNotAllowedException("You are not allowed to modify this thread");
+            throw new ProfileNotAllowedException("You are not allowed to delete this thread");
         }
 
         thread.setTitle("This thread has been deleted");

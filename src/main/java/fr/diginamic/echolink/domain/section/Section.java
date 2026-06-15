@@ -1,6 +1,7 @@
 package fr.diginamic.echolink.domain.section;
 
 import fr.diginamic.echolink.domain.thread.Thread;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -47,7 +48,11 @@ public class Section {
     /**
      * Threads belonging to this section.
      */
-    @OneToMany(mappedBy = "section")
+    @OneToMany(
+            mappedBy = "section",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     private List<Thread> threads = new ArrayList<>();
 
     /**

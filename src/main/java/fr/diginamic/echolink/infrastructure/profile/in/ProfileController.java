@@ -3,6 +3,7 @@ package fr.diginamic.echolink.infrastructure.profile.in;
 import fr.diginamic.echolink.application.profile.port.in.ProfileDeleteUseCase;
 import fr.diginamic.echolink.application.profile.port.in.ProfileGetUseCase;
 import fr.diginamic.echolink.application.profile.port.in.ProfileUpdateUseCase;
+import fr.diginamic.echolink.domain.location.exception.LocationNotFoundException;
 import fr.diginamic.echolink.domain.profile.Profile;
 import fr.diginamic.echolink.domain.profile.ProfileUpdateRequest;
 import fr.diginamic.echolink.domain.profile.exception.ProfileNotAllowedException;
@@ -28,6 +29,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -246,6 +248,96 @@ public class ProfileController {
     }
 
     /**
+     * Adds a favorite location to profile.
+     *
+     * @param profileId profile id
+     * @param locationId location id
+     */
+    @PostMapping("/{profileId}/favorites/location/{locationId}")
+    @RolesAllowed({"ADMIN", "USER"})
+    @Operation(
+            operationId = "addFavoriteLocation",
+            summary = "Add favorite location",
+            description = "Adds a location to profile favorites (max 3 allowed)",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Favorite location added",
+                            content = @Content(schema = @Schema(implementation = ProfileQuery.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Max 5 favorites reached or Forbidden",
+                            content = @Content(schema = @Schema(implementation = ErrorMessageQuery.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Profile or Location not found",
+                            content = @Content(schema = @Schema(implementation = ErrorMessageQuery.class))
+                    )
+            }
+    )
+    public ResponseEntity<ProfileQuery> addFavoriteLocation(
+            @Parameter(description = "Profile UUID", required = true) @PathVariable UUID profileId,
+            @Parameter(description = "Location UUID", required = true) @PathVariable UUID locationId,
+            Authentication authentication
+    ) throws ProfileNotFoundException, ProfileNotAllowedException, LocationNotFoundException {
+
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        UUID id = UUID.fromString(Objects.requireNonNull(jwt).getSubject());
+        Profile user = getUseCase.getById(id);
+
+        Profile profile = updateUseCase.addFavoriteLocation(user, profileId, locationId);
+
+        return ResponseEntity.ok(mapper.toQuery(profile));
+    }
+
+    /**
+     * Removes a favorite location from profile.
+     *
+     * @param profileId profile id
+     * @param locationId location id
+     */
+    @DeleteMapping("/{profileId}/favorites/location/{locationId}")
+    @RolesAllowed({"ADMIN", "USER"})
+    @Operation(
+            operationId = "removeFavoriteLocation",
+            summary = "Remove favorite location",
+            description = "Removes a location from profile favorites",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Favorite location removed",
+                            content = @Content(schema = @Schema(implementation = ProfileQuery.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Forbidden",
+                            content = @Content(schema = @Schema(implementation = ErrorMessageQuery.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Profile not found",
+                            content = @Content(schema = @Schema(implementation = ErrorMessageQuery.class))
+                    )
+            }
+    )
+    public ResponseEntity<ProfileQuery> removeFavoriteLocation(
+            @Parameter(description = "Profile UUID", required = true) @PathVariable UUID profileId,
+            @Parameter(description = "Location UUID", required = true) @PathVariable UUID locationId,
+            Authentication authentication
+    ) throws ProfileNotFoundException, ProfileNotAllowedException {
+
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        UUID id = UUID.fromString(Objects.requireNonNull(jwt).getSubject());
+        Profile user = getUseCase.getById(id);
+
+        Profile profile = updateUseCase.removeFavoriteLocation(user, profileId, locationId);
+
+        return ResponseEntity.ok(mapper.toQuery(profile));
+    }
+
+    /**
      * Deletes a profile.
      *
      * @param profileId unique identifier of the profile to delete
@@ -253,7 +345,7 @@ public class ProfileController {
      * @throws ProfileNotFoundException if no profile is found with the specified identifier
      */
     @DeleteMapping("/{profileId}")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "USER"})
     @Operation(
             operationId = "deleteProfile",
             summary = "Delete profile",
@@ -281,10 +373,15 @@ public class ProfileController {
             }
     )
     public ResponseEntity<MessageResponse> deleteProfile(
-            @Parameter(description = "Profile UUID", required = true) @PathVariable UUID profileId
-    ) throws ProfileNotFoundException {
+            @Parameter(description = "Profile UUID", required = true) @PathVariable UUID profileId,
+            Authentication authentication
+    ) throws ProfileNotFoundException, ProfileNotAllowedException {
 
-        deleteUseCase.delete(profileId);
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        UUID id = UUID.fromString(Objects.requireNonNull(jwt).getSubject());
+        Profile user = getUseCase.getById(id);
+
+        deleteUseCase.delete(user, profileId);
 
         return ResponseEntity.ok(new MessageResponse("Profile with id: " + profileId + " is correctly deleted"));
     }

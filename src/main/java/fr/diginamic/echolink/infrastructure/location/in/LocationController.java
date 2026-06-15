@@ -53,7 +53,6 @@ public class LocationController {
      * @throws LocationNotFoundException if no location is found with the specified identifier
      */
     @GetMapping("/{locationId}")
-    @RolesAllowed({"ADMIN", "USER"})
     @Operation(
             operationId = "getLocationById",
             summary = "Get a location by ID",
@@ -100,7 +99,6 @@ public class LocationController {
      * @return list of matching locations
      */
     @GetMapping("/search")
-    @RolesAllowed({"ADMIN", "USER"})
     @Operation(
             operationId = "searchLocationsByName",
             summary = "Search locations by name",

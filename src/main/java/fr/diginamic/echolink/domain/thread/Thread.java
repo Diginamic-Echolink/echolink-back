@@ -3,6 +3,7 @@ package fr.diginamic.echolink.domain.thread;
 import fr.diginamic.echolink.domain.message.Message;
 import fr.diginamic.echolink.domain.profile.Profile;
 import fr.diginamic.echolink.domain.section.Section;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -74,7 +75,11 @@ public class Thread {
     /**
      * Messages posted within this thread.
      */
-    @OneToMany(mappedBy = "thread")
+    @OneToMany(
+            mappedBy = "thread",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     private List<Message> messages = new ArrayList<>();
 
     /**

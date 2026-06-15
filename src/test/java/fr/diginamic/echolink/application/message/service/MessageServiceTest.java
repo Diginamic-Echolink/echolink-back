@@ -18,6 +18,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -38,6 +40,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -86,6 +89,9 @@ public class MessageServiceTest {
         assertThatThrownBy(() -> service.getById(id))
                 .isInstanceOf(MessageNotFoundException.class)
                 .hasMessage("Message with id " + id + " not found");
+
+        verify(repository).getById(id);
+        verifyNoMoreInteractions(repository);
     }
 
     @Test
@@ -121,6 +127,29 @@ public class MessageServiceTest {
     }
 
     @Test
+    void should_return_paginated_messages_by_thread_id() throws ThreadNotFoundException {
+        // GIVEN
+        UUID threadId = givenUUID();
+
+        Thread thread = givenThread1();
+        Pageable pageable = Pageable.ofSize(10);
+
+        Page<Message> page = Page.empty();
+
+        when(threadGetUseCase.getById(threadId)).thenReturn(thread);
+        when(repository.getAllByThreadId(thread.getId(), pageable)).thenReturn(page);
+
+        // WHEN
+        Page<Message> result = service.getAllByThreadId(threadId, pageable);
+
+        // THEN
+        assertThat(result).isNotNull();
+
+        verify(threadGetUseCase).getById(threadId);
+        verify(repository).getAllByThreadId(thread.getId(), pageable);
+    }
+
+    @Test
     void should_create_message() throws ThreadNotFoundException, ProfileNotFoundException {
         // GIVEN
         UUID threadId = givenUUID();
@@ -153,6 +182,36 @@ public class MessageServiceTest {
         assertThat(saved.getThread()).isNotNull();
         assertThat(saved.getThread().getId()).isEqualTo(thread.getId());
         assertThat(saved.getThread().getTitle()).isEqualTo(thread.getTitle());
+    }
+
+    @Test
+    void should_throw_when_profile_not_found_on_create() throws ThreadNotFoundException, ProfileNotFoundException {
+        UUID threadId = givenUUID();
+        UUID profileId = givenUUID();
+
+        Thread thread = givenThread1();
+        MessageCreateRequest request = givenMessageCreateRequest(threadId, profileId);
+
+        when(threadGetUseCase.getById(threadId)).thenReturn(thread);
+        when(profileGetUseCase.getById(profileId))
+                .thenThrow(new ProfileNotFoundException("Profile not found"));
+
+        assertThatThrownBy(() -> service.create(request))
+                .isInstanceOf(ProfileNotFoundException.class);
+    }
+
+    @Test
+    void should_throw_when_thread_not_found_on_create() throws ThreadNotFoundException {
+        UUID threadId = givenUUID();
+        UUID profileId = givenUUID();
+
+        MessageCreateRequest request = givenMessageCreateRequest(threadId, profileId);
+
+        when(threadGetUseCase.getById(threadId))
+                .thenThrow(new ThreadNotFoundException("Thread not found"));
+
+        assertThatThrownBy(() -> service.create(request))
+                .isInstanceOf(ThreadNotFoundException.class);
     }
 
     @Test
@@ -204,9 +263,7 @@ public class MessageServiceTest {
     }
 
     @Test
-    void should_allow_admin_to_update_other_user_message()
-            throws MessageNotFoundException, ProfileNotAllowedException {
-
+    void should_allow_admin_to_update_other_user_message() throws MessageNotFoundException, ProfileNotAllowedException {
         // GIVEN
         UUID messageId = givenUUID();
 

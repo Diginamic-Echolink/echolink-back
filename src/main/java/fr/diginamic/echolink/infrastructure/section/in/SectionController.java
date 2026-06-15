@@ -72,6 +72,58 @@ public class SectionController {
     private final SectionQueryMapper mapper;
 
     /**
+     * Retrieves a section by its unique identifier.
+     *
+     * @param sectionId unique identifier of the section to retrieve
+     * @return section information corresponding to the given identifier
+     * @throws SectionNotFoundException if no section is found with the specified identifier
+     */
+    @GetMapping("/{sectionId}")
+    @RolesAllowed({"ADMIN", "USER"})
+    @Operation(
+            operationId = "getSectionById",
+            summary = "Get a section by ID",
+            description = "Returns a section based on its unique identifier",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Section retrieved successfully",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = SectionQuery.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized",
+                            content = @Content(schema = @Schema(hidden = true))
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Section not found",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorMessageQuery.class)
+                            )
+                    )
+            }
+    )
+    public ResponseEntity<SectionQuery> getSectionById(
+            @Parameter(
+                    description = "Section UUID",
+                    required = true,
+                    example = "550e8400-e29b-41d4-a716-446655440000"
+            )
+            @PathVariable UUID sectionId
+    ) throws SectionNotFoundException {
+
+        Section section = getUseCase.getById(sectionId);
+        SectionQuery query = mapper.toQuery(section);
+
+        return ResponseEntity.ok(query);
+    }
+
+    /**
      * Retrieves all available sections.
      *
      * @return list of section information

@@ -1,6 +1,9 @@
 package fr.diginamic.echolink.infrastructure.profile.in.dto;
 
+import fr.diginamic.echolink.infrastructure.location.in.dto.LocationQuery;
 import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.List;
 
 /**
  * Represents profile information returned to clients.
@@ -10,11 +13,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @param lastName profile last name
  * @param pseudo profile pseudonym
  * @param email profile email address
- * @param city city of residence
  * @param postalCode postal code
- * @param address postal address
  * @param phoneNumber phone number
  * @param linkImgProfile link to the profile image
+ * @param role profile role
+ * @param favoriteLocations collection of favorite locations
  */
 @Schema(description = "Profile information returned to the user")
 public record ProfileQuery(
@@ -50,22 +53,10 @@ public record ProfileQuery(
         String email,
 
         @Schema(
-                description = "City of residence",
-                example = "Lyon"
-        )
-        String city,
-
-        @Schema(
                 description = "Postal code",
                 example = "69000"
         )
         String postalCode,
-
-        @Schema(
-                description = "Full postal address",
-                example = "12 rue de la Paix"
-        )
-        String address,
 
         @Schema(
                 description = "Phone number",
@@ -77,6 +68,15 @@ public record ProfileQuery(
                 description = "URL of the profile image",
                 example = "https://cdn.app.com/profiles/123.png"
         )
-        String linkImgProfile
+        String linkImgProfile,
+
+        @Schema(
+                description = "Role of this profile",
+                example = "USER"
+        )
+        String role,
+
+        @Schema(description = "Favorite locations of the profile")
+        List<LocationQuery> favoriteLocations
 ) {
 }
