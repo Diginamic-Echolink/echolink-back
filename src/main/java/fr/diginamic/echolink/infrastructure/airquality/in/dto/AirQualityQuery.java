@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  *
  * @param recordedAt date and time when the air quality data was recorded
  * @param particles10 concentration of PM10 particles
- * @param particle25 concentration of PM2.5 particles
+ * @param particles25 concentration of PM2.5 particles
  * @param euAqi European Air Quality Index value
  * @param carbonMonoxide concentration of carbon monoxide
  * @param ozone concentration of ozone
@@ -32,7 +32,7 @@ public record AirQualityQuery(
         float particles10,
 
         @Schema(description = "Concentration of PM2.5 particles (µg/m³)", example = "8.3")
-        float particle25,
+        float particles25,
 
         @Schema(
                 description = "European Air Quality Index value (0-100)",

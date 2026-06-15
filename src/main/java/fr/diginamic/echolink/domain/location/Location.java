@@ -8,8 +8,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,12 +26,14 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = "location")
 public class Location {
 
     /** Unique identifier of the Location. */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @EqualsAndHashCode.Include
     private UUID id;
 
     /** Location's name */
@@ -54,8 +60,13 @@ public class Location {
     @Column(name = "population")
     private long population;
 
-    /** Profile lived within this location. */
-    @OneToMany(mappedBy="location")
+    /** User that defined this location as favorite. */
+    @ManyToMany
+    @JoinTable(
+            name = "profile_favorite_locations",
+            joinColumns = @JoinColumn(name = "location_id"),
+            inverseJoinColumns = @JoinColumn(name = "profile_id")
+    )
     private Set<Profile> profiles = new HashSet<>();
 
     /** AirQuality link within this location. */

@@ -13,6 +13,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
@@ -36,6 +37,12 @@ public class Message {
     @Column(name="text", length = 10000)
     private String text;
 
+    /**
+     * Date and time when the message was created.
+     */
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
     /** Thread to which this message belongs */
     @ManyToOne
     @JoinColumn(name="thread_id")
@@ -53,11 +60,13 @@ public class Message {
      * Constructs a new Message.
      *
      * @param text content of the message
+     * @param createdAt date and time of creation
      * @param profile author of the message
      * @param thread thread in which the message is posted
      */
-    public Message(String text, Profile profile, Thread thread) {
+    public Message(String text, LocalDateTime createdAt, Profile profile, Thread thread) {
         this.text = text;
+        this.createdAt = createdAt;
         this.profile = profile;
         this.thread = thread;
     }

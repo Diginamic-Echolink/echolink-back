@@ -17,7 +17,7 @@ public final class ProfileTestData {
         profile.setLastName("Doe");
         profile.setPseudo("jdoe");
         profile.setRole(ProfileRole.USER);
-        profile.setLocation(givenLocation1());
+        profile.getFavoriteLocations().add(givenLocation1());
         return profile;
     }
 
@@ -29,7 +29,7 @@ public final class ProfileTestData {
         profile.setLastName("Doe");
         profile.setPseudo("jdoe");
         profile.setRole(ProfileRole.USER);
-        profile.setLocation(givenLocation1());
+        profile.getFavoriteLocations().add(givenLocation1());
         return profile;
     }
 
@@ -41,10 +41,8 @@ public final class ProfileTestData {
         profile.setLastName("Martin");
         profile.setPseudo("amartin");
         profile.setRole(ProfileRole.USER);
-        profile.setCity("Lyon");
         profile.setPostalCode("69000");
-        profile.setPhoneNumber("0612345678");
-        profile.setLocation(givenLocation2());
+        profile.getFavoriteLocations().add(givenLocation2());
         return profile;
     }
 
@@ -57,10 +55,10 @@ public final class ProfileTestData {
         profile.setLastName("Durand");
         profile.setPseudo("admin");
         profile.setRole(ProfileRole.ADMIN);
-        profile.setCity("Paris");
         profile.setPostalCode("75001");
         profile.setPhoneNumber("0699999999");
-        profile.setLocation(givenLocation3());
+        profile.getFavoriteLocations().add(givenLocation1());
+        profile.getFavoriteLocations().add(givenLocation3());
         return profile;
     }
 

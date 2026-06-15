@@ -22,10 +22,15 @@ public class MessageQueryMapper {
      */
     public MessageQuery toQuery(Message message) {
 
+        String profileId = message.getProfile() != null
+                ? message.getProfile().getId().toString()
+                : null;
+
         return new MessageQuery(
                 message.getId().toString(),
                 message.getText(),
-                message.getProfile().getId().toString(),
+                message.getCreatedAt(),
+                profileId,
                 message.getThread().getId().toString()
         );
     }

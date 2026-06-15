@@ -1,14 +1,22 @@
 package fr.diginamic.echolink.infrastructure.profile.in.mapper;
 
 import fr.diginamic.echolink.domain.profile.Profile;
+import fr.diginamic.echolink.infrastructure.location.in.mapper.LocationQueryMapper;
 import fr.diginamic.echolink.infrastructure.profile.in.dto.ProfileQuery;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
  * Maps profile domain objects to profile query DTOs.
  */
 @Component
+@RequiredArgsConstructor
 public class ProfileQueryMapper {
+
+    /**
+     * Mapper used to convert location domain objects into query DTOs.
+     */
+    private final LocationQueryMapper locationQueryMapper;
 
     /**
      * Converts a profile domain object into a profile query DTO.
@@ -24,11 +32,13 @@ public class ProfileQueryMapper {
                 profile.getLastName(),
                 profile.getPseudo(),
                 profile.getEmail(),
-                profile.getCity(),
                 profile.getPostalCode(),
-                profile.getAddress(),
                 profile.getPhoneNumber(),
-                profile.getLinkImgProfile()
+                profile.getLinkImgProfile(),
+                profile.getRole().toString(),
+                profile.getFavoriteLocations().stream()
+                        .map(locationQueryMapper::toQuery)
+                        .toList()
         );
     }
 }

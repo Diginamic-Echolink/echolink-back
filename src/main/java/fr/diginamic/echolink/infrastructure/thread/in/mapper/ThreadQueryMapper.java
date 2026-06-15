@@ -18,13 +18,17 @@ public class ThreadQueryMapper {
      */
     public ThreadQuery toQuery(Thread thread) {
 
+        String profileId = thread.getProfile() != null
+                ? thread.getProfile().getId().toString()
+                : null;
+
         return new ThreadQuery(
                 thread.getId().toString(),
                 thread.getTitle(),
                 thread.getSubject(),
                 thread.getCreatedAt(),
                 thread.getSection().getId().toString(),
-                thread.getProfile().getId().toString()
+                profileId
         );
     }
 }

@@ -3,6 +3,8 @@ package fr.diginamic.echolink.application.thread.port.in;
 import fr.diginamic.echolink.domain.section.exception.SectionNotFoundException;
 import fr.diginamic.echolink.domain.thread.Thread;
 import fr.diginamic.echolink.domain.thread.exception.ThreadNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.UUID;
@@ -22,10 +24,21 @@ public interface ThreadGetUseCase {
     Thread getById(UUID id) throws ThreadNotFoundException;
 
     /**
-     * Retrieves all threads associated with a section.
+     * Retrieves all threads belonging to a given section.
      *
      * @param sectionId unique identifier of the section
-     * @return list of threads belonging to the section
+     * @return paginated list of threads
+     * @throws SectionNotFoundException if the section does not exist
      */
     List<Thread> getAllBySectionId(UUID sectionId) throws SectionNotFoundException;
+
+    /**
+     * Retrieves paginated threads belonging to a given section.
+     *
+     * @param sectionId unique identifier of the section
+     * @param pageable pagination and sorting information
+     * @return paginated list of threads
+     * @throws SectionNotFoundException if the section does not exist
+     */
+    Page<Thread> getAllBySectionId(UUID sectionId, Pageable pageable) throws SectionNotFoundException;
 }

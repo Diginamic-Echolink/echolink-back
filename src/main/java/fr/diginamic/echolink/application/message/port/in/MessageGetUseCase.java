@@ -3,6 +3,8 @@ package fr.diginamic.echolink.application.message.port.in;
 import fr.diginamic.echolink.domain.message.Message;
 import fr.diginamic.echolink.domain.message.exception.MessageNotFoundException;
 import fr.diginamic.echolink.domain.thread.exception.ThreadNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.UUID;
@@ -32,4 +34,14 @@ public interface MessageGetUseCase {
      * @throws ThreadNotFoundException if the thread does not exist
      */
     List<Message> getAllByThreadId(UUID id) throws ThreadNotFoundException;
+
+    /**
+     * Retrieves paginated messages belonging to a thread.
+     *
+     * @param threadId unique identifier of the thread
+     * @param pageable pagination and sorting information
+     * @return paginated list of messages
+     * @throws ThreadNotFoundException if thread does not exist
+     */
+    Page<Message> getAllByThreadId(UUID threadId, Pageable pageable) throws ThreadNotFoundException;
 }

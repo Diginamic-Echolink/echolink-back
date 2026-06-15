@@ -1,9 +1,14 @@
 package fr.diginamic.echolink.application.profile.service;
 
+import fr.diginamic.echolink.application.location.port.out.LocationRepository;
+import fr.diginamic.echolink.application.message.port.out.MessageRepository;
 import fr.diginamic.echolink.application.profile.port.in.ProfileDeleteUseCase;
 import fr.diginamic.echolink.application.profile.port.in.ProfileGetUseCase;
 import fr.diginamic.echolink.application.profile.port.in.ProfileUpdateUseCase;
 import fr.diginamic.echolink.application.profile.port.out.ProfileRepository;
+import fr.diginamic.echolink.application.thread.port.out.ThreadRepository;
+import fr.diginamic.echolink.domain.location.Location;
+import fr.diginamic.echolink.domain.location.exception.LocationNotFoundException;
 import fr.diginamic.echolink.domain.profile.Profile;
 import fr.diginamic.echolink.domain.profile.ProfileUpdateRequest;
 import fr.diginamic.echolink.domain.profile.exception.ProfileNotAllowedException;
@@ -25,44 +30,39 @@ public class ProfileService implements ProfileGetUseCase, ProfileUpdateUseCase, 
     /**
      * Repository used to access profile data.
      */
-    private final ProfileRepository repository;
+    private final ProfileRepository profileRepository;
+
+    /**
+     * Repository used to access location data.
+     */
+    private final LocationRepository locationRepository;
+
+    /**
+     * Repository used to access message data.
+     */
+    private final MessageRepository messageRepository;
+
+    /**
+     * Repository used to access thread data.
+     */
+    private final ThreadRepository threadRepository;
 
     /**
      * Encoder used to hash passwords.
      */
     private final PasswordEncoder passwordEncoder;
 
-    /**
-     * Retrieves a profile by its unique identifier.
-     *
-     * @param id unique identifier of the profile
-     * @return the matching profile
-     * @throws ProfileNotFoundException if no profile is found with the specified identifier
-     */
     @Override
     public Profile getById(UUID id) throws ProfileNotFoundException {
-        return repository.getById(id)
+        return profileRepository.getById(id)
                 .orElseThrow(() -> new ProfileNotFoundException("Profile with id " + id + " not found"));
     }
 
-    /**
-     * Retrieves all available profiles.
-     *
-     * @return list of all profiles
-     */
     @Override
     public List<Profile> getAllProfiles() {
-        return repository.getAllProfiles();
+        return profileRepository.getAllProfiles();
     }
 
-    /**
-     * Updates an existing profile.
-     *
-     * @param id unique identifier of the profile to update
-     * @param request request containing updated profile information
-     * @return the updated profile
-     * @throws ProfileNotFoundException if no profile is found with the specified identifier
-     */
     @Override
     public Profile update(Profile user, UUID id, ProfileUpdateRequest request)
             throws ProfileNotFoundException, ProfileNotAllowedException {
@@ -81,23 +81,57 @@ public class ProfileService implements ProfileGetUseCase, ProfileUpdateUseCase, 
         if (request.password() != null && !request.password().isEmpty()) {
             profile.setPassword(passwordEncoder.encode(request.password()));
         }
-        profile.setCity(request.city());
         profile.setPostalCode(request.postalCode());
-        profile.setAddress(request.address());
         profile.setPhoneNumber(request.phoneNumber());
         profile.setLinkImgProfile(request.linkImgProfile());
-        return repository.save(profile);
+        return profileRepository.save(profile);
     }
 
-    /**
-     * Deletes a profile.
-     *
-     * @param id unique identifier of the profile to delete
-     * @throws ProfileNotFoundException if no profile is found with the specified identifier
-     */
     @Override
-    public void delete(UUID id) throws ProfileNotFoundException {
-        getById(id);
-        repository.delete(id);
+    public Profile addFavoriteLocation(Profile user, UUID profileId, UUID locationId)
+            throws ProfileNotFoundException, ProfileNotAllowedException, LocationNotFoundException {
+
+        if (!user.isAdmin() && !user.getId().equals(profileId)) {
+            throw new ProfileNotAllowedException("You are not allowed to modify this profile");
+        }
+
+        Profile profile = getById(profileId);
+
+        Location location = locationRepository.getById(locationId)
+                .orElseThrow(() -> new LocationNotFoundException("Location with id " + locationId + " not found"));
+
+        if (profile.getFavoriteLocations().size() >= 3) {
+            throw new ProfileNotAllowedException("Maximum 3 favorite locations allowed");
+        }
+
+        profile.getFavoriteLocations().add(location);
+
+        return profileRepository.save(profile);
+    }
+
+    @Override
+    public Profile removeFavoriteLocation(Profile user, UUID profileId, UUID locationId)
+            throws ProfileNotFoundException, ProfileNotAllowedException {
+
+        if (!user.isAdmin() && !user.getId().equals(profileId)) {
+            throw new ProfileNotAllowedException("You are not allowed to modify this profile");
+        }
+
+        Profile profile = getById(profileId);
+        profile.getFavoriteLocations().removeIf(l -> locationId.equals(l.getId()));
+
+        return profileRepository.save(profile);
+    }
+
+    @Override
+    public void delete(Profile user, UUID id) throws ProfileNotFoundException, ProfileNotAllowedException {
+        if (!user.isAdmin() && !user.getId().equals(id)) {
+            throw new ProfileNotAllowedException("You are not allowed to modify this profile");
+        }
+
+        Profile profile = getById(id);
+        messageRepository.removeProfileReferences(profile.getId());
+        threadRepository.removeProfileReferences(profile.getId());
+        profileRepository.delete(profile.getId());
     }
 }

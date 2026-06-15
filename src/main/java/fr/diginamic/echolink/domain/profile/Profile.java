@@ -13,7 +13,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -67,20 +69,8 @@ public class Profile implements UserDetails {
     /**
      * User's postal code.
      */
-    @Column(name = "city")
-    private String city;
-
-    /**
-     * User's postal code.
-     */
     @Column(name = "postal_code")
     private String postalCode;
-
-    /**
-     * User's postal address.
-     */
-    @Column(name = "address")
-    private String address;
 
     /**
      * User's phone number.
@@ -114,11 +104,16 @@ public class Profile implements UserDetails {
     private List<Message> messages = new ArrayList<>();
 
     /**
-     * Geographic location associated with the user profile.
+     * Favorite locations selected by the user.
+     * Maximum of 5 locations allowed.
      */
-    @ManyToOne
-    @JoinColumn(name = "location_id")
-    private Location location;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "profile_favorite_locations",
+            joinColumns = @JoinColumn(name = "profile_id"),
+            inverseJoinColumns = @JoinColumn(name = "location_id")
+    )
+    private Set<Location> favoriteLocations = new HashSet<>();
 
     public Profile() {}
 
@@ -160,9 +155,7 @@ public class Profile implements UserDetails {
                 ", lastName='" + lastName + '\'' +
                 ", pseudonym='" + pseudo + '\'' +
                 ", email='" + email + '\'' +
-                ", city='" + city + '\'' +
                 ", postalCode='" + postalCode + '\'' +
-                ", address='" + address + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", linkImgProfile='" + linkImgProfile + '\'' +
                 ", role=" + role +

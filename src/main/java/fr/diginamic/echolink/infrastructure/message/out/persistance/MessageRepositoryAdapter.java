@@ -4,6 +4,8 @@ import fr.diginamic.echolink.application.message.port.out.MessageRepository;
 import fr.diginamic.echolink.domain.message.Message;
 import fr.diginamic.echolink.infrastructure.message.out.persistance.repository.MessageJdbcRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -31,12 +33,30 @@ public class MessageRepositoryAdapter implements MessageRepository {
     }
 
     @Override
-    public List<Message> getAllByThreadId(UUID id) {
-        return repository.findAllByThreadId(id);
+    public List<Message> getAllByProfileId(UUID profileId) {
+        return repository.findAllByProfileId(profileId);
+    }
+
+    @Override
+    public List<Message> getAllByThreadId(UUID threadId) {
+        return repository.findAllByThreadId(threadId);
+    }
+
+    @Override
+    public Page<Message> getAllByThreadId(UUID threadId, Pageable pageable) {
+        return repository.findAllByThreadId(threadId, pageable);
     }
 
     @Override
     public Message save(Message message) {
         return repository.save(message);
+    }
+
+    @Override
+    public void removeProfileReferences(UUID profileId) {
+        getAllByProfileId(profileId).forEach(message -> {
+            message.setProfile(null);
+            repository.save(message);
+        });
     }
 }

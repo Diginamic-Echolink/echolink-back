@@ -54,7 +54,6 @@ public class MeteoController {
      * @return the weather data associated with the location
      */
     @GetMapping("/{locationId}")
-    @RolesAllowed({"ADMIN", "USER"})
     @Operation(
             operationId = "getLastMeteoByLocationId",
             summary = "Get latest weather data for a location",
@@ -102,7 +101,7 @@ public class MeteoController {
     @GetMapping("/all/{locationId}")
     @RolesAllowed({"ADMIN", "USER"})
     @Operation(
-            operationId = "getAllMeteosByLocationId",
+            operationId = "getAllMeteoByLocationId",
             summary = "Get all weather records for a location",
             description = "Returns the full history of weather data for the given location ID",
             responses = {
@@ -129,7 +128,7 @@ public class MeteoController {
                     )
             }
     )
-    public ResponseEntity<List<MeteoQuery>> getAllMeteosByLocationId(
+    public ResponseEntity<List<MeteoQuery>> getAllMeteoByLocationId(
             @Parameter(description = "Location UUID", required = true) @PathVariable UUID locationId
     ) throws LocationNotFoundException, MeteoNotFoundException {
 

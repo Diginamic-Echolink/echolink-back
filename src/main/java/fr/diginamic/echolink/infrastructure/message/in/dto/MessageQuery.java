@@ -2,6 +2,8 @@ package fr.diginamic.echolink.infrastructure.message.in.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.time.LocalDateTime;
+
 /**
  * DTO representing a message returned by the API.
  * <p>
@@ -10,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  *
  * @param id unique identifier of the message
  * @param text content of the message
+ * @param createdAt date and time when the message was created
  * @param profileId identifier of the author profile
  * @param threadId identifier of the thread containing the message
  */
@@ -27,6 +30,12 @@ public record MessageQuery(
                 example = "Hello everyone!"
         )
         String text,
+
+        @Schema(
+                description = "Message creation date",
+                example = "2026-06-10T14:30:00"
+        )
+        LocalDateTime createdAt,
 
         @Schema(
                 description = "Author profile UUID",

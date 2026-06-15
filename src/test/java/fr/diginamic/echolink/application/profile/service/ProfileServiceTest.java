@@ -1,6 +1,10 @@
 package fr.diginamic.echolink.application.profile.service;
 
+import fr.diginamic.echolink.application.location.port.out.LocationRepository;
+import fr.diginamic.echolink.application.message.port.out.MessageRepository;
 import fr.diginamic.echolink.application.profile.port.out.ProfileRepository;
+import fr.diginamic.echolink.application.thread.port.out.ThreadRepository;
+import fr.diginamic.echolink.domain.location.Location;
 import fr.diginamic.echolink.domain.profile.Profile;
 import fr.diginamic.echolink.domain.profile.ProfileRole;
 import fr.diginamic.echolink.domain.profile.ProfileUpdateRequest;
@@ -17,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static fr.diginamic.echolink.domain.location.LocationTestData.givenLocation1;
 import static fr.diginamic.echolink.domain.profile.ProfileTestData.givenProfile1;
 import static fr.diginamic.echolink.domain.profile.ProfileTestData.givenProfile2;
 import static fr.diginamic.echolink.domain.profile.ProfileTestData.givenProfile3;
@@ -37,6 +42,12 @@ class ProfileServiceTest {
 
     @Mock
     private ProfileRepository repository;
+    @Mock
+    private LocationRepository locationRepository;
+    @Mock
+    private MessageRepository messageRepository;
+    @Mock
+    private ThreadRepository threadRepository;
     @Mock
     private PasswordEncoder passwordEncoder;
     @InjectMocks
@@ -133,9 +144,7 @@ class ProfileServiceTest {
         assertThat(result.getPseudo()).isEqualTo(request.pseudo());
         assertThat(result.getEmail()).isEqualTo(request.email());
         assertThat(result.getPassword()).isEqualTo("encodedPassword");
-        assertThat(result.getCity()).isEqualTo(request.city());
         assertThat(result.getPostalCode()).isEqualTo(request.postalCode());
-        assertThat(result.getAddress()).isEqualTo(request.address());
         assertThat(result.getPhoneNumber()).isEqualTo(request.phoneNumber());
         assertThat(result.getLinkImgProfile()).isEqualTo(request.linkImgProfile());
 
@@ -171,9 +180,7 @@ class ProfileServiceTest {
         assertThat(result.getLastName()).isEqualTo(request.lastName());
         assertThat(result.getPseudo()).isEqualTo(request.pseudo());
         assertThat(result.getPassword()).isEqualTo("newEncodedPassword");
-        assertThat(result.getCity()).isEqualTo(request.city());
         assertThat(result.getPostalCode()).isEqualTo(request.postalCode());
-        assertThat(result.getAddress()).isEqualTo(request.address());
         assertThat(result.getPhoneNumber()).isEqualTo(request.phoneNumber());
         assertThat(result.getLinkImgProfile()).isEqualTo(request.linkImgProfile());
 
@@ -206,9 +213,7 @@ class ProfileServiceTest {
         assertThat(result.getLastName()).isEqualTo(request.lastName());
         assertThat(result.getPseudo()).isEqualTo(request.pseudo());
         assertThat(result.getEmail()).isEqualTo(request.email());
-        assertThat(result.getCity()).isEqualTo(request.city());
         assertThat(result.getPostalCode()).isEqualTo(request.postalCode());
-        assertThat(result.getAddress()).isEqualTo(request.address());
         assertThat(result.getPhoneNumber()).isEqualTo(request.phoneNumber());
         assertThat(result.getLinkImgProfile()).isEqualTo(request.linkImgProfile());
 
@@ -241,9 +246,7 @@ class ProfileServiceTest {
         assertThat(result.getLastName()).isEqualTo(request.lastName());
         assertThat(result.getPseudo()).isEqualTo(request.pseudo());
         assertThat(result.getEmail()).isEqualTo(request.email());
-        assertThat(result.getCity()).isEqualTo(request.city());
         assertThat(result.getPostalCode()).isEqualTo(request.postalCode());
-        assertThat(result.getAddress()).isEqualTo(request.address());
         assertThat(result.getPhoneNumber()).isEqualTo(request.phoneNumber());
         assertThat(result.getLinkImgProfile()).isEqualTo(request.linkImgProfile());
 
@@ -299,33 +302,106 @@ class ProfileServiceTest {
     }
 
     @Test
-    void should_delete_profile() throws ProfileNotFoundException {
+    void should_add_favorite_location() throws Exception {
         // GIVEN
-        UUID id = givenUUID();
+        Profile user = givenProfile1();
+        UUID profileId = user.getId();
+        Location location = givenLocation1();
 
-        when(repository.getById(id))
-                .thenReturn(Optional.of(givenProfile1()));
+        when(repository.getById(profileId)).thenReturn(Optional.of(user));
+        when(locationRepository.getById(location.getId())).thenReturn(Optional.of(location));
+        when(repository.save(user)).thenReturn(user);
 
         // WHEN
-        service.delete(id);
+        Profile result = service.addFavoriteLocation(user, profileId, location.getId());
 
         // THEN
-        verify(repository).delete(id);
+        assertThat(result.getFavoriteLocations()).contains(location);
+
+        verify(repository).save(user);
+    }
+
+    @Test
+    void should_throw_exception_when_more_than_3_favorites() {
+        // GIVEN
+        Profile user = givenProfile1();
+        UUID profileId = user.getId();
+
+        for (int i = 0; i < 3; i++) {
+            Location loc = new Location();
+            loc.setId(UUID.randomUUID());
+            user.getFavoriteLocations().add(loc);
+        }
+
+        Location newLocation = givenLocation1();
+        UUID newId = givenUUID();
+
+        when(repository.getById(profileId)).thenReturn(Optional.of(user));
+        when(locationRepository.getById(newId)).thenReturn(Optional.of(newLocation));
+
+        // WHEN / THEN
+        assertThatThrownBy(() ->
+                service.addFavoriteLocation(user, profileId, newId))
+                .isInstanceOf(ProfileNotAllowedException.class)
+                .hasMessage("Maximum 3 favorite locations allowed");
+    }
+
+    @Test
+    void should_remove_favorite_location() throws Exception {
+        // GIVEN
+        Profile user = givenProfile1();
+        UUID profileId = user.getId();
+
+        Location location = givenLocation1();
+        location.setId(givenUUID());
+
+        user.getFavoriteLocations().add(location);
+
+        when(repository.getById(profileId)).thenReturn(Optional.of(user));
+        when(repository.save(user)).thenReturn(user);
+
+        // WHEN
+        Profile result = service.removeFavoriteLocation(user, profileId, location.getId());
+
+        // THEN
+        assertThat(result.getFavoriteLocations()).doesNotContain(location);
+
+        verify(repository).save(user);
+    }
+
+    @Test
+    void should_delete_profile() throws ProfileNotFoundException, ProfileNotAllowedException {
+        // GIVEN
+        Profile user = givenProfile1();
+
+        when(repository.getById(user.getId()))
+                .thenReturn(Optional.of(user));
+
+        // WHEN
+        service.delete(user, user.getId());
+
+        // THEN
+        verify(messageRepository).removeProfileReferences(user.getId());
+        verify(threadRepository).removeProfileReferences(user.getId());
+        verify(repository).delete(user.getId());
     }
 
     @Test
     void should_throw_exception_when_deleting_unknown_profile() {
         // GIVEN
-        UUID id = givenUUID();
+        Profile user = givenProfile1();
+        UUID id = user.getId();
 
         when(repository.getById(id))
                 .thenReturn(Optional.empty());
 
         // WHEN / THEN
-        assertThatThrownBy(() -> service.delete(id))
+        assertThatThrownBy(() -> service.delete(user, id))
                 .isInstanceOf(ProfileNotFoundException.class)
                 .hasMessage("Profile with id " + id + " not found");
 
+        verify(messageRepository, never()).removeProfileReferences(any());
+        verify(threadRepository, never()).removeProfileReferences(any());
         verify(repository, never()).delete(any());
     }
 }
